@@ -332,12 +332,13 @@ public class GameRenderer {
         }
     }
 
-    public void renderNPCs(SpriteBatch batch, ArrayList<NPC> allNPCs, float deltaTime) {
+    public void renderNPCs(SpriteBatch batch, float deltaTime) {
         if (allNPCs == null) {
             Logger.log("NPCs is null");
             return;
         }
-        for (NPC npc : allNPCs) {
+        for (int i=0; i<allNPCs.size(); i++) {
+            NPC npc = allNPCs.get(i);
             npc.render(batch, deltaTime);
         }
     }
@@ -588,7 +589,7 @@ public class GameRenderer {
         });
     }
 
-    private float lightRadius = 200.0f; // Radius des beleuchteten Bereichs
+    private float lightRadius = 250.0f; // Radius des beleuchteten Bereichs
     private float fadeStart = 600.0f;  // Fade-Distanz
     private final Vector2 playerScreenPos = new Vector2(); // Position des Spielers auf dem Bildschirm
     private float altZOOM = 1;

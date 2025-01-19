@@ -47,7 +47,7 @@ public class StartScreen implements Screen {
         // set input to  stage, so that we can catch UI events
         Gdx.input.setInputProcessor(stage);
 
-        // skin - default UI skin TODO: find more beautiful skins
+        // skin - default UI skin
         Skin skin = new Skin(Gdx.files.internal("ui/skin/freezing-ui.json"));
 
         // Title Label
@@ -74,7 +74,7 @@ public class StartScreen implements Screen {
         });
 
         serverSelectBox = new SelectBox<>(skin);
-        serverSelectBox.setItems("Thomas' Server (v3.1)", "Local Server"); // 设置选项
+        serverSelectBox.setItems("Thomas' Server (v3.3)", "Local Server (v3.4)"); // 设置选项
         serverSelectBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -131,14 +131,14 @@ public class StartScreen implements Screen {
 
         String selectedServerUrl;
         switch (selectedServer){
-            case "Thomas' Server":
+            case "Thomas' Server (v3.3)":
                 selectedServerUrl="http://www.thomas-hub.com:9595";
                 break;
-            case "Local Server":
+            case "Local Server (v3.4)":
                 selectedServerUrl="http://localhost:9595";
                 break;
             default:
-                selectedServerUrl="http://www.thomas-hub.com:9595";
+                selectedServerUrl="http://localhost:9595";
                 break;
         }
         if (isDevelopmentMode) {
@@ -167,6 +167,9 @@ public class StartScreen implements Screen {
         // clear screen
         Gdx.gl.glClearColor(0.439f, 0.5f, 0.5625f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        viewport.apply();
+        batch.setProjectionMatrix(viewport.getCamera().combined);
         batch.begin();
         batch.draw(texture,
             0, 0,

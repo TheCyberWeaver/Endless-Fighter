@@ -6,7 +6,7 @@ The game contains several screens
 Screens:
 StartScreen
 MainGameScreen
-TODO: EndGameScreen
+EndGameScreen
  */
 public class Main extends Game {
     private String username;
@@ -14,7 +14,7 @@ public class Main extends Game {
     private String serverUrl;
 
 
-    public String  clientVersion="v3.2";
+    public String  clientVersion="v3.4";
     /*
         create() will be called once the application is started
      */

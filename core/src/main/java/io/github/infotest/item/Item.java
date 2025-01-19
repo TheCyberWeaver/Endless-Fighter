@@ -1,6 +1,7 @@
 package io.github.infotest.item;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import io.github.infotest.util.MyAssetManager;
 
 public abstract class Item {
@@ -9,8 +10,10 @@ public abstract class Item {
     public String description;
     private Texture texture; // Texture, wie das Item im Inventory/ market aussieht // ItemTexture: 14x14 Pixel
 
-    public Item(String name, String description, Texture texture) {
+    public Item(String id,String name, String description, Texture texture) {
         this.name = name;
+        this.id=id;
+        this.description=description;
         this.texture = texture;
     }
 
@@ -26,8 +29,11 @@ public abstract class Item {
         return texture;
     }
 
+    public void render(Batch batch, float x, float y,float scale) {
+        batch.draw(texture, x, y, 80*scale, 80*scale);
+    }
     @Override
     public String toString(){
-        return name;
+        return id;
     }
 }

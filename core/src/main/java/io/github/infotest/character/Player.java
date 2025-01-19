@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector2;
-import io.github.infotest.Main;
 import io.github.infotest.item.Item;
 import io.github.infotest.util.Factory.ItemFactory;
 import io.github.infotest.util.Logger;
@@ -33,7 +32,9 @@ public abstract class Player extends Actor{
     protected float maxMana;
     protected float manaRegen = 2f;
 
-    protected int INV_SIZE = 5;
+    protected int gold=0;
+
+    protected int INV_SIZE = 7;
 
     protected float ausdauer;
     protected float maxAusdauer;
@@ -53,11 +54,21 @@ public abstract class Player extends Actor{
     protected Vector2 spawnpoint;
     protected Vector2 lastDeathPos;
 
-    protected float timeSinceLastT1Skill;
+
 
     //Assassin Att
     protected boolean seeAllActive = false;
 
+    // Speech bubble fields
+    private String speechBubbleMessage = null;
+    private boolean isSpeechBubbleVisible = false;
+    private float speechBubbleTimer = 0f;
+    private float speechBubbleDuration = 4f;  // how many seconds to show
+    // near top of Player class
+    protected GlyphLayout glyphLayout = new GlyphLayout();
+
+    protected float T1CoolDownTime =0f;
+    protected float timeSinceLastT1Skill;
 
     public Player(String id, String name, String className, int maxHealthPoints, int maxMana, int maxAusdauer, Vector2 initialPosition, float speed) {
         super(maxHealthPoints,initialPosition,speed);
@@ -98,15 +109,61 @@ public abstract class Player extends Actor{
     @Override
     public void render(Batch batch, float delta) {
         Vector2 predictedPosition = predictPosition();
+        //1. draw texture if player has texture
         if (texture != null) {
             batch.draw(texture, predictedPosition .x, predictedPosition .y,32,32);
         }
-        //Logger.log(name);
-        //calculate name width
-
+        //2. render Player name
         GlyphLayout layout = new GlyphLayout(font, name);
         float textWidth = layout.width;
         font.draw(batch, name, predictedPosition.x + (CELL_SIZE /2f) - textWidth/2f  , predictedPosition.y + 80);
+
+        // 3) Speech bubble logic
+        if (isSpeechBubbleVisible && speechBubbleMessage != null) {
+            // Update timer
+            speechBubbleTimer += delta;
+            if (speechBubbleTimer > speechBubbleDuration) {
+                // Hide bubble
+                isSpeechBubbleVisible = false;
+            } else {
+                // STILL VISIBLE, so draw it.
+
+                // (A) Measure text
+                glyphLayout.setText(font, speechBubbleMessage);
+                float bubbleTextWidth = glyphLayout.width;
+                float bubbleTextHeight = glyphLayout.height;
+
+                // (B) Decide bubble position
+                // Top-right of the player => offset from predictedPosition
+                float offsetX = 40f; // shift to right
+                float offsetY = 80f; // shift upwards from the player's sprite
+                float bubbleX = predictedPosition.x + offsetX;
+                float bubbleY = predictedPosition.y + offsetY;
+
+                // (C) Define bubble rect size with some padding
+                float padding = 8f;
+                float bubbleWidth  = bubbleTextWidth + padding * 2;
+                float bubbleHeight = bubbleTextHeight + padding * 2;
+
+                // (D) Optional: draw a background shape using a 1×1 white texture with alpha
+                // e.g., MyAssetManager.getWhitePixel()
+                Texture whitePixel = new Texture("ui/whitePixel.png");
+
+                // Set color for tinted draw (e.g., semi‐transparent black)
+                batch.setColor(0f, 0f, 0f, 0.7f); // black with 70% alpha
+                batch.draw(whitePixel, bubbleX, bubbleY,
+                    bubbleWidth, bubbleHeight);
+
+                // Reset color so the subsequent text is not tinted
+                batch.setColor(1f, 1f, 1f, 1f);
+
+                // (E) Draw text inside bubble
+                float textX = bubbleX + padding;
+                float textY = bubbleY + bubbleHeight - padding;
+                font.draw(batch, glyphLayout, textX, textY);
+            }
+        }
+
         updateTileUnderID();
     }
 
@@ -212,9 +269,31 @@ public abstract class Player extends Actor{
             this.clearInv();
         }
     }
+    public void showMessage(String message,ServerConnection serverConnection) {
+        showMessage(message);
+        serverConnection.sendShowPlayerMessage(this,message);
+    }
+    public void showMessage(String message) {
+        // 1) Store the message
+        this.speechBubbleMessage = message;
+        this.isSpeechBubbleVisible = true;
 
+        // 2) Reset the timer
+        this.speechBubbleTimer = 0f;
+
+        // For debugging
+        System.out.println("[Player Debug]: " + name + " says: " + message);
+    }
+
+    public abstract Texture getMainSkillSymbol();
 
     /// Getter / Setter
+    public float getT1SkillCoolDownTime(){
+        return T1CoolDownTime;
+    }
+    public float getT1SkillCoolDownTimer(){
+        return timeSinceLastT1Skill;
+    }
     public String getClassName() {
         return className;
     }
@@ -279,14 +358,17 @@ public abstract class Player extends Actor{
     public void setId(String id) {
         this.id = id;
     }
-    public void updateItemFromPlayerData(String[] playerDataItems, MyAssetManager assetManager) {
-        for (String itemName : playerDataItems) {
-            Item item = ItemFactory.createItem(itemName, assetManager);
-            items.add(item);
+    public void updateItems(ArrayList<String> itemIDs,MyAssetManager assetManager){
+        for(int i = 0; i < itemIDs.size(); i++){
+            items.set(i % INV_SIZE, ItemFactory.createItem(itemIDs.get(i), assetManager));
+        }
+        for(int i = itemIDs.size(); i < INV_SIZE; i++){
+            items.set(i % INV_SIZE, null);
         }
     }
     public void kill(ServerConnection serverConnection) {
         super.kill();
+        this.gold=0;
         serverConnection.sendPlayerDeath(this);
     }
     public void setRotation(Vector2 rotation) {
@@ -320,5 +402,13 @@ public abstract class Player extends Actor{
 
     public boolean isSeeAllActive() {
         return seeAllActive;
+    }
+
+    public int getGold() {
+        return gold;
+    }
+
+    public void updateGold(int gold) {
+        this.gold = gold;
     }
 }

@@ -22,7 +22,7 @@ public class Player {
     public Position position;
 
     /**
-     * The items that the player is currently carrying
+     * The item that the player is currently carrying
      */
     public ArrayList<String> itemIDs;
 
@@ -47,6 +47,7 @@ public class Player {
     public Position rotation;
 
     public String lastAttackedBy = "[Nothing]";
+    public int gold;
 
     public Player(String id, String name) {
         this.id = id;
@@ -58,6 +59,7 @@ public class Player {
         this.classtype = "";
         this.level = 0;
         this.mana = 0;
+        this.gold=100;
         this.isAlive = true;
     }
 
@@ -83,12 +85,25 @@ public class Player {
         this.level = l;
     }
 
-    public void pickItem(String item) {
-        itemIDs.add(item);
+    public void pickItem(String itemID) {
+        boolean picked=false;
+        for(int i=0;i<itemIDs.size();i++) {
+            if(itemIDs.get(i)==null) {
+                itemIDs.set(i,itemID);
+                picked=true;
+            }
+        }
+        if(!picked) {
+            itemIDs.add(itemID);
+        }
     }
 
-    public void dropItem(String item) {
-        itemIDs.remove(item);
+    public void dropItem(String itemID) {
+        for(int i=0;i<itemIDs.size();i++) {
+            if(itemIDs.get(i)==itemID) {
+                itemIDs.set(i,null);
+            }
+        }
     }
 
     public void takeDamage(float damage) {
