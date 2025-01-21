@@ -26,7 +26,7 @@ public abstract class Gegner extends  Actor{
     }
 
 
-    public Player findPlayer(){
+    public Player findPlayer(HashMap allPlayers){
 //        if (allPlayers == null){
 //            return null;
 //        } else{
