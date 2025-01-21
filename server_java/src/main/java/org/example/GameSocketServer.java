@@ -5,6 +5,7 @@ package org.example;
  */
 import com.corundumstudio.socketio.*;
 import com.google.gson.*;
+import org.example.character.Gegner;
 import org.example.character.Player;
 import org.example.character.NPC;
 import org.example.util.MapCreator;
@@ -29,15 +30,19 @@ public class GameSocketServer {
     public static int numOfValidTextures = 4;
     public static int[][] GAME_MAP=new int[MAP_SIZE][MAP_SIZE];
 
-    //NPC
-    private static ArrayList<NPC> npcs= new ArrayList<>();
+
 
     private static boolean needPlayerUpdate = true;
     private static boolean needNPCUpdate = true;
+    private static boolean needGegnerUpdate = true;
     /**
      * Stores all connected players
      */
     private static final Map<String, Player> players = new ConcurrentHashMap<>();
+    //NPC
+    private static ArrayList<NPC> npcs= new ArrayList<>();
+
+    private static ArrayList<Gegner> gegners= new ArrayList<>();
 
     private static SocketIOServer server;
     public static void runServer() {
@@ -311,6 +316,10 @@ public class GameSocketServer {
                 // 定时广播：此处如果只做广播，则无需更新逻辑，仅调用 broadcastAllPlayers
                 broadcastAllPlayers(server);
 
+                for(Gegner gegner : gegners) {
+                    gegner.update();
+                }
+
                 // 控制广播频率，比如每 1 秒广播一次
                 try {
                     Thread.sleep(16);  //
@@ -332,6 +341,7 @@ public class GameSocketServer {
         MapCreator mapCreator=new MapCreator(seed);
         mapCreator.initializePerlinNoiseMap();
         npcs = mapCreator.spawnNPCs();
+        gegners = mapCreator.spawnGegners();
     }
 
     private static void broadcastDeathMessage(SocketIOServer server, String deathMessage,String targetId){
@@ -348,6 +358,10 @@ public class GameSocketServer {
         if(needNPCUpdate){
             server.getBroadcastOperations().sendEvent("updateAllNPCs", npcs);
             needNPCUpdate=false;
+        }
+        if(needGegnerUpdate){
+            server.getBroadcastOperations().sendEvent("updateAllGegners", gegners);
+            //needGegnerUpdate=false;
         }
     }
 
