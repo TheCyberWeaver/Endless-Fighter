@@ -6,23 +6,20 @@ The game contains several screens
 Screens:
 StartScreen
 MainGameScreen
-TODO: EndGameScreen
+EndGameScreen
  */
 public class Main extends Game {
     private String username;
     private String playerClass;
     private String serverUrl;
-    public static boolean isDevelopmentMode=true;
-
-    public String  clientVersion="v3.2";
 
 
+    public String  clientVersion="v3.4";
     /*
         create() will be called once the application is started
      */
     @Override
     public void create() {
-
         setScreen(new StartScreen(this)); //set to start screen
     }
 
@@ -35,6 +32,9 @@ public class Main extends Game {
         this.serverUrl=selectedServerUrl;
         // switch to gaming screen
         setScreen(new MainGameScreen(this));
+    }
+    public void endGame(float survivalTime) {
+        setScreen(new EndScreen(this, survivalTime));
     }
 
     public String getUsername() {

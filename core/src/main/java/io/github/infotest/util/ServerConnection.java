@@ -1,10 +1,14 @@
 package io.github.infotest.util;
 
 import com.badlogic.gdx.math.Vector2;
+import io.github.infotest.character.Gegner;
 import io.github.infotest.character.Player;
 import io.github.infotest.character.NPC;
+import io.github.infotest.item.Item;
+import io.github.infotest.util.DataObjects.GegnerData;
 import io.github.infotest.util.DataObjects.NPCData;
 import io.github.infotest.util.DataObjects.PlayerData;
+import io.github.infotest.util.Factory.GegnerFactory;
 import io.github.infotest.util.Factory.NPCFactory;
 import io.github.infotest.util.Factory.PlayerFactory;
 import io.socket.client.IO;
@@ -13,7 +17,6 @@ import io.socket.emitter.Emitter;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -36,10 +39,10 @@ public class ServerConnection {
     // key is socketId
     // value is player object
 
-    private String clientVersion;
+    private final String clientVersion;
 
 
-    private MyAssetManager assetManager;
+    private final MyAssetManager assetManager;
 
     public interface SeedListener {
         void onSeedReceived(int seed);
@@ -77,9 +80,9 @@ public class ServerConnection {
                 @Override
                 public void call(Object... args) {
                     if (args.length > 1 && args[1] instanceof JSONObject) {
-                        Logger.log("[ServerConnection Debug]: "+args[0].toString());
+                        //Logger.log("[ServerConnection Debug]: "+args[0].toString());
                         JSONObject data = (JSONObject) args[1];
-                        Logger.log("[ServerConnection INFO] Received init data: " + data.toString());
+                        Logger.log("[ServerConnection INFO] Received init data: " + data);
                         try{
                             initClient(data);
                         }catch (Exception e){
@@ -91,11 +94,18 @@ public class ServerConnection {
                         Logger.log("[ServerConnection ERROR]: Received init event with invalid data");
                     }
                 }
-            }).on("updateAllPlayers", new Emitter.Listener() {
+            });
+
+            socket.on("updateAllPlayers", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    if (args.length > 0 && args[0] instanceof JSONObject) {
-                        String updatedPlayersJson = args[0].toString();
+                    if (args.length > 0  && hasInitializedMap) {
+                        String updatedPlayersJson;
+                        if(args[0].toString().equals("updateAllPlayers")){  //DO NOT try to optimize any of this code, only god and I knew how it worked.
+                            updatedPlayersJson = args[1].toString();
+                        }else{
+                            updatedPlayersJson = args[0].toString();
+                        }
                         // Logger.log("[ServerConnection Debug]: "+updatedPlayersJson);
                         //   - key: socketId (e.g., "socketId_1")
                         //   - value: <PlayerData>
@@ -115,14 +125,24 @@ public class ServerConnection {
                 @Override
                 public void call(Object... args) {
 //                    if (args.length > 0 && args[0] instanceof JSONObject) {
-                    if(args.length > 0){
-                        String updatedNPCsJson = args[0].toString();
+                    if(args.length > 0 && hasInitializedMap){
+                        // DO NOT optimize any of this code, only god knew why it worked.
+                        // Therefore, if you are trying to optimize this routine, and it fails (most surely),
+                        // please increase this counter as a warning for the next person:
+                        // total_hours_wasted_here = 5
+                        String updatedNPCsJson;
+                        if(args[0].toString().equals("updateAllNPCs")){
+                            updatedNPCsJson = args[1].toString();
+                        }else{
+                            updatedNPCsJson = args[0].toString();
+                        }
+
                         //Logger.log("[ServerConnection Debug]: "+updatedNPCsJson);
                         //   - key: socketId (e.g., "socketId_1")
                         //   - value: <NPCData>
                         Gson gson = new Gson();
-                        Type typeOfHashMap = new TypeToken<ArrayList<NPCData>>(){}.getType();
-                        ArrayList<NPCData> NPCsList = gson.fromJson(updatedNPCsJson, typeOfHashMap);
+                        Type type = new TypeToken<ArrayList<NPCData>>(){}.getType();
+                        ArrayList<NPCData> NPCsList = gson.fromJson(updatedNPCsJson, type);
 
                         updateNPCs(NPCsList);
                     }
@@ -132,10 +152,51 @@ public class ServerConnection {
 
 
                 }
+            }).on("updateAllGegners", new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+//                    if (args.length > 0 && args[0] instanceof JSONObject) {
+                    if(args.length > 0 && hasInitializedMap){
+
+                        String updatedGegnersJson;
+                        if(args[0].toString().equals("updateAllGegners")){
+                            updatedGegnersJson = args[1].toString();
+                        }else{
+                            updatedGegnersJson = args[0].toString();
+                        }
+
+                        //Logger.log("[ServerConnection Debug]: "+updatedGegnersJson);
+                        //   - key: socketId (e.g., "socketId_1")
+                        //   - value: <GegnerData>
+                        Gson gson = new Gson();
+                        Type type = new TypeToken<ArrayList<GegnerData>>(){}.getType();
+                        ArrayList<GegnerData> GegnersList = gson.fromJson(updatedGegnersJson, type);
+
+                        updateGegners(GegnersList);
+                    }
+                    else {
+                        Logger.log("[ServerConnection ERROR]: Received updateAllGegners event with invalid data");
+                    }
+
+
+                }
+            }).on("deathBroadcastMessage", new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    if (args.length > 0 && args[0] instanceof JSONObject && hasInitializedMap) {
+                        JSONObject data = (JSONObject) args[0];
+                        try {
+                            showDeathMessage(data);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }).on("playerLeft", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    if (args.length > 0 && args[0] instanceof String) {
+                    if (args.length > 0 && args[0] instanceof String && hasInitializedMap) {
                         String leftPlayerId = (String) args[0];
                         //Logger.log("[ServerConnection Debug]: left Playerid "+leftPlayerId);
                         allPlayers.remove(leftPlayerId);
@@ -144,7 +205,7 @@ public class ServerConnection {
             }).on("playerAction", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    if (args.length > 0 && args[0] instanceof JSONObject) {
+                    if (args.length > 0 && args[0] instanceof JSONObject && hasInitializedMap) {
                         JSONObject data = (JSONObject) args[0];
                         try {
                             //Logger.log("[ServerConnection INFO]: " + data.toString());
@@ -169,12 +230,12 @@ public class ServerConnection {
             socket.connect();
 
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
     private void initClient(JSONObject data) {
         GLOBAL_SEED = (int) data.get("seed");
-        Logger.log("[INFO]: Global seed : " + GLOBAL_SEED);
+        //Logger.log("[ServerConnection INFO]: Global seed : " + GLOBAL_SEED);
         // call back
         if (seedListener != null) {
             seedListener.onSeedReceived(GLOBAL_SEED);
@@ -209,6 +270,7 @@ public class ServerConnection {
             }
         }
     }
+
     private void doPlayerAction(JSONObject data) throws JSONException {
         String actionType = data.getString("actionType");
         String playerID   = data.getString("playerID");
@@ -234,11 +296,39 @@ public class ServerConnection {
             case "PlayerDeath":
                 player.kill();
                 break;
+            case "PlayerShowMessage":
+                String message = data.getString("message");
+                player.showMessage(message);
+                break;
             default:
                 Logger.log("[SeverConnection Warning]: received Action not Known: " + actionType);
                 break;
         }
 
+    }
+    private void showDeathMessage (JSONObject data) throws JSONException {
+        String deathMessage = data.getString("deathMessage");
+        String targetId   = data.getString("targetId");
+
+        if (deathMessage != null) {
+            if (allPlayers.get(deathMessage)!=null) {
+                Player attacker= allPlayers.get(deathMessage);
+                String attackerName= attacker.getName();
+                Player deadPlayer = allPlayers.get(targetId);
+                if(deadPlayer != null){
+                    String deadPlayerName = deadPlayer.getName();
+                    uiLayer.showDeathMessage(attackerName, deadPlayerName);
+                }
+
+            }
+            else{
+                String deadPlayerName = allPlayers.get(targetId).getName();
+                uiLayer.showDeathMessage(deathMessage, deadPlayerName);
+            }
+        }
+        else{
+            Logger.log("[SeverConnection Error]: DeathMessage is null");
+        }
     }
 
     private void updatePlayers(Map<String, PlayerData> playersMap){
@@ -251,9 +341,7 @@ public class ServerConnection {
             float x = (float)playerData.position.x;
             float y = (float)playerData.position.y;
 
-            if (socketId.equals(mySocketId)) {
-                continue;
-            }
+
             Player player = allPlayers.get(socketId);
             if (player == null) {
 
@@ -267,9 +355,11 @@ public class ServerConnection {
                 // Old Player - update position
                 player.updateTargetPosition(new Vector2(x, y));
                 player.updateHPFromPlayerData((float)playerData.hp);
-                player.updateItemFromPlayerData(playerData.itemIDs, assetManager);
+                player.updateItems(playerData.itemIDs, assetManager);
                 player.updateRotationFromPlayerData(playerData.rotation.x,playerData.rotation.y);
                 player.updateisAlive(playerData.isAlive);
+                player.updateGold(playerData.gold);
+                //Logger.log("[Serverconnection Debug]: "+playerData.gold);
                 //Logger.log("[INFO]: Player Rotation update " + playerData.rotation.x+" "+playerData.rotation.y);
             }
         }
@@ -277,14 +367,44 @@ public class ServerConnection {
     private void updateNPCs(ArrayList<NPCData> NPCsMap){
         // playersMap 中每一个 key 都是一个 socketId，
         // value 则是对应的 PlayerData 对象
-        allNPCs=new ArrayList<>();
         for (NPCData npcData : NPCsMap) {
-//            Logger.log("Debug:"+socketId+" | "+playerData.name);
-            float x = (float)npcData.position.x;
-            float y = (float)npcData.position.y;
+            boolean found = false;
+            for(NPC npc : allNPCs){
+                if (npcData.id.equals(npc.id)){
+                    found = true;
+                    npc.updateItems(npcData.itemIDs);
+                    break;
+                }
+            }
+            if (!found) {
+//                Logger.log("Debug:"+socketId+" | "+playerData.name);
+                float x = npcData.position.x;
+                float y = npcData.position.y;
+                NPC npc = NPCFactory.createNPC(npcData.id, npcData.name,npcData.maxHP,new Vector2(x,y),npcData.gender,npcData.type, npcData.marketTextureID,assetManager);
+                npc.updateItems(npcData.itemIDs);
+                allNPCs.add(npc);
+            }
+        }
+    }
 
-            NPC npc = NPCFactory.createNPC(npcData.name,npcData.maxHP,new Vector2(x,y),npcData.gender,npcData.type,assetManager);
-            allNPCs.add(npc);
+    private void updateGegners(ArrayList<GegnerData> GegnersMap){
+        // playersMap 中每一个 key 都是一个 socketId，
+        // value 则是对应的 PlayerData 对象
+        for (GegnerData gegnerData : GegnersMap) {
+            boolean found = false;
+            for(Gegner gegner : allGegner){
+                if (gegnerData.id.equals(gegner.id)){
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+//                Logger.log("Debug:"+socketId+" | "+playerData.name);
+                float x = gegnerData.position.x;
+                float y = gegnerData.position.y;
+                Gegner Gegner = GegnerFactory.createGegner(gegnerData.id, gegnerData.name,gegnerData.maxHP,new Vector2(x,y),gegnerData.type,assetManager);
+                allGegner.add(Gegner);
+            }
         }
     }
 
@@ -327,9 +447,9 @@ public class ServerConnection {
             initData.put("name", player.getName());
             initData.put("hp",player.getHealthPoints());
             initData.put("classtype",player.getClassName());
-            initData.put("items",player.getItems());
+            initData.put("item",player.getItems());
 
-            Logger.log("[ServerConnection INFO]: Init Data: "+initData.toString());
+            Logger.log("[ServerConnection INFO]: Sending Init Data: "+ initData);
 
             socket.emit("init", initData);
             //Logger.log("Updated position: " + pos);
@@ -341,7 +461,7 @@ public class ServerConnection {
         JSONObject skillData = new JSONObject();
         try {
             skillData.put("actionType", skillName);
-            skillData.put("targetId", "");
+            skillData.put("targetId", player.id);
             //skillData.put("damage", damage);
 
             socket.emit("playerAction", skillData);
@@ -369,7 +489,45 @@ public class ServerConnection {
             e.printStackTrace();
         }
     }
+    public void sendShowPlayerMessage(Player player, String message){
+        JSONObject ShowPlayerMessageeData = new JSONObject();
+        try {
+            String id= player.id;
+            if(id!=null){
+                ShowPlayerMessageeData.put("actionType", "PlayerShowMessage");
+                ShowPlayerMessageeData.put("targetId", id);
+                ShowPlayerMessageeData.put("message", message);
+                socket.emit("playerAction", ShowPlayerMessageeData);
+            }
+            else{
+                Logger.log("[ServerConnection Error]: sendShowPlayerMessage: key is null"+player.getName());
+            }
 
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+    public void sendPlayerTradeWithNPC(NPC npc, Item item){
+        JSONObject tradeWithNPCData = new JSONObject();
+        try {
+            tradeWithNPCData.put("NPCID", npc.id);
+            tradeWithNPCData.put("itemID", item.id);
+            socket.emit("playerTradeWithNPC", tradeWithNPCData);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+    public void sendPlayerUpdateGold(Player player){
+        JSONObject playerUpdateGoldData = new JSONObject();
+        try {
+            playerUpdateGoldData.put("gold", player.getGold()+"");
+            socket.emit("playerUpdateGold", playerUpdateGoldData);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
     public void disconnect() {
         if (socket != null) {
             socket.disconnect();
@@ -398,16 +556,6 @@ public class ServerConnection {
         }
 
         return new int[]{major, minor};
-    }
-
-    public HashMap<String, Player> getPlayers() {
-        return allPlayers;
-    }
-    public ArrayList<NPC> getNPCs() {
-        return allNPCs;
-    }
-    public int getGlobalSeed() {
-        return GLOBAL_SEED;
     }
     public String getMySocketId() {
         return mySocketId;

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Random;
 
 import static org.example.GameSocketServer.*;
+
+import org.example.character.Gegner;
 import org.example.character.NPC;
 
 public class MapCreator {
@@ -52,10 +54,20 @@ public class MapCreator {
         //Example:
         int centralPointX = MAP_SIZE *CELL_SIZE / 2; // centralPointX=48000
         int centralPointY = MAP_SIZE *CELL_SIZE / 2; // centralPointY=48000
-        npcs.add(new NPC("Unknown",100,new Vector2(centralPointX,centralPointY),0,2));
+        npcs.add(new NPC("Unknown",100,new Vector2(centralPointX,centralPointY),0,2,0));
 
 
         return npcs;
+    }
+
+    public ArrayList<Gegner> spawnGegners(){
+        ArrayList<Gegner> gegners = new ArrayList<>();
+        //Example:
+        int centralPointX = MAP_SIZE *CELL_SIZE / 2; // centralPointX=48000
+        int centralPointY = MAP_SIZE *CELL_SIZE / 2; // centralPointY=48000
+        gegners.add(new Gegner("Gegner1",100,new Vector2(centralPointX+100,centralPointY),0));
+
+        return gegners;
     }
 
     private boolean isIsolatedBlock(int x, int y) {

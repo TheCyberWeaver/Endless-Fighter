@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="run" />
+          <option value="lwjgl3:run" />
         </list>
       </option>
       <option name="vmOptions" />

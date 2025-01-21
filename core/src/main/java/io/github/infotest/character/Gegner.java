@@ -4,12 +4,18 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import static io.github.infotest.MainGameScreen.*;
-public abstract class Gegner extends  Actor{
+public class Gegner extends  Actor{
 
     private final float killXP;
-
+    public String id;
     public Gegner(int maxHealthPoints, Vector2 initialPosition, float speed, Texture texture, float exp) {
         super(maxHealthPoints, initialPosition, speed, texture);
+        this.killXP = exp;
+    }
+    public Gegner(String id,int maxHealthPoints, Vector2 initialPosition, float speed, Texture texture, float exp) {
+
+        super(maxHealthPoints, initialPosition, speed, texture);
+        this.id=id;
         this.killXP = exp;
     }
 
@@ -37,7 +43,7 @@ public abstract class Gegner extends  Actor{
         for (int i = 0; i < allPlayers.length; i++){
              Player player = allPlayers.get (i);
             float distance = position.dst (player.getPosition());
-           
+
         if (distance < shortestDistance){
             shortestDistance = distance;
             closestPlayer = player;
@@ -67,6 +73,9 @@ public abstract class Gegner extends  Actor{
 
     public abstract void performAttack(Player player);
 
+    public void performAttack() {
+
+    }
     @Override
     public String toString() {
         return "";

@@ -5,8 +5,10 @@ package io.github.infotest;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -15,6 +17,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.infotest.util.Logger;
+import io.github.infotest.util.MyAssetManager;
+
+import static io.github.infotest.GameSettings.*;
 
 public class StartScreen implements Screen {
 
@@ -26,21 +31,38 @@ public class StartScreen implements Screen {
     private CheckBox devModeCheckBox;
     private Viewport viewport;
 
+    private final SpriteBatch batch;
+    private final Texture texture;
+
+    private  MyAssetManager assetManager;
+
+    private Music music;
     public StartScreen(Main game) {
         this.game = game;
+        this.batch = new SpriteBatch();
+        texture=new Texture("ui/startscreen.png");
+
+        assetManager=new MyAssetManager();
+        assetManager.loadStartGameMusicAssets();
+        assetManager.manager.finishLoading();
     }
 
     @Override
     public void show() {
         Logger.log("[StartScreen] StartScreen started");
+
+        music =assetManager.getStartGameMusicAssets();
+        music.setLooping(true);
+        music.play();
+
         // Viewport initialization
         viewport = new ScreenViewport();
         stage = new Stage(viewport);
         // set input to  stage, so that we can catch UI events
         Gdx.input.setInputProcessor(stage);
 
-        // skin - default UI skin TODO: find more beautiful skins
-        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+        // skin - default UI skin
+        Skin skin = new Skin(Gdx.files.internal("ui/skin/freezing-ui.json"));
 
         // Title Label
         Label titleLabel = new Label("Select Your Name and Your Role", skin);
@@ -62,13 +84,11 @@ public class StartScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                String selectedRole = roleSelectBox.getSelected();
-                //Logger.log("Selected:" + selectedRole);
             }
         });
 
         serverSelectBox = new SelectBox<>(skin);
-        serverSelectBox.setItems("Thomas' Server (v3.1)", "Local Server"); // 设置选项
+        serverSelectBox.setItems("Thomas' Server (v3.3)", "Local Server (v3.4)"); // 设置选项
         serverSelectBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -78,11 +98,11 @@ public class StartScreen implements Screen {
         });
 
         devModeCheckBox = new CheckBox("Dev Mode", skin);
-        devModeCheckBox.setChecked(true);
+        devModeCheckBox.setChecked(isDevelopmentMode);
         devModeCheckBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.isDevelopmentMode=devModeCheckBox.isChecked();
+                isDevelopmentMode=devModeCheckBox.isChecked();
             }
         });
 
@@ -121,24 +141,31 @@ public class StartScreen implements Screen {
         String playerName = nameTextField.getText();
         String selectedRole = roleSelectBox.getSelected();
         String selectedServer = serverSelectBox.getSelected();
+
+
+        String selectedServerUrl;
+        switch (selectedServer){
+            case "Thomas' Server (v3.3)":
+                selectedServerUrl="http://www.thomas-hub.com:9595";
+                break;
+            case "Local Server (v3.4)":
+                selectedServerUrl="http://localhost:9595";
+                break;
+            default:
+                selectedServerUrl="http://localhost:9595";
+                break;
+        }
+        if (isDevelopmentMode) {
+            playerName=defaultPlayerName;
+            selectedRole=defaultPlayerClass;
+            selectedServerUrl=defaultServer;
+        }
         // Validation
         if (playerName == null || playerName.trim().isEmpty()) {
             Logger.log("[StartScreen WARNING]: Name cannot be empty!");
             return;
         }
 
-        String selectedServerUrl="";
-        switch (selectedServer){
-            case "Thomas' Server":
-                selectedServerUrl="http://www.thomas-hub.com:9595";
-                break;
-            case "Local Server":
-                selectedServerUrl="http://localhost:9595";
-                break;
-            default:
-                selectedServerUrl="http://www.thomas-hub.com:9595";
-                break;
-        }
         // Log
         Logger.log("-------Init Setup-------");
         Logger.log("User Name:" + playerName);
@@ -155,6 +182,13 @@ public class StartScreen implements Screen {
         Gdx.gl.glClearColor(0.439f, 0.5f, 0.5625f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        viewport.apply();
+        batch.setProjectionMatrix(viewport.getCamera().combined);
+        batch.begin();
+        batch.draw(texture,
+            0, 0,
+            Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.end();
         handleInput();
 
         // draw stage
@@ -184,6 +218,7 @@ public class StartScreen implements Screen {
     public void hide() {
         // when the screen is hidden, stop processing input
         Gdx.input.setInputProcessor(null);
+        music.stop();
     }
 
     @Override
