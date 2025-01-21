@@ -48,17 +48,20 @@ public abstract class Gegner extends  Actor{
 
     public void moveTowards (Vector2 playerPosition, float delta) {
         Vector2 direction = playerPosition.sub (position);
-        Vector2 movement = ;
+        direction = direction.nor();
+        Vector2 movement = direction.scl (20);
         position.add (movement);
     }
 
     @Override
     public void update(float delta) {
-        allPlayers.value(player.getPosition);
-        float distance = position.dst;
+        Player closestPlayer = findPlayer(allPlayers);
+        float distance = position.dst (closestPlayer) ;
         if (distance <= attackRange) {
             performAttack(playerPosition);
-        }
+        } else {
+            moveTowards (closestPlayer, delta);
+    }
     }
 
 
