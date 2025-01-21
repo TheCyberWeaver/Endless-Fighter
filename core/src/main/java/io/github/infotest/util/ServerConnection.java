@@ -1,11 +1,14 @@
 package io.github.infotest.util;
 
 import com.badlogic.gdx.math.Vector2;
+import io.github.infotest.character.Gegner;
 import io.github.infotest.character.Player;
 import io.github.infotest.character.NPC;
 import io.github.infotest.item.Item;
+import io.github.infotest.util.DataObjects.GegnerData;
 import io.github.infotest.util.DataObjects.NPCData;
 import io.github.infotest.util.DataObjects.PlayerData;
+import io.github.infotest.util.Factory.GegnerFactory;
 import io.github.infotest.util.Factory.NPCFactory;
 import io.github.infotest.util.Factory.PlayerFactory;
 import io.socket.client.IO;
@@ -145,6 +148,34 @@ public class ServerConnection {
                     }
                     else {
                         Logger.log("[ServerConnection ERROR]: Received updateAllNPCs event with invalid data");
+                    }
+
+
+                }
+            }).on("updateAllGegners", new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+//                    if (args.length > 0 && args[0] instanceof JSONObject) {
+                    if(args.length > 0 && hasInitializedMap){
+
+                        String updatedGegnersJson;
+                        if(args[0].toString().equals("updateAllGegners")){
+                            updatedGegnersJson = args[1].toString();
+                        }else{
+                            updatedGegnersJson = args[0].toString();
+                        }
+
+                        //Logger.log("[ServerConnection Debug]: "+updatedGegnersJson);
+                        //   - key: socketId (e.g., "socketId_1")
+                        //   - value: <GegnerData>
+                        Gson gson = new Gson();
+                        Type type = new TypeToken<ArrayList<GegnerData>>(){}.getType();
+                        ArrayList<GegnerData> GegnersList = gson.fromJson(updatedGegnersJson, type);
+
+                        updateGegners(GegnersList);
+                    }
+                    else {
+                        Logger.log("[ServerConnection ERROR]: Received updateAllGegners event with invalid data");
                     }
 
 
@@ -352,6 +383,27 @@ public class ServerConnection {
                 NPC npc = NPCFactory.createNPC(npcData.id, npcData.name,npcData.maxHP,new Vector2(x,y),npcData.gender,npcData.type, npcData.marketTextureID,assetManager);
                 npc.updateItems(npcData.itemIDs);
                 allNPCs.add(npc);
+            }
+        }
+    }
+
+    private void updateGegners(ArrayList<GegnerData> GegnersMap){
+        // playersMap 中每一个 key 都是一个 socketId，
+        // value 则是对应的 PlayerData 对象
+        for (GegnerData gegnerData : GegnersMap) {
+            boolean found = false;
+            for(Gegner gegner : allGegner){
+                if (gegnerData.id.equals(gegner.id)){
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+//                Logger.log("Debug:"+socketId+" | "+playerData.name);
+                float x = gegnerData.position.x;
+                float y = gegnerData.position.y;
+                Gegner Gegner = GegnerFactory.createGegner(gegnerData.id, gegnerData.name,gegnerData.maxHP,new Vector2(x,y),gegnerData.type,assetManager);
+                allGegner.add(Gegner);
             }
         }
     }
