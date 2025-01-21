@@ -2,6 +2,7 @@ package io.github.infotest;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -80,7 +81,9 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     //Settings
     private float waitAfterDeath=7f;
 
-    Music music;
+    private Music backgroundMusic;
+    private Music runningSound;
+
     public MainGameScreen(Game game) {
         this.game = (Main) game;
         this.camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -216,7 +219,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
         assetManager.manager.finishLoading();
 
-
+        runningSound= assetManager.getRunningSound();
 
         // connect to server
         //serverConnection = new ServerConnection("http://www.thomas-hub.com:9595", assassinTexture);
@@ -253,9 +256,9 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
         currentTradingToNPC = null;
 
-        music=assetManager.getMainGameMusicAssets();
-        music.setLooping(true);
-        music.play();
+        backgroundMusic =assetManager.getMainGameBackgroundMusic();
+        backgroundMusic.setLooping(true);
+        backgroundMusic.play();
     }
     @Override
     public void onSeedReceived(int seed) {
@@ -392,7 +395,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
             Timer.schedule(new Timer.Task() {
                 @Override
                 public void run() {
-                    music.stop();
+                    backgroundMusic.stop();
                     // Switch to the EndScreen, passing player's survival time, etc.
                     game.endGame(survivalTimer);
                 }
@@ -461,8 +464,14 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
             }
             if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && moved) {
                 localPlayer.sprint(delta);
+                if(!runningSound.isPlaying()){
+                    runningSound.play();
+                }
             } else if (localPlayer.isSprinting()) {
                 localPlayer.stopSprint();
+                if(runningSound.isPlaying()){
+                    runningSound.stop();
+                }
             }
             if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                 if (tempTime >= 0.5f) {

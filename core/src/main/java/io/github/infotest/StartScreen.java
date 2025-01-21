@@ -35,6 +35,8 @@ public class StartScreen implements Screen {
     private final Texture texture;
 
     private  MyAssetManager assetManager;
+
+    private Music music;
     public StartScreen(Main game) {
         this.game = game;
         this.batch = new SpriteBatch();
@@ -49,7 +51,7 @@ public class StartScreen implements Screen {
     public void show() {
         Logger.log("[StartScreen] StartScreen started");
 
-        Music music =assetManager.getStartGameMusicAssets();
+        music =assetManager.getStartGameMusicAssets();
         music.setLooping(true);
         music.play();
 
@@ -216,6 +218,7 @@ public class StartScreen implements Screen {
     public void hide() {
         // when the screen is hidden, stop processing input
         Gdx.input.setInputProcessor(null);
+        music.stop();
     }
 
     @Override

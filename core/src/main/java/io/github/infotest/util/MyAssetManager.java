@@ -2,6 +2,7 @@ package io.github.infotest.util;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 
 public class MyAssetManager {
@@ -338,9 +339,34 @@ public class MyAssetManager {
         return manager.get("music/StartGameMusic_1.mp3", Music.class);
     }
     public void loadMainGameMusicAssets(){
-        manager.load("music/mainGameMusic_1.wav", Music.class);
+        manager.load("music/mainGameMusic_1.mp3", Music.class);
+        manager.load("music/death.mp3", Sound.class);
+        manager.load("music/castFireball.mp3", Sound.class);
+        manager.load("music/come_back_and_face_me.mp3", Sound.class);
+        manager.load("music/normalAttack.mp3", Sound.class);
+        manager.load("music/running.mp3", Music.class);
+        manager.load("music/taunt.mp3", Sound.class);
+        //manager.load("music/mainGameMusic_2.mp3", Sound.class);
     }
-    public Music getMainGameMusicAssets(){
-        return manager.get("music/mainGameMusic_1.wav", Music.class);
+    public Music getMainGameBackgroundMusic(){
+        return manager.get("music/mainGameMusic_1.mp3", Music.class);
+    }
+    public Sound getDeathSound(){
+        return manager.get("music/death.mp3", Sound.class);
+    }
+    public Sound getCastFireballSound(){
+        return manager.get("music/castFireball.mp3", Sound.class);
+    }
+    public Sound getComeBackSound(){
+        return manager.get("music/come_back_and_face_me.mp3", Sound.class);
+    }
+    public Sound getNormalAttackSound(){
+        return manager.get("music/normalAttack.mp3", Sound.class);
+    }
+    public Music getRunningSound(){
+        return manager.get("music/running.mp3", Music.class);
+    }
+    public Sound getTauntSound(){
+        return manager.get("music/taunt.mp3", Sound.class);
     }
 }

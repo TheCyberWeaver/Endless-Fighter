@@ -1,5 +1,6 @@
 package io.github.infotest.classes;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
@@ -34,7 +35,7 @@ public class Mage extends Player {
     private static float fireballScale = 3f;
     private static float fireballLT = 2f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
 
-
+    Sound castFireballSound;
 
     public Mage(String id, String name, Vector2 playerPosition, MyAssetManager assetManager) {
         super(id, name, "Mage",60, 125, 50, playerPosition, 200);
@@ -53,14 +54,19 @@ public class Mage extends Player {
         STATE = IDLE;
 
         this.assetManager=assetManager;
-    }
 
+        castFireballSound= assetManager.getCastFireballSound();
+    }
+    public long soundID=0;
     @Override
     public void castSkill(int skillID,ServerConnection serverConnection) {
         Player localPlayer=allPlayers.get(serverConnection.getMySocketId());
         switch(skillID) {
             case 1:
                 if(timeSinceLastT1Skill >= fireballCooldown && drainMana(fireballCost) ||  localPlayer!=this) {
+                    //castFireballSound.stop(soundID);
+                    soundID =castFireballSound.play();
+
                     Logger.log("[Mage INFO]: Player ["+this.getName()+"] casts skill "+skillID);
                     timeSinceLastT1Skill = 0;
 
@@ -75,11 +81,15 @@ public class Mage extends Player {
                     ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
                     int finalXOffset = xOffset;
                     scheduler.schedule(() -> {
+
                         castFireball(this.position.x + finalXOffset, this.position.y + 46, rotation);
                         scheduler.shutdown(); // Scheduler nach Ausführung beenden
                     }, 400, TimeUnit.MILLISECONDS);
 
                     if(localPlayer==this){
+
+
+
                         serverConnection.sendCastSkill(this, "Fireball");
                     }
                 }
