@@ -446,40 +446,47 @@ public class GameRenderer {
         activeFireballs.removeAll(toRemove);
     }
 
-    ShapeRenderer shapeRenderer = MainGameScreen.shapeRenderer;
     private void renderArrows(SpriteBatch batch, float deltaTime) {
         float r = 100f; // Radius des Kreises um den Spieler
 
         for (Vector3 arrow : activeArrows.values()) {
-            Vector2 v = new Vector2(arrow.x, arrow.y);
-            Vector2 OA = new Vector2(localPlayer.getX(), localPlayer.getY());
             float tWidth = assetManager.getArrowAssets().getWidth();
-
+            Vector2 v = new Vector2(arrow.x, arrow.y);
+            Logger.log(v.toString());
+            Vector2 OA = new Vector2(localPlayer.getX(), localPlayer.getY());
             Vector2 middlePoint = new Vector2(v.x*r+OA.x,v.y*r+OA.y);
-            Vector2 addVector = new Vector2(v.y*tWidth/2, -(v.x*tWidth/2));
+            Vector2 u = new Vector2(v.x*r, v.y*r);
+            Vector2 rotatedV = new Vector2(v.y*tWidth/2f, -(v.x)*tWidth/2f);
 
-            OrthographicCamera camera = new OrthographicCamera();
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Point);
-            shapeRenderer.setColor(Color.GREEN);
-            Vector3 a = camera.project(new Vector3(middlePoint.x, middlePoint.y, 0));
-            shapeRenderer.point(a.x+100, a.y+100, a.z);
-            shapeRenderer.end();
-            //Logger.log("localPlayer: (" + localPlayer.getX() + ", " + localPlayer.getY() + ")");
+            Vector2 drawPos = new Vector2(OA.x + u.x + rotatedV.x, OA.y + u.y + rotatedV.y);
 
-            //TODO arrow rendering
 
-            Vector2 drawPos = new Vector2(middlePoint.x+addVector.x, middlePoint.y+addVector.y);
+            Sprite point = new Sprite(assetManager.getPlayerAssets());
+            point.setScale(8f/assetManager.getPlayerAssets().getWidth());
+            Sprite point2 = new Sprite(assetManager.getPlayerAssets());
+            point2.setScale(8f/assetManager.getPlayerAssets().getWidth());
+            point2.setPosition(drawPos.x-100, drawPos.y-100);
+            point2.draw(batch);
 
             // Sprite vorbereiten
             Sprite arrowTexture = new Sprite(assetManager.getArrowAssets());
-            //arrowTexture.setOrigin(arrowTexture.getWidth() / 2, arrowTexture.getHeight() / 2);
-            //arrowTexture.setScale(arrowTexture.getWidth() / arrow.z + 0.5f, arrowTexture.getHeight() / arrow.z);
+            arrowTexture.setScale(arrowTexture.getWidth() / arrow.z + 0.5f, arrowTexture.getHeight() / arrow.z);
             arrowTexture.setRotation(v.angleDeg()+90); // Pfeil in Richtung des Ziels ausrichten
-            arrowTexture.setPosition(drawPos.x, drawPos.y);
+//            arrowTexture.setPosition(middlePoint.x-arrowTexture.getWidth()*arrowTexture.getScaleX()/2,
+//                middlePoint.y-arrowTexture.getHeight()*arrowTexture.getScaleY()/2);
+            arrowTexture.setPosition(
+                drawPos.x - arrowTexture.getWidth() * arrowTexture.getScaleX() / 2,
+                drawPos.y - arrowTexture.getHeight() * arrowTexture.getScaleY() / 2
+            );
 
+            point.setPosition(drawPos.x, drawPos.y);
+            point.draw(batch);
 
+            // TODO fix
 
-            //arrowTexture.draw(batch);
+            arrowTexture.draw(batch);
+
+            batch.draw(assetManager.getArrowAssets(), drawPos.x, drawPos.y);
         }
         updateAllArrows();
     }

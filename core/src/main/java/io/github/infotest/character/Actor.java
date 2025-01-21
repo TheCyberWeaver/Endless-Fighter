@@ -115,10 +115,8 @@ public abstract class Actor {
 
     public void updateTileUnderID() {
         Vector2 predictedPosition = predictPosition();
-        Logger.log(predictedPosition.toString());
         if (predictedPosition.x <= MainGameScreen.MAP_SIZE*32 && predictedPosition.y <= MainGameScreen.MAP_SIZE*32) {
             tileUnderID = MainGameScreen.GAME_MAP[(int) (predictedPosition.x/32f)][(int) (predictedPosition.y/32f)];
-            Logger.log(tileUnderID+"");
         }
     }
 

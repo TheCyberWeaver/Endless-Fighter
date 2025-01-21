@@ -306,8 +306,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
             }
 
             gameRenderer.renderNPCs(batch, delta);
-            gameRenderer.renderAnimations(batch,delta,shapeRenderer);
             gameRenderer.renderTrees(batch, camera.zoom, localPlayer.getPosition());
+            gameRenderer.renderAnimations(batch,delta,shapeRenderer);
 
             // Render Market and Items
             if (currentTradingToNPC != null) {
