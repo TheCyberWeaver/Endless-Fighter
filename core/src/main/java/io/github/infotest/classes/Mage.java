@@ -28,12 +28,18 @@ public class Mage extends Player {
 
     private MyAssetManager assetManager;
 
-    private static float fireballCost = 5f;
-    private static float fireballDamage = 16f;
+    private static final float fireballCost = 5f;
+    private static final float fireballDamage = 16f;
     private static float fireballCooldown;
-    private static float fireballSpeed = 20f;
-    private static float fireballScale = 3f;
-    private static float fireballLT = 2f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
+    private static final float fireballSpeed = 20f;
+    private static final float fireballScale = 3f;
+    private static final float fireballLT = 2f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
+
+    private static final float blackHoleCost = 5f;
+    private static final float blackHoleDamage = 16f;
+    private static final float blackHoleCooldown = 20f;
+    private static final float blackHoleScale = 3f;
+    private static final float blackHoleLT = 2f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
 
     Sound castFireballSound;
 
@@ -113,6 +119,9 @@ public class Mage extends Player {
         float velocityX = 1.5f * playerRot.x;
         float velocityY = 1.5f * playerRot.y;
         GameRenderer.fireball(x, y, velocityX, velocityY, playerRot, fireballScale, fireballDamage, fireballSpeed, fireballLT, this);
+    }
+    public void castBlackHole(float x, float y) {
+        GameRenderer.blackHole(x, y, );
     }
 
     @Override

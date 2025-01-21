@@ -31,6 +31,8 @@ public class GameRenderer {
 
     // Fireball animation-related fields
     private static ArrayList<AbilityInstance> activeFireballs;
+    private static ArrayList<AbilityInstance> activeBlackHoles;
+
     private static HashMap<Player, Vector3> activeArrows;
     private final float fireballFrameDuration = 0.1f;
 
@@ -544,6 +546,9 @@ public class GameRenderer {
     /// ABILITY HELPER
     public static void fireball(float pX, float pY, float velocityX, float velocityY, Vector2 rotation, float scale, float damage, float speed, float lt, Player player) {
         activeFireballs.add(new AbilityInstance(pX, pY, velocityX, velocityY, rotation, scale, damage, speed, lt, player));
+    }
+    public static void blackHole(float pX, float pY, float scale, float damage, float lt, Player player){
+        activeBlackHoles.add(new AbilityInstance(pX, pY, 0, 0, new Vector2(), scale, scale, damage, lt, player));
     }
 
     private void updateAllArrows() {
