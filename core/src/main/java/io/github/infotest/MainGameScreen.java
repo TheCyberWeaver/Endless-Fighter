@@ -197,6 +197,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
         assetManager.loadPlayerAssets();
 
+        assetManager.loadGegnerAsset();
+
         assetManager.loadMageAssets();
         assetManager.loadFireballAssets();
         assetManager.loadFireballSymbol();
@@ -533,19 +535,26 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 //                    Logger.log("-> Items: " + str);
 //                }
 //                Logger.log("-----[Debug END]-----");
-                Logger.log("-----[Debug: showing npc status]-----");
-                for (NPC npc : allNPCs) {
 
-                    Logger.log(npc.getName() + " " + npc.getHealthPoints() +" "+ npc.getMarket().length);
-                    StringBuilder str = new StringBuilder();
-                    for (Item i : npc.getMarket()) {
-                        if (i == null) {
-                            str.append("null ");
-                        } else {
-                            str.append(i.id).append(" ");
-                        }
-                    }
-                    Logger.log("-> Items: " + str);
+//                Logger.log("-----[Debug: showing npc status]-----");
+//                for (NPC npc : allNPCs) {
+//
+//                    Logger.log(npc.getName() + " " + npc.getHealthPoints() +" "+ npc.getMarket().length);
+//                    StringBuilder str = new StringBuilder();
+//                    for (Item i : npc.getMarket()) {
+//                        if (i == null) {
+//                            str.append("null ");
+//                        } else {
+//                            str.append(i.id).append(" ");
+//                        }
+//                    }
+//                    Logger.log("-> Items: " + str);
+//                }
+//                Logger.log("-----[Debug END]-----");
+
+                Logger.log("-----[Debug: showing Gegner status]-----");
+                for (Gegner gegner : allGegner) {
+                    Logger.log(gegner.toString());
                 }
                 Logger.log("-----[Debug END]-----");
 

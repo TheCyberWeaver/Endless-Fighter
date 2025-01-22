@@ -307,6 +307,9 @@ public class MyAssetManager {
         return npcmarket;
 
     }
+    public void loadGegnerAsset(){
+        manager.load("Gegner.png", Texture.class);
+    }
     public Texture getGegnerAsset(){
         return manager.get("Gegner.png", Texture.class);
     }

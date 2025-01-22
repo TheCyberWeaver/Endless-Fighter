@@ -1,5 +1,7 @@
 package org.example.character;
 
+import org.example.util.Vector2;
+
 import java.util.ArrayList;
 
 /**
@@ -19,7 +21,7 @@ public class Player {
     /**
      * The player's current position
      */
-    public Position position;
+    public Vector2 position;
 
     /**
      * The item that the player is currently carrying
@@ -44,7 +46,7 @@ public class Player {
     /**
      * rotation, for example, angle or direction
      */
-    public Position rotation;
+    public Vector2 rotation;
 
     public String lastAttackedBy = "[Nothing]";
     public int gold;
@@ -52,8 +54,8 @@ public class Player {
     public Player(String id, String name) {
         this.id = id;
         this.name = name;
-        this.position = new Position(0, 0);
-        this.rotation = new Position(0, 0);
+        this.position = new Vector2(0, 0);
+        this.rotation = new Vector2(0, 0);
         this.itemIDs = new ArrayList<>();
         this.hp = 100;
         this.classtype = "";
@@ -116,12 +118,3 @@ public class Player {
 }
 
 
-class Position {
-    public float x;
-    public float y;
-
-    public Position(float x, float y) {
-        this.x = x;
-        this.y = y;
-    }
-}

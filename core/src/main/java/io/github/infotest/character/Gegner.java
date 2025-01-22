@@ -3,20 +3,24 @@ package io.github.infotest.character;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
+import io.github.infotest.util.DataObjects.GegnerData;
+
 import static io.github.infotest.MainGameScreen.*;
 public class Gegner extends  Actor{
-
-    private final float killXP;
     public String id;
-    public Gegner(int maxHealthPoints, Vector2 initialPosition, float speed, Texture texture, float exp) {
-        super(maxHealthPoints, initialPosition, speed, texture);
-        this.killXP = exp;
-    }
-    public Gegner(String id,int maxHealthPoints, Vector2 initialPosition, float speed, Texture texture, float exp) {
+    public String name;
+    public int type;
+
+    private float killXP;
+    private float killGold;
+
+
+    public Gegner(String id,int maxHealthPoints, Vector2 initialPosition, float speed, Texture texture, float exp, float gold) {
 
         super(maxHealthPoints, initialPosition, speed, texture);
         this.id=id;
         this.killXP = exp;
+        this.killGold = gold;
     }
 
     @Override
@@ -32,53 +36,18 @@ public class Gegner extends  Actor{
     }
 
 
-    public Player findPlayer(HashMap allPlayers){
-//        if (allPlayers == null){
-//            return null;
-//        } else{
-//            distance = position.dst (player.getPosition());
-//        }
-        Player closestPlayer = null;
-        float shortestDistance = Float.MAX_VALUE;
-        for (int i = 0; i < allPlayers.length; i++){
-             Player player = allPlayers.get (i);
-            float distance = position.dst (player.getPosition());
-
-        if (distance < shortestDistance){
-            shortestDistance = distance;
-            closestPlayer = player;
-        }
-        }
-        return closestPlayer;
-    }
-
-    public void moveTowards (Vector2 playerPosition, float delta) {
-        Vector2 direction = playerPosition.sub (position);
-        direction = direction.nor();
-        Vector2 movement = direction.scl (20);
-        position.add (movement);
-    }
-
     @Override
     public void update(float delta) {
-        Player closestPlayer = findPlayer(allPlayers);
-        float distance = position.dst (closestPlayer) ;
-        if (distance <= attackRange) {
-            performAttack(playerPosition);
-        } else {
-            moveTowards (closestPlayer, delta);
+        return;
     }
+    public void updateHPFromGegnerData(float hp){
+        this.healthPoints=hp;
     }
 
 
-    public abstract void performAttack(Player player);
-
-    public void performAttack() {
-
-    }
     @Override
     public String toString() {
-        return "";
+        return id+"-"+name+" "+ position.x+" "+position.y+" "+targetPosition.x+" "+targetPosition.y;
     }
 }
 

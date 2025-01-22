@@ -369,17 +369,20 @@ public class ServerConnection {
         // value 则是对应的 PlayerData 对象
         for (NPCData npcData : NPCsMap) {
             boolean found = false;
+            float x = npcData.position.x;
+            float y = npcData.position.y;
+
             for(NPC npc : allNPCs){
                 if (npcData.id.equals(npc.id)){
                     found = true;
                     npc.updateItems(npcData.itemIDs);
+                    npc.updateTargetPosition(new Vector2(x, y));
                     break;
                 }
             }
             if (!found) {
 //                Logger.log("Debug:"+socketId+" | "+playerData.name);
-                float x = npcData.position.x;
-                float y = npcData.position.y;
+
                 NPC npc = NPCFactory.createNPC(npcData.id, npcData.name,npcData.maxHP,new Vector2(x,y),npcData.gender,npcData.type, npcData.marketTextureID,assetManager);
                 npc.updateItems(npcData.itemIDs);
                 allNPCs.add(npc);
@@ -392,16 +395,22 @@ public class ServerConnection {
         // value 则是对应的 PlayerData 对象
         for (GegnerData gegnerData : GegnersMap) {
             boolean found = false;
+
+            float x = gegnerData.position.x;
+            float y = gegnerData.position.y;
+
             for(Gegner gegner : allGegner){
                 if (gegnerData.id.equals(gegner.id)){
                     found = true;
+                    gegner.updateTargetPosition(new Vector2(x, y));
+
+                    gegner.updateHPFromGegnerData(gegnerData.hp);
                     break;
                 }
             }
             if (!found) {
 //                Logger.log("Debug:"+socketId+" | "+playerData.name);
-                float x = gegnerData.position.x;
-                float y = gegnerData.position.y;
+
                 Gegner Gegner = GegnerFactory.createGegner(gegnerData.id, gegnerData.name,gegnerData.maxHP,new Vector2(x,y),gegnerData.type,assetManager);
                 allGegner.add(Gegner);
             }
