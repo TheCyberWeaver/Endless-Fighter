@@ -45,7 +45,12 @@ public abstract class Player extends Actor{
 
     protected boolean hasMoved;
     protected  boolean isHit;
+
     protected boolean isAttacking;
+    protected boolean isAttacking2;
+    protected boolean isAttacking3;
+    protected boolean isAttacking4;
+
     protected float animationTime = 0f;
 
     protected float sprintingSpeed = speed*7/4;
@@ -67,8 +72,18 @@ public abstract class Player extends Actor{
     // near top of Player class
     protected GlyphLayout glyphLayout = new GlyphLayout();
 
-    protected float T1CoolDownTime =0f;
+
     protected float timeSinceLastT1Skill;
+    protected float T1CoolDownTime =0f;
+
+    protected float timeSinceLastT2Skill;
+    protected float T2CoolDownTime =0f;
+
+    protected float timeSinceLastT3Skill;
+    protected float T3CoolDownTime =0f;
+
+    protected float timeSinceLastT4Skill;
+    protected float T4CoolDownTime =0f;
 
     public Player(String id, String name, String className, int maxHealthPoints, int maxMana, int maxAusdauer, Vector2 initialPosition, float speed) {
         super(maxHealthPoints,initialPosition,speed);
@@ -102,6 +117,9 @@ public abstract class Player extends Actor{
         this.spawnpoint = initialPosition;
 
         this.timeSinceLastT1Skill = 0;
+        this.timeSinceLastT2Skill = 0;
+        this.timeSinceLastT3Skill = 0;
+        this.timeSinceLastT4Skill = 0;
 
     }
 
@@ -183,7 +201,11 @@ public abstract class Player extends Actor{
                 ausdauer = maxAusdauer;
             }
         }
+
         timeSinceLastT1Skill += delta;
+        timeSinceLastT2Skill += delta;
+        timeSinceLastT3Skill += delta;
+        timeSinceLastT4Skill += delta;
     }
 
     public void sprint(float delta){
@@ -293,6 +315,57 @@ public abstract class Player extends Actor{
     public float getT1SkillCoolDownTimer(){
         return timeSinceLastT1Skill;
     }
+
+    public float getT2SkillCoolDownTime(){
+        return T2CoolDownTime;
+    }
+    public float getT2SkillCoolDownTimer(){
+        return timeSinceLastT2Skill;
+    }
+
+    public float getT3SkillCoolDownTime(){
+        return T3CoolDownTime;
+    }
+    public float getT3SkillCoolDownTimer(){
+        return timeSinceLastT3Skill;
+    }
+
+    public float getT4SkillCoolDownTime(){
+        return T4CoolDownTime;
+    }
+    public float getT4SkillCoolDownTimer(){
+        return timeSinceLastT4Skill;
+    }
+
+    public boolean isAttacking(){
+        return isAttacking;
+    }
+    public boolean isAttacking2(){
+        return isAttacking2;
+    }
+    public boolean isAttacking3(){
+        return isAttacking3;
+    }
+    public boolean isAttacking4(){
+        return isAttacking4;
+    }
+
+
+    public void resetT1Timer(){
+        timeSinceLastT1Skill = 0;
+    }
+    public void resetT2Timer(){
+        timeSinceLastT2Skill = 0;
+    }
+    public void resetT3Timer(){
+        timeSinceLastT3Skill = 0;
+    }
+    public void resetT4Timer(){
+        timeSinceLastT4Skill = 0;
+    }
+
+
+
     public String getClassName() {
         return className;
     }
@@ -392,9 +465,7 @@ public abstract class Player extends Actor{
     public void setAlive(){
         isAlive = true;
     }
-    public void resetT1Timer(){
-        timeSinceLastT1Skill = 0;
-    }
+
     public void setHasMoved(boolean hasMoved) {
         this.hasMoved = hasMoved;
     }

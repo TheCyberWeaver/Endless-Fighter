@@ -179,6 +179,19 @@ public class MyAssetManager {
         fireball_sheets[3]=manager.get("fireball_sheet_endHit.png", Texture.class);
         return fireball_sheets;
     }
+
+    public void loadBlackHoleAssets(){
+        manager.load("player/mage/abilities/blackHole1_sheet.png",Texture.class);
+        manager.load("player/mage/abilities/blackHole2_sheet.png",Texture.class);
+    }
+    public Texture[] getBlackHoleAssets(){
+        Texture[] textures=new Texture[2];
+        textures[0] = manager.get("player/mage/abilities/blackHole1_sheet.png", Texture.class);
+        textures[1] = manager.get("player/mage/abilities/blackHole2_sheet.png", Texture.class);
+        return textures;
+    }
+
+
     public void loadFireballSymbol(){
         manager.load("player/mage/mageFireballSymbol.png", Texture.class);
     }

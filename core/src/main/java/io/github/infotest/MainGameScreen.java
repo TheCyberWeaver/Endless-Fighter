@@ -33,8 +33,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     private final OrthographicCamera camera;
     public static UI_Layer uiLayer;
 
-    private Vector3 clickPos = null;
-    private boolean clicked = false;
+    public static Vector3 clickPos = null;
+    public static boolean clicked = false;
 
     private boolean isRenderingWithNightShader = false;
 
@@ -200,6 +200,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
         assetManager.loadMageAssets();
         assetManager.loadFireballAssets();
         assetManager.loadFireballSymbol();
+        assetManager.loadBlackHoleAssets();
 
         assetManager.loadHealthBarAssets();
         assetManager.loadManaBarAssets();
@@ -272,7 +273,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
         hasInitializedMap = true;
 
-        gameRenderer = new GameRenderer(this, assetManager);
+        gameRenderer = new GameRenderer(this, assetManager, camera);
         gameRenderer.initAnimations();
         gameRenderer.initShaders();
 
@@ -592,6 +593,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
+        if (localPlayer.isAttacking4()) return false;
         camera.zoom += amountY * 0.1f;
         if(!isDevelopmentMode){
             camera.zoom = Math.max(0.25f, Math.min(1.5f, camera.zoom));
@@ -695,5 +697,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     }
     public float getZoom(){
         return camera.zoom;
+    }
+    public Vector3 getClickedPos(){
+        return clickPos;
     }
 }

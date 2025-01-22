@@ -2,6 +2,7 @@ package io.github.infotest.util;
 
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -37,15 +38,18 @@ public class GameRenderer {
     private final float fireballFrameDuration = 0.1f;
 
     private Animation<TextureRegion>[] fireballAnimations;
+    private Animation<TextureRegion>[] blackHoleAnimation;
 
     private final MainGameScreen mainGameScreen;
+    private static final OrthographicCamera camera;
     private final MyAssetManager assetManager;
 
     private ShaderProgram nightEffectShader;
 
 
-    public GameRenderer(MainGameScreen mainGameScreen, MyAssetManager assetManager) {
+    public GameRenderer(MainGameScreen mainGameScreen, MyAssetManager assetManager, OrthographicCamera camera) {
         this.mainGameScreen = mainGameScreen;
+        this.camera = camera;
         this.assetManager = assetManager;
         this.textures = assetManager.getMapAssets();
         this.fadeTexture = assetManager.getMapFadeAssets();
@@ -146,7 +150,7 @@ public class GameRenderer {
 
                 // Render high graphics (fade transitions)
                 if (GameSettings.highGrafik) {
-                    String str = FADE_MAP[worldY][worldX];
+                    String str = MainGameScreen.FADE_MAP[worldY][worldX];
                     int topLeft = -1, top = -1, topRight = -1, right = -1;
                     int bottomRight = -1, bottom = -1, bottomLeft = -1, left = -1;
 
@@ -448,6 +452,8 @@ public class GameRenderer {
         activeFireballs.removeAll(toRemove);
     }
 
+
+
     ShapeRenderer shapeRenderer = MainGameScreen.shapeRenderer;
     private void renderArrows(SpriteBatch batch, float deltaTime) {
         float r = 100f; // Radius des Kreises um den Spieler
@@ -578,7 +584,11 @@ public class GameRenderer {
         );
         activeArrows.put(player, temp);
     }
+    public static boolean activateBlackHoleAnimation(Batch batch, float delta){
+        if (camera.zoom < 2 &&  )
+            camera.zoom -= delta;
 
+    }
 
     /// SHADER LOGIC
     public void initShaders() {

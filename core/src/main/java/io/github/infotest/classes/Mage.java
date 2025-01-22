@@ -1,9 +1,11 @@
 package io.github.infotest.classes;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
+import io.github.infotest.MainGameScreen;
 import io.github.infotest.character.Player;
 import io.github.infotest.util.GameRenderer;
 import io.github.infotest.util.Logger;
@@ -55,7 +57,9 @@ public class Mage extends Player {
         RUN.setPlayMode(Animation.PlayMode.LOOP);
 
         fireballCooldown = ATTACK_1.getAnimationDuration()+0.5f;
-        T1CoolDownTime =fireballCooldown;
+        T1CoolDownTime = fireballCooldown;
+
+        T4CoolDownTime = blackHoleCooldown;
 
         STATE = IDLE;
 
@@ -87,24 +91,23 @@ public class Mage extends Player {
                     ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
                     int finalXOffset = xOffset;
                     scheduler.schedule(() -> {
-
                         castFireball(this.position.x + finalXOffset, this.position.y + 46, rotation);
                         scheduler.shutdown(); // Scheduler nach Ausführung beenden
                     }, 400, TimeUnit.MILLISECONDS);
 
                     if(localPlayer==this){
-
-
-
                         serverConnection.sendCastSkill(this, "Fireball");
                     }
                 }
-                //Logger.log(mana+"/"+maxMana);
                 break;
-            case 2:
+            case 2: break;
+            case 3: break;
+            case 4:
+                Logger.log("[Mage INFO]: Player ["+this.getName()+"] casts skill "+skillID);
+                timeSinceLastT4Skill = 0;
+                this.isAttacking4 = true;
                 break;
-            default:
-                break;
+            default: break;
         }
     }
 
@@ -121,7 +124,7 @@ public class Mage extends Player {
         GameRenderer.fireball(x, y, velocityX, velocityY, playerRot, fireballScale, fireballDamage, fireballSpeed, fireballLT, this);
     }
     public void castBlackHole(float x, float y) {
-        GameRenderer.blackHole(x, y, );
+        GameRenderer.blackHole(x, y, blackHoleScale, blackHoleDamage, blackHoleLT, this);
     }
 
     @Override
@@ -157,6 +160,13 @@ public class Mage extends Player {
         currentFrame.setOrigin(currentFrame.getWidth()/2, currentFrame.getHeight()/2);
         currentFrame.setScale(0.75f);
         currentFrame.draw(batch);
+
+        if (isAttacking4) {
+            if (!GameRenderer.activateBlackHoleAnimation(batch, delta)){
+                castBlackHole(MainGameScreen.clickPos.x, MainGameScreen.clickPos.y);
+                isAttacking4 = false;
+            }
+        }
 
         animationTime += delta;
     }
