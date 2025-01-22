@@ -104,19 +104,6 @@ public class GameRenderer {
 
 
     public void renderMap(SpriteBatch batch, float zoom, Vector2 pos) {
-        // Define fade textures for different tiles
-        Texture[] tile1FADE = new Texture[5];
-        System.arraycopy(fadeTexture, 0, tile1FADE, 0, 5);
-
-        Texture[] tile2FADE = new Texture[5];
-        System.arraycopy(fadeTexture, 5, tile2FADE, 0, 5);
-
-        Texture[] tile4FADE = new Texture[5];
-        System.arraycopy(fadeTexture, 10, tile4FADE, 0, 5);
-
-        Texture[] tile5FADE = new Texture[5];
-        System.arraycopy(fadeTexture, 15, tile5FADE, 0, 5);
-
         // Calculate visible tiles
         int widthCell = (int) Math.ceil(Gdx.graphics.getWidth() * zoom / CELL_SIZE);
         int heightCell = (int) Math.ceil(Gdx.graphics.getHeight() * zoom / CELL_SIZE);
@@ -144,53 +131,22 @@ public class GameRenderer {
 
                 // Render high graphics (fade transitions)
                 if (GameSettings.highGrafik) {
-                    String str = FADE_MAP[worldY][worldX];
-                    int topLeft = -1, top = -1, topRight = -1, right = -1;
-                    int bottomRight = -1, bottom = -1, bottomLeft = -1, left = -1;
+                    HashMap<Vector2,Integer> nachbarn = MainGameScreen.FADE_MAP[worldY][worldX];
 
-                    // Parse fade map string
-                    int altIndex = 0;
-                    for (int i = 0; i < 8; i++) {
-                        int index = str.indexOf(';', altIndex);
-                        if (index == -1) break;
-
-                        String s = str.substring(altIndex, index);
-                        altIndex = index + 1;
-
-                        if (s.isEmpty()) continue;
-
-                        int tileID = Integer.parseInt(String.valueOf(s.charAt(0)));
-                        if (s.contains("c")) {
-                            switch (Integer.parseInt(String.valueOf(s.charAt(s.length() - 1)))) {
-                                case 1:
-                                    topLeft = tileID;
-                                    break;
-                                case 2:
-                                    topRight = tileID;
-                                    break;
-                                case 3:
-                                    bottomRight = tileID;
-                                    break;
-                                case 4:
-                                    bottomLeft = tileID;
-                                    break;
-                            }
-                        }
-                        if (s.contains("t")) top = tileID;
-                        if (s.contains("r")) right = tileID;
-                        if (s.contains("b")) bottom = tileID;
-                        if (s.contains("l")) left = tileID;
+                    for(Vector2 v: nachbarn.getKeys()){
+                        int type = nachbarn.get(v);
                     }
-
+                    /*
                     // Render transitions
-                    drawTransition(batch, worldX, worldY, tile1FADE, tile2FADE, tile4FADE, tile5FADE, topLeft, 180);
-                    drawTransition(batch, worldX, worldY, tile1FADE, tile2FADE, tile4FADE, tile5FADE, top, 0);
-                    drawTransition(batch, worldX, worldY, tile1FADE, tile2FADE, tile4FADE, tile5FADE, topRight, 90);
-                    drawTransition(batch, worldX, worldY, tile1FADE, tile2FADE, tile4FADE, tile5FADE, right, 0);
-                    drawTransition(batch, worldX, worldY, tile1FADE, tile2FADE, tile4FADE, tile5FADE, bottomRight, 0);
-                    drawTransition(batch, worldX, worldY, tile1FADE, tile2FADE, tile4FADE, tile5FADE, bottom, 0);
-                    drawTransition(batch, worldX, worldY, tile1FADE, tile2FADE, tile4FADE, tile5FADE, bottomLeft, -90);
-                    drawTransition(batch, worldX, worldY, tile1FADE, tile2FADE, tile4FADE, tile5FADE, left, 0);
+                    // drawTransition(batch, worldX, worldY, topLeft, 180);
+                    drawTransition(batch, worldX, worldY, top, 0);
+                    // drawTransition(batch, worldX, worldY, topRight, 90);
+                    drawTransition(batch, worldX, worldY, right, 0);
+                    // drawTransition(batch, worldX, worldY, bottomRight, 0);
+                    drawTransition(batch, worldX, worldY, bottom, 0);
+                    // drawTransition(batch, worldX, worldY, bottomLeft, -90);
+                    drawTransition(batch, worldX, worldY, left, 0);
+                    */
                 }
             }
         }
@@ -230,8 +186,20 @@ public class GameRenderer {
         }
     }
 
-    private void drawTransition(SpriteBatch batch, int worldX, int worldY, Texture[] tile1FADE, Texture[] tile2FADE, Texture[] tile4FADE, Texture[] tile5FADE, int tileType, float rotation) {
+    private void drawTransition(SpriteBatch batch, int worldX, int worldY, int tileType, float rotation) {
         Sprite transitionSprite = null;
+        // Define fade textures for different tiles
+        Texture[] tile1FADE = new Texture[5];
+        System.arraycopy(fadeTexture, 0, tile1FADE, 0, 5);
+
+        Texture[] tile2FADE = new Texture[5];
+        System.arraycopy(fadeTexture, 5, tile2FADE, 0, 5);
+
+        Texture[] tile4FADE = new Texture[5];
+        System.arraycopy(fadeTexture, 10, tile4FADE, 0, 5);
+
+        Texture[] tile5FADE = new Texture[5];
+        System.arraycopy(fadeTexture, 15, tile5FADE, 0, 5);
 
         switch (tileType) {
             case 1:
@@ -240,10 +208,10 @@ public class GameRenderer {
             case 2:
                 transitionSprite = new Sprite(tile2FADE[0]);
                 break;
-            case 4:
+            case 5:
                 transitionSprite = new Sprite(tile4FADE[0]);
                 break;
-            case 5:
+            case 6:
                 transitionSprite = new Sprite(tile5FADE[0]);
                 break;
         }
