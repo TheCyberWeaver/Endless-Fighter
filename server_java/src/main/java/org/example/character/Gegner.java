@@ -3,6 +3,7 @@ package org.example.character;
 
 import org.example.util.Vector2;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static org.example.GameSocketServer.allPlayers;
@@ -16,8 +17,10 @@ public class Gegner {
     public int hp;
     public Vector2 position;
 
-    public float attackRange=10;
+    private float attackRange=10;
 
+    private float attackCoolDownTime=0.5f;
+    private float attackCoolDownTimer=0;
 
     public Gegner(String name, int maxHealthPoints, Vector2 startPosition, int type) {
         this.name = name;
@@ -32,44 +35,47 @@ public class Gegner {
 
         Player closestPlayer = null;
         float shortestDistance = Float.MAX_VALUE;
-        for (int i = 0; i < allPlayers.size(); i++){
-            Player player = allPlayers.get (i);
-            float distance = dst(position, player.position);
+        for (Map.Entry<String, Player> entry : allPlayers.entrySet()) {
+            Player player = entry.getValue();
+            if(player.isAlive){
+                float distance = position.distance(player.position);
 
-            if (distance < shortestDistance){
-                shortestDistance = distance;
-                closestPlayer = player;
+                if (distance < shortestDistance){
+                    shortestDistance = distance;
+                    closestPlayer = player;
+                }
             }
+
         }
         return closestPlayer;
-    }
-    public static float dst(Vector2 v1, Vector2 v2){
-        float x=v1.x-v2.x;
-        float y=v1.y-v2.y;
-        return (float)Math.sqrt(x*x+y*y);
     }
 
     public void moveTowards (Player playerPosition, float delta) {
         Vector2 direction = playerPosition.position.sub(position);
         direction = direction.normal();
-        Vector2 movement = direction.scale (20);
+        Vector2 movement = direction.scale (3f);
         position=position.add (movement);
     }
 
     public void update(float delta) {
-        position=position.add(new Vector2(0.5f,0f));
-//        Player closestPlayer = findPlayer();
-//        if(closestPlayer != null){
-//            float distance = dst(position, closestPlayer.position) ;
-//            if (distance <= attackRange) {
-//                performAttack(closestPlayer);
-//            } else { moveTowards (closestPlayer, delta);
-//            }
-//        }
+        //position=position.add(new Vector2(0.5f,0f));
+        Player closestPlayer = findPlayer();
+        if(closestPlayer != null){
+            //System.out.println("Moving to "+closestPlayer.name );
+
+            float distance =position.distance(closestPlayer.position) ;
+            if (distance <= attackRange && attackCoolDownTimer>=attackCoolDownTime) {
+                performAttack(closestPlayer);
+            } else {
+                moveTowards (closestPlayer, delta);
+            }
+        }
+        attackCoolDownTimer+=delta;
     }
 
     public void performAttack(Player player) {
         player.takeDamage (5);
+        attackCoolDownTimer=0;
     }
 
 

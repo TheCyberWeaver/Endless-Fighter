@@ -26,7 +26,12 @@ public class Vector2 {
         float length= (float) Math.sqrt(x*x + y*y);
         return new Vector2(x/length, y/length);
     }
-    public Vector2 scale(int v){
+    public Vector2 scale(float v){
         return new Vector2(x*v, y*v);
+    }
+    public float distance(Vector2 v){
+        float dx=x-v.x;
+        float dy=y-v.y;
+        return (float) Math.sqrt(dx*dx + dy*dy);
     }
 }

@@ -65,7 +65,7 @@ public class MapCreator {
         //Example:
         int centralPointX = MAP_SIZE *CELL_SIZE / 2; // centralPointX=48000
         int centralPointY = MAP_SIZE *CELL_SIZE / 2; // centralPointY=48000
-        gegners.add(new Gegner("Gegner1",100,new Vector2(centralPointX+100,centralPointY),0));
+        gegners.add(new Gegner("Gegner1",300,new Vector2(centralPointX+100,centralPointY),0));
 
         return gegners;
     }

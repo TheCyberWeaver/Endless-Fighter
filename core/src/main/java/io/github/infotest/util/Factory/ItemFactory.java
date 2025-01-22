@@ -18,7 +18,7 @@ public class ItemFactory {
         String itemName = getNameFromId(itemID);
         switch (itemName) {
             case "Apple":
-                return new Apple(itemID, assetManager);
+                return new Apple(itemID, "apple",assetManager,100);
 
             default:
                 throw new IllegalArgumentException("Unknown item: " + itemName);
