@@ -2,7 +2,7 @@ package io.github.infotest;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -37,6 +37,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     public static boolean clicked = false;
 
     private boolean isRenderingWithNightShader = false;
+    public static boolean isRenderingBlackHoleActivation = false;
 
 
     // Map data
@@ -293,7 +294,9 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
             camera.position.set(localPlayer.getX(), localPlayer.getY(), 0);
             camera.update();
             batch.setProjectionMatrix(camera.combined);
-
+            shapeRenderer.setProjectionMatrix(camera.combined);
+            Gdx.gl.glLineWidth(5); // make line width to 5 pixel
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             batch.begin();
 
             if(isRenderingWithNightShader){
@@ -362,10 +365,25 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 uiLayer.addSignTimer(delta);
             }
 
+            float d = 32*32;
+            if (isRenderingBlackHoleActivation && renderBlackHoleActivation(delta, d)) {
+                if (clickPos != null) {
+                    float dX = Math.abs(clickPos.x-localPlayer.getX());
+                    float dY = Math.abs(clickPos.y-localPlayer.getY());
+                    if (dX < d/2 && dY < d/2) {
+                        GameRenderer.blackHole(clickPos.x, clickPos.y, localPlayer.getT4Scale(), localPlayer.getT4Damage(), localPlayer.getT4LT(), localPlayer);
+                        Logger.log("Add Black Hole ["+ d/2+"; "+ dX+"; "+ dY+"]");
+                        localPlayer.resetAttacking4();
+                    }
+                }
+            }
+
 
             batch.draw(assetManager.getPlayerAssets(), 0, 0, 0, 0, assetManager.getPlayerAssets().getWidth(), assetManager.getPlayerAssets().getWidth(), 32, 32);
             batch.setShader(null);
             batch.end();
+            shapeRenderer.end();
+            Gdx.gl.glLineWidth(1); // Reset the line width to 1 pixel
 
             doGameLogic(delta);
 
@@ -380,6 +398,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
         }
 
         uiLayer.render();
+        clickPos = null;
+        clicked = false;
 
     }
     private void doGameLogic(float delta) {
@@ -462,6 +482,9 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
             if (Gdx.input.isKeyPressed(Input.Keys.E)) {
                 localPlayer.castSkill(1, serverConnection);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+                localPlayer.castSkill(4, serverConnection);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && moved) {
                 localPlayer.sprint(delta);
@@ -574,12 +597,24 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
             }
         }
     }
+
+    private boolean renderBlackHoleActivation(float delta, float radius) {
+        if (camera.zoom < 1.2){
+            camera.zoom += 4*delta;
+            return false;
+        } else {
+            shapeRenderer.setColor(Color.RED);
+            shapeRenderer.rect(localPlayer.getX()-radius/2, localPlayer.getY()-radius/2, radius, radius);
+            return true;
+        }
+    }
+
+
     @Override
     public void resize(int width, int height) {
         camera.setToOrtho(false, width, height);
         uiLayer.resize(width, height);
     }
-
     @Override
     public void show() {
         Gdx.input.setInputProcessor(this);
@@ -697,6 +732,9 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     }
     public float getZoom(){
         return camera.zoom;
+    }
+    public void setZoom(float zoom){
+        camera.zoom = zoom;
     }
     public Vector3 getClickedPos(){
         return clickPos;

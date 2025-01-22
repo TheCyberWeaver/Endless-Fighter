@@ -33,15 +33,16 @@ public class GameRenderer {
     // Fireball animation-related fields
     private static ArrayList<AbilityInstance> activeFireballs;
     private static ArrayList<AbilityInstance> activeBlackHoles;
-
     private static HashMap<Player, Vector3> activeArrows;
+
     private final float fireballFrameDuration = 0.1f;
+    private final float blackHoleFrameDuration = 0.1f;
 
     private Animation<TextureRegion>[] fireballAnimations;
     private Animation<TextureRegion>[] blackHoleAnimation;
 
     private final MainGameScreen mainGameScreen;
-    private static final OrthographicCamera camera;
+    private final OrthographicCamera camera;
     private final MyAssetManager assetManager;
 
     private ShaderProgram nightEffectShader;
@@ -57,13 +58,16 @@ public class GameRenderer {
         this.treeTexture = assetManager.getMapTreeAssets();
 
         activeFireballs = new ArrayList<>();
+        activeBlackHoles = new ArrayList<>();
         activeArrows = new HashMap<Player, Vector3>();
 
     }
 
     public void initAnimations() {
+        /// FIREBALL
         Texture[] fireball_sheets = assetManager.getFireballAssets();
         fireballAnimations = new Animation[fireball_sheets.length];
+
         int frameCols;
         int frameRows = 1;
 
@@ -91,8 +95,37 @@ public class GameRenderer {
         frameCols = 7;
         fireballAnimations[3] = sheetsToAnimation(frameCols, frameRows, fireball_sheet_endHit, fireballFrameDuration);
         fireballAnimations[3].setPlayMode(Animation.PlayMode.NORMAL);
+
+
+        /// BLACK HOLE
+        Texture[] blackHole_sheets = assetManager.getBlackHoleAssets();
+        blackHoleAnimation = new Animation[blackHole_sheets.length];
+
+        // FG
+        Texture fg_sheet = blackHole_sheets[0];
+        frameCols = 4;
+        frameRows = 5;
+        Animation<TextureRegion> tempBH = sheetsToAnimation(frameCols, frameRows, fg_sheet, blackHoleFrameDuration);
+        tempBH.setPlayMode(Animation.PlayMode.LOOP);
+        blackHoleAnimation[0] = tempBH;
+
+        // BG
+        Texture bg_sheet = blackHole_sheets[1];
+        frameCols = 5;
+        frameRows = 6;
+        tempBH = sheetsToAnimation(frameCols, frameRows, bg_sheet, blackHoleFrameDuration);
+        tempBH.setPlayMode(Animation.PlayMode.LOOP);
+        blackHoleAnimation[1] = tempBH;
     }
 
+    /**
+     *  Convertes Animation Sheets to Animations (from left to right; from top to bottom)
+     * @param frameCols Columns of Sheet
+     * @param frameRows Rows of Sheet
+     * @param fireball_sheet Sheet itself
+     * @param frameDuration Duration each frame should be displayed
+     * @return Returns the Animation
+     */
     public static Animation<TextureRegion> sheetsToAnimation(int frameCols, int frameRows, Texture fireball_sheet, float frameDuration) {
         TextureRegion[][] tempFrames2 = TextureRegion.split(fireball_sheet,
             fireball_sheet.getWidth() / frameCols,
@@ -354,6 +387,7 @@ public class GameRenderer {
     public void renderAnimations(SpriteBatch batch, float deltaTime, ShapeRenderer shapeRenderer) {
         time += deltaTime;
         renderFireballs(batch, deltaTime, fireballAnimations, shapeRenderer);
+        renderBlackHoles(batch, deltaTime, blackHoleAnimation);
         renderArrows(batch, deltaTime);
     }
 
@@ -452,7 +486,44 @@ public class GameRenderer {
         activeFireballs.removeAll(toRemove);
     }
 
+    private void renderBlackHoles(SpriteBatch batch, float deltaTime, Animation<TextureRegion>[] blackHoleAnimation) {
+        ArrayList<AbilityInstance> toRemove = new ArrayList<>();
 
+        Animation<TextureRegion> blackHoleFG = blackHoleAnimation[0];
+        Animation<TextureRegion> blackHoleBG = blackHoleAnimation[1];
+
+        for (AbilityInstance blackHole : activeBlackHoles) {
+            if (blackHole.elapsedTime > blackHole.lt){
+                if (blackHole.scale < 0.1f){
+                    toRemove.add(blackHole);
+                    continue;
+                } else {
+                    blackHole.scale -= 0.75f*deltaTime;
+                }
+            }
+            Sprite currentFrameBG = new Sprite(blackHoleBG.getKeyFrame(blackHole.elapsedTime));
+            currentFrameBG.setOrigin(currentFrameBG.getRegionWidth()/2f, currentFrameBG.getRegionHeight()/2f);
+            currentFrameBG.setScale(blackHole.scale);
+            currentFrameBG.setPosition(blackHole.x-currentFrameBG.getRegionWidth()/2f - 25, blackHole.y - 36);
+
+            Sprite currentFrameFG = new Sprite(blackHoleFG.getKeyFrame(blackHole.elapsedTime));
+            currentFrameFG.setOrigin(currentFrameFG.getRegionWidth()/2f, currentFrameFG.getRegionHeight()/2f);
+            currentFrameFG.setScale(blackHole.scale);
+            currentFrameFG.setPosition(blackHole.x-currentFrameBG.getRegionWidth()/2f, blackHole.y);
+
+            Sprite currentFrameFG2 = new Sprite(currentFrameFG);
+            currentFrameFG2.setOrigin(currentFrameFG.getRegionWidth()/2f, currentFrameFG.getRegionHeight()/2f);
+            currentFrameFG2.rotate(90);
+            currentFrameFG2.setPosition(blackHole.x-currentFrameBG.getRegionWidth()/2f, blackHole.y);
+
+            currentFrameBG.draw(batch);
+            currentFrameFG.draw(batch);
+            currentFrameFG2.draw(batch);
+
+            blackHole.elapsedTime += deltaTime;
+        }
+        activeBlackHoles.removeAll(toRemove);
+    }
 
     ShapeRenderer shapeRenderer = MainGameScreen.shapeRenderer;
     private void renderArrows(SpriteBatch batch, float deltaTime) {
@@ -584,11 +655,6 @@ public class GameRenderer {
         );
         activeArrows.put(player, temp);
     }
-    public static boolean activateBlackHoleAnimation(Batch batch, float delta){
-        if (camera.zoom < 2 &&  )
-            camera.zoom -= delta;
-
-    }
 
     /// SHADER LOGIC
     public void initShaders() {
@@ -645,15 +711,15 @@ public class GameRenderer {
     /// Helper class for tracking ability instances
     public static class AbilityInstance {
         private float x, y;
-        float velocityX, velocityY;
-        Vector2 rotation;
-        float elapsedTime;
-        float scale;
-        float damage;
-        float lt;
-        float endTimer;
-        boolean hasHit;
-        Player owner;
+        private final float velocityX, velocityY;
+        private final Vector2 rotation;
+        private float elapsedTime;
+        private float scale;
+        private final float damage;
+        private final float lt;
+        private float endTimer;
+        private boolean hasHit;
+        private final Player owner;
 
         private float speedFactor = 32f;
 

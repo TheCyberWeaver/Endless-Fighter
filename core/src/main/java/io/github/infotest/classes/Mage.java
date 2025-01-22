@@ -30,18 +30,18 @@ public class Mage extends Player {
 
     private MyAssetManager assetManager;
 
-    private static final float fireballCost = 5f;
-    private static final float fireballDamage = 16f;
-    private static float fireballCooldown;
-    private static final float fireballSpeed = 20f;
-    private static final float fireballScale = 3f;
-    private static final float fireballLT = 2f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
+    private float fireballCost = 5f;
+    private float fireballDamage = 16f;
+    private float fireballCooldown;
+    private float fireballSpeed = 20f;
+    private float fireballScale = 3f;
+    private float fireballLT = 2f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
 
-    private static final float blackHoleCost = 5f;
-    private static final float blackHoleDamage = 16f;
-    private static final float blackHoleCooldown = 20f;
-    private static final float blackHoleScale = 3f;
-    private static final float blackHoleLT = 2f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
+    private float blackHoleCost = 30f;
+    private float blackHoleDamage = 2f;
+    private float blackHoleCooldown = 20f;
+    private float blackHoleScale = 1f;
+    private float blackHoleLT = 4f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
 
     Sound castFireballSound;
 
@@ -57,15 +57,25 @@ public class Mage extends Player {
         RUN.setPlayMode(Animation.PlayMode.LOOP);
 
         fireballCooldown = ATTACK_1.getAnimationDuration()+0.5f;
-        T1CoolDownTime = fireballCooldown;
-
-        T4CoolDownTime = blackHoleCooldown;
 
         STATE = IDLE;
 
         this.assetManager=assetManager;
 
         castFireballSound= assetManager.getCastFireballSound();
+
+        this.T1Cost = fireballCost;
+        this.T1Damage = fireballDamage;
+        this.T1Cooldown = fireballCooldown;
+        this.T1Speed = fireballSpeed;
+        this.T1Scale = fireballScale;
+        this.T1LT =fireballLT;
+
+        this.T4Cost = blackHoleCost;
+        this.T4Damage = blackHoleDamage;
+        this.T4Cooldown = blackHoleCooldown;
+        this.T4Scale = blackHoleScale;
+        this.T4LT = blackHoleLT;
     }
     public long soundID=0;
     @Override
@@ -123,9 +133,6 @@ public class Mage extends Player {
         float velocityY = 1.5f * playerRot.y;
         GameRenderer.fireball(x, y, velocityX, velocityY, playerRot, fireballScale, fireballDamage, fireballSpeed, fireballLT, this);
     }
-    public void castBlackHole(float x, float y) {
-        GameRenderer.blackHole(x, y, blackHoleScale, blackHoleDamage, blackHoleLT, this);
-    }
 
     @Override
     public void render(Batch batch, float delta) {
@@ -161,12 +168,7 @@ public class Mage extends Player {
         currentFrame.setScale(0.75f);
         currentFrame.draw(batch);
 
-        if (isAttacking4) {
-            if (!GameRenderer.activateBlackHoleAnimation(batch, delta)){
-                castBlackHole(MainGameScreen.clickPos.x, MainGameScreen.clickPos.y);
-                isAttacking4 = false;
-            }
-        }
+        MainGameScreen.isRenderingBlackHoleActivation = isAttacking4;
 
         animationTime += delta;
     }

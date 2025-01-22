@@ -59,6 +59,19 @@ public abstract class Player extends Actor{
     protected Vector2 spawnpoint;
     protected Vector2 lastDeathPos;
 
+    protected float T1Cost = 0f;
+    protected float T1Damage = 0f;
+    protected float T1Cooldown = 0f;
+    protected float T1Speed = 0f;
+    protected float T1Scale = 0f;
+    protected float T1LT = 0f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
+
+    protected float T4Cost = 5f;
+    protected float T4Damage = 16f;
+    protected float T4Cooldown = 20f;
+    protected float T4Scale = 3f;
+    protected float T4LT = 2f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
+
 
 
     //Assassin Att
@@ -74,16 +87,12 @@ public abstract class Player extends Actor{
 
 
     protected float timeSinceLastT1Skill;
-    protected float T1CoolDownTime =0f;
 
     protected float timeSinceLastT2Skill;
-    protected float T2CoolDownTime =0f;
 
     protected float timeSinceLastT3Skill;
-    protected float T3CoolDownTime =0f;
 
     protected float timeSinceLastT4Skill;
-    protected float T4CoolDownTime =0f;
 
     public Player(String id, String name, String className, int maxHealthPoints, int maxMana, int maxAusdauer, Vector2 initialPosition, float speed) {
         super(maxHealthPoints,initialPosition,speed);
@@ -310,31 +319,65 @@ public abstract class Player extends Actor{
 
     /// Getter / Setter
     public float getT1SkillCoolDownTime(){
-        return T1CoolDownTime;
+        return T1Cooldown;
     }
     public float getT1SkillCoolDownTimer(){
         return timeSinceLastT1Skill;
     }
 
-    public float getT2SkillCoolDownTime(){
-        return T2CoolDownTime;
-    }
+//    public float getT2SkillCoolDownTime(){
+//        return T2Cooldown;
+//    }
     public float getT2SkillCoolDownTimer(){
         return timeSinceLastT2Skill;
     }
 
-    public float getT3SkillCoolDownTime(){
-        return T3CoolDownTime;
-    }
+//    public float getT3SkillCoolDownTime(){
+//        return T3Cooldown;
+//    }
     public float getT3SkillCoolDownTimer(){
         return timeSinceLastT3Skill;
     }
-
     public float getT4SkillCoolDownTime(){
-        return T4CoolDownTime;
+        return T4Cooldown;
     }
     public float getT4SkillCoolDownTimer(){
         return timeSinceLastT4Skill;
+    }
+
+    public float getT1Cost(){
+        return T1Cost;
+    }
+    public float getT1Damage(){
+        return T1Damage;
+    }
+    public float getT1Cooldown(){
+        return T1Cooldown;
+    }
+    public float getT1Speed(){
+        return T1Speed;
+    }
+    public float getT1Scale(){
+        return T1Scale;
+    }
+    public float getT1LT(){
+        return T1LT;
+    }
+
+    public float getT4Cost(){
+        return T4Cost;
+    }
+    public float getT4Damage(){
+        return T4Damage;
+    }
+    public float getT4Cooldown(){
+        return T4Cooldown;
+    }
+    public float getT4Scale(){
+        return T4Scale;
+    }
+    public float getT4LT(){
+        return T4LT;
     }
 
     public boolean isAttacking(){
@@ -350,6 +393,18 @@ public abstract class Player extends Actor{
         return isAttacking4;
     }
 
+    public void resetAttacking(){
+        isAttacking = false;
+    }
+    public void resetAttacking2(){
+        isAttacking2 = false;
+    }
+    public void resetAttacking3(){
+        isAttacking3 = false;
+    }
+    public void resetAttacking4(){
+        isAttacking4 = false;
+    }
 
     public void resetT1Timer(){
         timeSinceLastT1Skill = 0;
@@ -363,8 +418,6 @@ public abstract class Player extends Actor{
     public void resetT4Timer(){
         timeSinceLastT4Skill = 0;
     }
-
-
 
     public String getClassName() {
         return className;
@@ -465,19 +518,15 @@ public abstract class Player extends Actor{
     public void setAlive(){
         isAlive = true;
     }
-
     public void setHasMoved(boolean hasMoved) {
         this.hasMoved = hasMoved;
     }
-
     public boolean isSeeAllActive() {
         return seeAllActive;
     }
-
     public int getGold() {
         return gold;
     }
-
     public void updateGold(int gold) {
         this.gold = gold;
     }
