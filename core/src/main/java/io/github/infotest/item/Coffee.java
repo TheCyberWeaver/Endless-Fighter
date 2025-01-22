@@ -4,15 +4,15 @@ import io.github.infotest.util.MyAssetManager;
 
 public class Coffee extends Item {
     public String color;
-    private int ausdauerRecovery;
+    private float ausdauerRecovery;
 
-    public Apple(MyAssetManager assetManager, int ausdauerRecovery) {
+    public Apple(MyAssetManager assetManager, float ausdauerRecovery) {
         super("apple","just an apple", assetManager.getLoadingScreenTexture());
         this ausdauerRecovery = ausdauerRecovery;
     }
 
-    public void drink (Player player){
-        
+    public float getAusdauerRecovery(){
+        return ausdauerRecovery;
     }
     
     public void render(){
