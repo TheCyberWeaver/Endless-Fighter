@@ -80,19 +80,22 @@ public class MapCreator {
         }
     }
 
+    /**
+    * Generiert für jede Zelle eine Liste (in Form eines Strings) der Typen der Nachbarzellen.
+    */
     private void initFadeMap(){
         for (int y2 = 0; y2 < MAP_SIZE; y2++) {
             for (int x2 = 0; x2 < MAP_SIZE; x2++) {
                 String str = "";
-                int thisCell = GAME_MAP[y2][x2];
-                int topLeft;
-                int top;
-                int topRight;
-                int right;
-                int bottomRight;
-                int bottom;
-                int bottomLeft;
-                int left;
+                int thisCell = GAME_MAP[y2][x2]; // type of this cell
+                int topLeft; // für c1
+                int top; // für t
+                int topRight; // für c2
+                int right; // für r
+                int bottomRight; // für c3
+                int bottom; // für b
+                int bottomLeft; // für c4
+                int left; // für l
 
                 if (x2>0 && y2<MAP_SIZE-1) {topLeft = GAME_MAP[y2+1][x2-1];} else {topLeft = -1;}
                 if (y2<MAP_SIZE-1) {top = GAME_MAP[y2+1][x2];} else {top = -1;}
