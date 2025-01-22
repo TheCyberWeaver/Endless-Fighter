@@ -4,9 +4,9 @@ import io.github.infotest.util.MyAssetManager;
 
 public class Apple extends Item {
     public String color;
-    private int healthRecovery;
+    private float healthRecovery;
 
-    public Apple(MyAssetManager assetManager, int healthRecovery) {
+    public Apple(MyAssetManager assetManager, float healthRecovery) {
         super("apple","just an apple", assetManager.getLoadingScreenTexture());
         this healthRecovery = healthRecovery;
     }
@@ -15,7 +15,7 @@ public class Apple extends Item {
         actor.heal (healthRecovery);
     }
 
-    public int getHealthRecovery(){
+    public float getHealthRecovery(){
         return healthRecovery;
     }
     
