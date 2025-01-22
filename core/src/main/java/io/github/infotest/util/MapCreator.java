@@ -97,28 +97,19 @@ public class MapCreator {
                 int bottomLeft; // für c4
                 int left; // für l
 
-                if (x2>0 && y2<MAP_SIZE-1) {topLeft = GAME_MAP[y2+1][x2-1];} else {topLeft = -1;}
-                if (y2<MAP_SIZE-1) {top = GAME_MAP[y2+1][x2];} else {top = -1;}
-                if (x2<MAP_SIZE-1 && y2<MAP_SIZE-1) {topRight = GAME_MAP[y2+1][x2+1];} else {topRight = -1;}
-                if (x2<MAP_SIZE-1) {right = GAME_MAP[y2][x2+1];} else {right = -1;}
-                if (x2<MAP_SIZE-1 && y2>0) {bottomRight = GAME_MAP[y2-1][x2+1];} else {bottomRight = -1;}
-                if (y2>0) {bottom = GAME_MAP[y2-1][x2];} else {bottom = -1;}
-                if (x2>0 && y2>0) {bottomLeft = GAME_MAP[y2-1][x2-1];} else {bottomLeft = -1;}
-                if (x2>0) {left = GAME_MAP[y2][x2-1];} else {left = -1;}
+                FADE_MAP[y2][x2] = new HashMap<Vector2,Integer>();
 
-                if (topLeft != thisCell && topLeft > 0) str+=topLeft+"c1"+";";
-                if (top != thisCell && top > 0) str+=top+"t"+";";
-                if (topRight != thisCell && topRight > 0) str+=topRight+"c2"+";";
-                if (right != thisCell && right > 0) str+=right+"r"+";";
-                if (bottomRight != thisCell && bottomRight > 0) str+=bottomRight+"c3"+";";
-                if (bottom != thisCell && bottom > 0) str+=bottom+"b"+";";
-                if (bottomLeft != thisCell && bottomLeft > 0) str+=bottomLeft+"c4"+";";
-                if (left != thisCell && left > 0) str+=left+"l"+";";
-
-                //Logger.log("x:"+x2+"; y:"+y2+"; str:"+str);
-                str = "";
-
-                FADE_MAP[y2][x2] = str;
+                for(int i =-1; i <= 1; i++){ // iteriere über alle Nachbarzellen
+                    for(int j = -1; j<= 1; j++){
+                        if(x2+i < 0 || x2+i > MAP_SIZE || y2+j < 0 || y2 +j > MAP_SIZE){
+                            continue; // Nachbarzelle ist ausserhalb der Welt
+                        }
+                        if(GAME_MAP[y2][x2] >= GAME_MAP[y2+j][x2+i]){
+                            continue; // Nachbarzelle kann fürs Fading ignoriert werden
+                        }
+                        FADE_MAP[y2][x2].put(new Vector(i,j),GAME_MAP[y2+j][x2+i]);
+                    }
+                }
             }
         }
     }
