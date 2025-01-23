@@ -49,7 +49,7 @@ public class Player {
     public Vector2 rotation;
 
     public String lastAttackedBy = "[Nothing]";
-    public int gold;
+    public float gold;
 
     public Player(String id, String name) {
         this.id = id;

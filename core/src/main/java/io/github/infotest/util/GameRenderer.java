@@ -625,18 +625,33 @@ public class GameRenderer {
 
 
     private void drawFrame(SpriteBatch batch, TextureRegion currentFrame, AbilityInstance fireball, float rotation) {
-        float dX = fireball.x - 46f;
-        float dY = fireball.y - 51f;
+        // The unscaled width and height of the region
+        float regionWidth = currentFrame.getRegionWidth();
+        float regionHeight = currentFrame.getRegionHeight();
+
+        // The final width/height on screen after applying fireball.scale
+        float scaledWidth = regionWidth * fireball.scale;
+        float scaledHeight = regionHeight * fireball.scale;
+
+        // We want fireball.x, fireball.y to be the center
+        // so offset by half the scaled sprite
+        float dX = fireball.x - scaledWidth / 2f;
+        float dY = fireball.y - scaledHeight / 2f;
+
+        // The origin is also the center, so rotation happens around the sprite's center
+        float originX = scaledWidth / 2f;
+        float originY = scaledHeight / 2f;
+
         batch.draw(
             currentFrame,
             dX,
             dY,
-            64,
-            64,
-            currentFrame.getRegionWidth(),
-            currentFrame.getRegionWidth(),
-            fireball.scale,
-            fireball.scale,
+            originX,
+            originY,
+            scaledWidth,
+            scaledHeight,
+            1f,          // Additional scaleX
+            1f,          // Additional scaleY
             rotation
         );
     }
