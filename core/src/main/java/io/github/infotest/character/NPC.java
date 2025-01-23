@@ -17,8 +17,6 @@ import java.util.HashMap;
 import static io.github.infotest.MainGameScreen.uiLayer;
 
 public class NPC extends Actor {
-    public String id;
-    protected String name;
     // 1.: Gender: 0 = male, 1 = female
     // 2.: Type: 0-7 NPC Type
     protected Vector2 genderType;

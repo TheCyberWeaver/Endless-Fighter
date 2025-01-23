@@ -85,10 +85,10 @@ public class AssetPaths {
     };
 
     public static final String[] FIREBALL_ASSETS = {
-        "fireball_sheet_start.png",
-        "fireball_sheet_fly.png",
-        "fireball_sheet_endTime.png",
-        "fireball_sheet_endHit.png"
+        "player/mage/fireball/fireball_sheet_start.png",
+        "player/mage/fireball/fireball_sheet_fly.png",
+        "player/mage/fireball/fireball_sheet_endTime.png",
+        "player/mage/fireball/fireball_sheet_endHit.png"
     };
 
     // Bars

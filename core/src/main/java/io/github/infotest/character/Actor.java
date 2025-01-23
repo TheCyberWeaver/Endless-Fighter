@@ -11,6 +11,8 @@ public abstract class Actor {
 
 
     // basic things
+    public String id;
+    public String name;
     protected float healthPoints;    // current HP
     protected float maxHealthPoints; // maximum HP
     protected boolean isAlive;

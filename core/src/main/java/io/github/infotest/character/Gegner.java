@@ -7,8 +7,7 @@ import io.github.infotest.util.DataObjects.GegnerData;
 
 import static io.github.infotest.MainGameScreen.*;
 public class Gegner extends  Actor{
-    public String id;
-    public String name;
+
     public int type;
 
     private float killXP;

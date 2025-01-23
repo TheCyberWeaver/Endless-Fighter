@@ -20,8 +20,6 @@ import static io.github.infotest.GameSettings.*;
 public abstract class Player extends Actor{
 
     // basic things
-    public String id;
-    protected String name;
     protected String className;
     protected int level;
     protected float experience;
