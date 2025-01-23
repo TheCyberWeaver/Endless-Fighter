@@ -235,7 +235,6 @@ public class ServerConnection {
                     if (args.length > 1 && args[1] instanceof String) {
                         String text = (String) args[1];
                         Logger.log("[Server Warning]: " + text);
-                        //TODO: Write server warnings into a logging file
                     }
                 }
             });
@@ -432,15 +431,18 @@ public class ServerConnection {
     private void recievedGegnerKilled(JSONObject data) throws JSONException {
         String gegnerID = data.getString("gegnerID");
         String playerID   = data.getString("killedByPlayerID");
-        NPC npc=null;
-        for(NPC npc2 : allNPCs){
-            if(npc2.id.equals(gegnerID)){
-                npc=npc2;
+        Gegner gegner=null;
+        for(Gegner gegner1 : allGegner){
+            if(gegner1.id.equals(gegnerID)){
+                gegner=gegner1;
             }
         }
         Player player = allPlayers.get(playerID);
         if(player!=null&&player.isAlive()&&gegnerID!=null){
-            //TODO
+            if(player.equals(localPlayer)){
+                Logger.log("You killed Gegner["+gegnerID+"]");
+                //TODO recieved Gegner get killed
+            }
         }
     }
     public void sendPlayerDeath(Player player){

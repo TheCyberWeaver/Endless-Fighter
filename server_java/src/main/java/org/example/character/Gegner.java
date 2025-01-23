@@ -6,9 +6,7 @@ import org.example.util.Vector2;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.example.GameSocketServer.allPlayers;
 import static org.example.GameSocketServer.*;
-import static org.example.GameSocketServer.server;
 
 public class Gegner {
     public String id;
@@ -94,12 +92,13 @@ public class Gegner {
         if(hp==0){
             killed();
         }
-        System.out.println("Taking " + damage + " damage remaining"+hp);
+        System.out.println("Gegner["+name+"] Taking " + damage + " damage with remaining "+hp +"HP");
     }
     public void killed() {
-        //server.getBroadcastOperations().sendEvent("GegnerKilled", new getKilledData(id,lastAttackedBy.getId()));
+        server.getBroadcastOperations().sendEvent("GegnerKilled", new getKilledData(id,lastAttackedBy.getId()));
         lastAttackedBy.gold+=killGold;
         isAlive=false;
+        System.out.println("Gegner["+name+"] is killed by Player["+lastAttackedBy.name+"]");
     }
     public boolean isAlive() {
         return isAlive;
