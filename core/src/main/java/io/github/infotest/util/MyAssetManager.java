@@ -39,6 +39,7 @@ public class MyAssetManager {
         loadMageAssets();
         loadFireballAssets();
         loadFireballSymbol();
+        loadBlackHoleAssets();
 
         loadHealthBarAssets();
         loadManaBarAssets();
@@ -110,6 +111,10 @@ public class MyAssetManager {
 
     public void loadFireballSymbol() {
         manager.load(AssetPaths.FIREBALL_SYMBOL, Texture.class);
+    }
+
+    public void loadBlackHoleAssets(){
+        loadTextures(AssetPaths.BLACKHOLE_ASSETS);
     }
 
     public void loadHealthBarAssets() {
@@ -213,6 +218,8 @@ public class MyAssetManager {
     public Texture[] getFireballAssets() {
         return getTextures(AssetPaths.FIREBALL_ASSETS);
     }
+
+    public Texture[] getBlackHoleAssets() {return getTextures(AssetPaths.BLACKHOLE_ASSETS);}
 
     public Texture getFireballSymbol() {
         return manager.get(AssetPaths.FIREBALL_SYMBOL, Texture.class);

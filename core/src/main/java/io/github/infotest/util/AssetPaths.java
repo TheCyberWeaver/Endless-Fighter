@@ -1,5 +1,7 @@
 package io.github.infotest.util;
 
+import com.badlogic.gdx.graphics.Texture;
+
 public class AssetPaths {
 
     // Single-file asset paths
@@ -21,7 +23,8 @@ public class AssetPaths {
         "worldTexture/TreeTile.png",
         "worldTexture/TreeTile_snow.png",
         "worldTexture/Tile4.png",
-        "worldTexture/Tile5.png"
+        "worldTexture/Tile5.png",
+        "worldTexture/water_sheet.png"
     };
 
     public static final String[] MAP_FADE_ASSETS = {
@@ -89,6 +92,10 @@ public class AssetPaths {
         "player/mage/fireball/fireball_sheet_fly.png",
         "player/mage/fireball/fireball_sheet_endTime.png",
         "player/mage/fireball/fireball_sheet_endHit.png"
+    };
+    public static final String[] BLACKHOLE_ASSETS = {
+        "player/mage/abilities/blackHole1_sheet.png",
+        "player/mage/abilities/blackHole2_sheet.png"
     };
 
     // Bars

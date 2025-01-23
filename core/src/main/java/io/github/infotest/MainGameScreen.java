@@ -198,14 +198,11 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
             batch.end();
 
 
-            shapeRenderer.end();
-            Gdx.gl.glLineWidth(1); // Reset the line width to 1 pixel
-
-
             handleInput(batch, delta);
 
             doGameLogic(delta);
-
+            shapeRenderer.end();
+            Gdx.gl.glLineWidth(1); // Reset the line width to 1 pixel
 
         }
         else{
@@ -269,6 +266,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 }
             }
         }
+        shapeRenderer.end();
         checkFireballCollisions();
         checkPlayerDeath();
 
