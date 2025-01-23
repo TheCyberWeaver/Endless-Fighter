@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.example.GameSocketServer.allPlayers;
+import static org.example.GameSocketServer.*;
 
 public class Gegner {
     public String id;
@@ -75,6 +76,7 @@ public class Gegner {
 
     public void performAttack(Player player) {
         player.takeDamage (5);
+        needPlayerUpdate=true;
         attackCoolDownTimer=0;
     }
 

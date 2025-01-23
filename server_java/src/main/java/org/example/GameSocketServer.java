@@ -32,9 +32,9 @@ public class GameSocketServer {
 
 
 
-    private static boolean needPlayerUpdate = true;
-    private static boolean needNPCUpdate = true;
-    private static boolean needGegnerUpdate = true;
+    public static boolean needPlayerUpdate = true;
+    public static boolean needNPCUpdate = true;
+    public static boolean needGegnerUpdate = true;
     /**
      * Stores all connected players
      */
