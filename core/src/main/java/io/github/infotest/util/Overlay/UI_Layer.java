@@ -33,6 +33,8 @@ public class UI_Layer implements ApplicationListener {
     ShapeRenderer shapeRenderer;
     Vector2 windowSize;
 
+    public static Texture whitePixel;
+
     private final Texture[] healthbar;
     private final Texture[] manabar;
     private final Texture[] ausdauerbar;
@@ -69,6 +71,9 @@ public class UI_Layer implements ApplicationListener {
     }
 
     public void create() {
+
+
+        whitePixel = new Texture(Gdx.files.internal("ui/whitePixel.png"));
         this.batch = new SpriteBatch();
         this.shapeRenderer = new ShapeRenderer();
 

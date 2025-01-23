@@ -31,7 +31,7 @@ public class Mage extends Player {
     private static float fireballCost = 5f;
     private static float fireballDamage = 16f;
     private static float fireballCooldown;
-    private static float fireballSpeed = 2f;
+    private static float fireballSpeed = 20f;
     private static float fireballScale = 3f;
     private static float fireballLT = 2f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
 

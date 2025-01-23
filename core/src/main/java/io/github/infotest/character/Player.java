@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import static io.github.infotest.MainGameScreen.CELL_SIZE;
 
 import static io.github.infotest.GameSettings.*;
+import static io.github.infotest.MainGameScreen.localPlayer;
+import static io.github.infotest.util.Overlay.UI_Layer.whitePixel;
 
 public abstract class Player extends Actor{
 
@@ -30,7 +32,7 @@ public abstract class Player extends Actor{
     protected float maxMana;
     protected float manaRegen = 2f;
 
-    protected int gold=0;
+    protected float gold=0;
 
     protected int INV_SIZE = 7;
 
@@ -145,7 +147,6 @@ public abstract class Player extends Actor{
 
                 // (D) Optional: draw a background shape using a 1×1 white texture with alpha
                 // e.g., MyAssetManager.getWhitePixel()
-                Texture whitePixel = new Texture("ui/whitePixel.png");
 
                 // Set color for tinted draw (e.g., semi‐transparent black)
                 batch.setColor(0f, 0f, 0f, 0.7f); // black with 70% alpha
@@ -401,11 +402,15 @@ public abstract class Player extends Actor{
         return seeAllActive;
     }
 
-    public int getGold() {
+    public float getGold() {
         return gold;
     }
 
-    public void updateGold(int gold) {
+    public void updateGold(float gold) {
         this.gold = gold;
+    }
+    public void updateGold(float gold, ServerConnection serverConnection) {
+        this.gold = gold;
+        serverConnection.sendPlayerUpdateGold(localPlayer);
     }
 }

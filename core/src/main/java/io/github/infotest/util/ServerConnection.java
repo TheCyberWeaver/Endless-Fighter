@@ -193,6 +193,19 @@ public class ServerConnection {
                         }
                     }
                 }
+            }).on("GegnerKilled", new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    if (args.length > 0 && args[0] instanceof JSONObject && hasInitializedMap) {
+                        JSONObject data = (JSONObject) args[0];
+                        try {
+                            recievedGegnerKilled(data);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }).on("playerLeft", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
@@ -416,7 +429,20 @@ public class ServerConnection {
             }
         }
     }
-
+    private void recievedGegnerKilled(JSONObject data) throws JSONException {
+        String gegnerID = data.getString("gegnerID");
+        String playerID   = data.getString("killedByPlayerID");
+        NPC npc=null;
+        for(NPC npc2 : allNPCs){
+            if(npc2.id.equals(gegnerID)){
+                npc=npc2;
+            }
+        }
+        Player player = allPlayers.get(playerID);
+        if(player!=null&&player.isAlive()&&gegnerID!=null){
+            //TODO
+        }
+    }
     public void sendPlayerDeath(Player player){
         JSONObject actionData = new JSONObject();
         try {
@@ -530,13 +556,24 @@ public class ServerConnection {
     public void sendPlayerUpdateGold(Player player){
         JSONObject playerUpdateGoldData = new JSONObject();
         try {
-            playerUpdateGoldData.put("gold", player.getGold()+"");
+            playerUpdateGoldData.put("Gold", player.getGold()+"");
             socket.emit("playerUpdateGold", playerUpdateGoldData);
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+    public void sendAttackGegner(Gegner gegner, float damage){
+        JSONObject attackedGegnerData = new JSONObject();
+        try{
+            attackedGegnerData.put("gegnerID", gegner.id);
+            attackedGegnerData.put("damage", damage);
+            socket.emit("AttackGegner", attackedGegnerData);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void disconnect() {
         if (socket != null) {
             socket.disconnect();

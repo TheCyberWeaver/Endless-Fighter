@@ -45,7 +45,7 @@ public class GameSocketServer {
 
     public static ArrayList<Gegner> allGegner = new ArrayList<>();
 
-    private static SocketIOServer server;
+    public static SocketIOServer server;
     public static void runServer() {
         running = true;
         // 0. Initialize the Server
@@ -297,13 +297,38 @@ public class GameSocketServer {
 
             Gson gson = new Gson();
             JsonObject json = gson.toJsonTree(data).getAsJsonObject();
-            int gold = Integer.parseInt(json.get("gold").getAsString());
+            int gold = Integer.parseInt(json.get("Gold").getAsString());
 
             String socketId = client.getSessionId().toString();
             Player player = allPlayers.get(socketId);
             player.gold=gold;
 
             needPlayerUpdate=true;
+        });
+
+        server.addEventListener("AttackGegner", Object.class, (client, data, ackSender) -> {
+
+            Gson gson = new Gson();
+            JsonObject json = gson.toJsonTree(data).getAsJsonObject();
+            String gegnerID = json.get("gegnerID").getAsString();
+            float damage = Float.parseFloat(json.get("damage").getAsString());
+
+            Gegner gegner = null;
+
+            for(Gegner gegnerTMP : allGegner) {
+                if( gegnerTMP.id.equals(gegnerID)){
+                    gegner=gegnerTMP;
+                }
+            }
+            String socketId = client.getSessionId().toString();
+            Player player = allPlayers.get(socketId);
+
+            if(gegner!=null&& player!=null) {
+                if(gegner.isAlive()){
+                    gegner.takeDamage(damage,player);
+                }
+            }
+            needGegnerUpdate=true;
         });
 
 
@@ -318,7 +343,9 @@ public class GameSocketServer {
                 broadcastAllPlayers(server);
 
                 for(Gegner gegner : allGegner) {
-                    gegner.update(0.016f);
+                    if(gegner.isAlive()){
+                        gegner.update(0.016f);
+                    }
                 }
 
                 // 控制广播频率，比如每 1 秒广播一次
@@ -426,7 +453,6 @@ public class GameSocketServer {
         }
     }
 
-    // 这个加一个 getter，供 GUI 显示
     public static String getServerVersion(){
         return serverVersion;
     }
