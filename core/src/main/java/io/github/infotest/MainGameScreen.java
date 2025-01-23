@@ -43,7 +43,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     // Map data
     public static int GLOBAL_SEED; // this will be assigned by the seed from server
     public static final int CELL_SIZE = 32;
-    public static final int MAP_SIZE = 10;
+    public static final int MAP_SIZE = 100;
     public static int numOfValidTextures = 6;
     public static int numOfValidDeco = 13;
 
