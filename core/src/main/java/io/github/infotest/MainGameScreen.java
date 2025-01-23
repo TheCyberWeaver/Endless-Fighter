@@ -2,7 +2,7 @@ package io.github.infotest;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -33,16 +33,17 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     private final OrthographicCamera camera;
     public static UI_Layer uiLayer;
 
-    private Vector3 clickPos = null;
-    private boolean clicked = false;
+    public static Vector3 clickPos = null;
+    public static boolean clicked = false;
 
     private boolean isRenderingWithNightShader = false;
+    public static boolean isRenderingBlackHoleActivation = false;
 
 
     // Map data
     public static int GLOBAL_SEED; // this will be assigned by the seed from server
     public static final int CELL_SIZE = 32;
-    public static final int MAP_SIZE = 1000;
+    public static final int MAP_SIZE = 10;
     public static int numOfValidTextures = 6;
     public static int numOfValidDeco = 13;
 
@@ -146,7 +147,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
         hasInitializedMap = true;
 
-        gameRenderer = new GameRenderer(this, assetManager);
+        gameRenderer = new GameRenderer(this, assetManager, camera);
         gameRenderer.initAnimations();
         gameRenderer.initShaders();
 
@@ -166,7 +167,9 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
             camera.position.set(localPlayer.getX(), localPlayer.getY(), 0);
             camera.update();
             batch.setProjectionMatrix(camera.combined);
-
+            shapeRenderer.setProjectionMatrix(camera.combined);
+            Gdx.gl.glLineWidth(5); // make line width to 5 pixel
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             batch.begin();
 
             if(isRenderingWithNightShader){
@@ -175,7 +178,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 batch.setShader(null);
             }
 
-            gameRenderer.renderMap(batch, camera.zoom, localPlayer.getPosition());
+            gameRenderer.renderMap(batch, delta, camera.zoom, localPlayer.getPosition());
             gameRenderer.renderPlayers(batch, allPlayers, delta);
             gameRenderer.renderGegner(batch, allGegner, delta);
             gameRenderer.renderNPCs(batch, delta);
@@ -194,6 +197,11 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
             batch.setShader(null);
             batch.end();
 
+
+            shapeRenderer.end();
+            Gdx.gl.glLineWidth(1); // Reset the line width to 1 pixel
+
+
             handleInput(batch, delta);
 
             doGameLogic(delta);
@@ -209,6 +217,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
         }
 
         uiLayer.render();
+
+
 
     }
     private void doGameLogic(float delta) {
@@ -246,7 +256,19 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
         }
 
         localPlayer.update(delta);
-
+        float d = 32*32;
+        if (isRenderingBlackHoleActivation && renderBlackHoleActivation(delta, d)) {
+            if (clickPos != null) {
+                float dX = Math.abs(clickPos.x-localPlayer.getX());
+                float dY = Math.abs(clickPos.y-localPlayer.getY());
+                if (dX < d/2 && dY < d/2) {
+                    GameRenderer.blackHole(clickPos.x, clickPos.y, localPlayer.getT4Scale(), localPlayer.getT4Damage(), localPlayer.getT4LT(), localPlayer);
+                    localPlayer.drainMana(localPlayer.getT4Cost());
+                    localPlayer.resetAttacking4();
+                    localPlayer.unfreeze();
+                }
+            }
+        }
         checkFireballCollisions();
         checkPlayerDeath();
 
@@ -259,6 +281,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
         numberOfNPCInTheLastFrame = allNPCs.size();
         clicked = false;
+        clickPos = null;
     }
 
     Vector3 oldPosition = null;
@@ -287,32 +310,36 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
         tempTime += delta;
         if (localPlayer.isAlive()) {
             //Basic Movement
-            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.A) && !localPlayer.isFrozen()) {
                 localPlayer.setX(localPlayer.getX() - speed * delta);
                 moved = true;
                 localPlayer.setRotation(new Vector2(-1, 0));
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.D) && !localPlayer.isFrozen()) {
                 localPlayer.setX(localPlayer.getX() + speed * delta);
                 moved = true;
                 localPlayer.setRotation(new Vector2(1, 0));
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.W) && !localPlayer.isFrozen()) {
                 localPlayer.setY(localPlayer.getY() + speed * delta);
                 moved = true;
                 localPlayer.setRotation(new Vector2(0, 1));
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.S) && !localPlayer.isFrozen()) {
                 localPlayer.setY(localPlayer.getY() - speed * delta);
                 moved = true;
                 localPlayer.setRotation(new Vector2(0, -1));
             }
             //Skill T1
-            if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.E) && !localPlayer.isFrozen()) {
                 localPlayer.castSkill(1, serverConnection);
             }
+            //Skill T2
+            if (Gdx.input.isKeyPressed(Input.Keys.Q) && !localPlayer.isFrozen()) {
+                localPlayer.castSkill(4, serverConnection);
+            }
             //Sprint
-            if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && moved) {
+            if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && moved && !localPlayer.isFrozen()) {
                 localPlayer.sprint(delta);
                 if(!runningSound.isPlaying()){
                     runningSound.play();
@@ -331,7 +358,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 }
             }
             //interact with NPC
-            if (Gdx.input.isKeyPressed(Input.Keys.F)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.F) && !localPlayer.isFrozen()) {
                 if(currentTradingToNPC==null && currentTradingToNPCTimer>=0.3){
                     currentTradingToNPCTimer=0;
                     NPC cNpc = getClosestNPC();
@@ -392,16 +419,29 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
             if(!isDevelopmentMode){
                 if(camera.zoom<=defaultCameraZoom && cameraZoomTimer>=2)camera.zoom+=0.005;
-                if(camera.zoom>=defaultCameraZoom && cameraZoomTimer>=2)camera.zoom-=0.005;
+                if(camera.zoom>=defaultCameraZoom && cameraZoomTimer>=2 && !localPlayer.isAttacking4())camera.zoom-=0.005;
             }
         }
     }
+
+    private boolean renderBlackHoleActivation(float delta, float radius) {
+        localPlayer.freeze();
+        if (camera.zoom < 1.2){
+            camera.zoom += 4*delta;
+            return false;
+        } else {
+            shapeRenderer.setColor(Color.RED);
+            shapeRenderer.rect(localPlayer.getX()-radius/2, localPlayer.getY()-radius/2, radius, radius);
+            return true;
+        }
+    }
+
+
     @Override
     public void resize(int width, int height) {
         camera.setToOrtho(false, width, height);
         uiLayer.resize(width, height);
     }
-
     @Override
     public void show() {
         Gdx.input.setInputProcessor(this);
@@ -415,6 +455,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
+        if (localPlayer.isAttacking4()) return false;
         camera.zoom += amountY * 0.1f;
         if(!isDevelopmentMode){
             camera.zoom = Math.max(0.25f, Math.min(1.5f, camera.zoom));

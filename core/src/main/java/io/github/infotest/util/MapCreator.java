@@ -114,7 +114,7 @@ public class MapCreator {
                 if (left != thisCell && left > 0) str+=left+"l"+";";
 
                 //Logger.log("x:"+x2+"; y:"+y2+"; str:"+str);
-                str = "";
+                //str = "";
 
                 FADE_MAP[y2][x2] = str;
             }

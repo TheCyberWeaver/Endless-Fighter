@@ -1,9 +1,11 @@
 package io.github.infotest.classes;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
+import io.github.infotest.MainGameScreen;
 import io.github.infotest.character.Player;
 import io.github.infotest.util.GameRenderer;
 import io.github.infotest.util.Logger;
@@ -28,12 +30,18 @@ public class Mage extends Player {
 
     private MyAssetManager assetManager;
 
-    private static float fireballCost = 5f;
-    private static float fireballDamage = 16f;
-    private static float fireballCooldown;
-    private static float fireballSpeed = 20f;
-    private static float fireballScale = 3f;
-    private static float fireballLT = 2f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
+    private float fireballCost = 5f;
+    private float fireballDamage = 16f;
+    private float fireballCooldown;
+    private float fireballSpeed = 20f;
+    private float fireballScale = 3f;
+    private float fireballLT = 2f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
+
+    private float blackHoleCost = 30f;
+    private float blackHoleDamage = 2f;
+    private float blackHoleCooldown = 1f; //20
+    private float blackHoleScale = 1f;
+    private float blackHoleLT = 4f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
 
     Sound castFireballSound;
 
@@ -49,13 +57,25 @@ public class Mage extends Player {
         RUN.setPlayMode(Animation.PlayMode.LOOP);
 
         fireballCooldown = ATTACK_1.getAnimationDuration()+0.5f;
-        T1CoolDownTime =fireballCooldown;
 
         STATE = IDLE;
 
         this.assetManager=assetManager;
 
         castFireballSound= assetManager.getCastFireballSound();
+
+        this.T1Cost = fireballCost;
+        this.T1Damage = fireballDamage;
+        this.T1Cooldown = fireballCooldown;
+        this.T1Speed = fireballSpeed;
+        this.T1Scale = fireballScale;
+        this.T1LT =fireballLT;
+
+        this.T4Cost = blackHoleCost;
+        this.T4Damage = blackHoleDamage;
+        this.T4Cooldown = blackHoleCooldown;
+        this.T4Scale = blackHoleScale;
+        this.T4LT = blackHoleLT;
     }
     public long soundID=0;
     @Override
@@ -81,24 +101,25 @@ public class Mage extends Player {
                     ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
                     int finalXOffset = xOffset;
                     scheduler.schedule(() -> {
-
                         castFireball(this.position.x + finalXOffset, this.position.y + 46, rotation);
                         scheduler.shutdown(); // Scheduler nach Ausführung beenden
                     }, 400, TimeUnit.MILLISECONDS);
 
                     if(localPlayer==this){
-
-
-
                         serverConnection.sendCastSkill(this, "Fireball");
                     }
                 }
-                //Logger.log(mana+"/"+maxMana);
                 break;
-            case 2:
+            case 2: break;
+            case 3: break;
+            case 4:
+                if(timeSinceLastT4Skill >= blackHoleCooldown ||  localPlayer!=this) {
+                    Logger.log("[Mage INFO]: Player [" + this.getName() + "] casts skill " + skillID);
+                    timeSinceLastT4Skill = 0;
+                    this.isAttacking4 = true;
+                }
                 break;
-            default:
-                break;
+            default: break;
         }
     }
 
@@ -148,6 +169,8 @@ public class Mage extends Player {
         currentFrame.setOrigin(currentFrame.getWidth()/2, currentFrame.getHeight()/2);
         currentFrame.setScale(0.75f);
         currentFrame.draw(batch);
+
+        MainGameScreen.isRenderingBlackHoleActivation = isAttacking4;
 
         animationTime += delta;
     }
