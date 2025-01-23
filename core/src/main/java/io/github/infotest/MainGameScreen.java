@@ -184,41 +184,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
         shapeRenderer = new ShapeRenderer();
 
         assetManager = new MyAssetManager();
-
-        assetManager.loadLoadingScreen();
-
-        assetManager.loadMapAssets();
-        assetManager.loadSkillBarAsset();
-        assetManager.loadGoldBarAsset();
-
-        assetManager.loadMapFadeAssets();
-        assetManager.loadMapDecoAssets();
-        assetManager.loadMapTreeAssets();
-
-        assetManager.loadPlayerAssets();
-
-        assetManager.loadGegnerAsset();
-
-        assetManager.loadMageAssets();
-        assetManager.loadFireballAssets();
-        assetManager.loadFireballSymbol();
-
-        assetManager.loadHealthBarAssets();
-        assetManager.loadManaBarAssets();
-        assetManager.loadAusdauerBarAssets();
-
-        assetManager.loadNPCMaleAssets();
-        assetManager.loadNPCWomenAssets();
-        assetManager.loadNPCMarketAssets();
-
-        assetManager.loadSignsAssets();
-        assetManager.loadArrowAssets();
-
-        assetManager.loadItemBarAssets();
-        assetManager.loadItemAssets();
-
-        assetManager.loadMainGameMusicAssets();
-
+        assetManager.loadAllMainGameAssets();
         assetManager.manager.finishLoading();
 
         runningSound= assetManager.getRunningSound();
