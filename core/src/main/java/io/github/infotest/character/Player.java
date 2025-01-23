@@ -114,7 +114,7 @@ public abstract class Player extends Actor{
         //2. render Player name
         GlyphLayout layout = new GlyphLayout(font, name);
         float textWidth = layout.width;
-        font.draw(batch, name, predictedPosition.x + (CELL_SIZE /2f) - textWidth/2f  , predictedPosition.y + 80);
+        font.draw(batch, name, predictedPosition.x - textWidth/2f  , predictedPosition.y + 50);
 
         // 3) Speech bubble logic
         if (isSpeechBubbleVisible && speechBubbleMessage != null) {

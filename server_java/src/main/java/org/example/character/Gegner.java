@@ -66,9 +66,9 @@ public class Gegner {
 
             float distance =position.distance(closestPlayer.position) ;
             if (distance <= attackRange && attackCoolDownTimer>=attackCoolDownTime) {
-                performAttack(closestPlayer);
+                //performAttack(closestPlayer);
             } else {
-                moveTowards (closestPlayer, delta);
+                //moveTowards (closestPlayer, delta);
             }
         }
         attackCoolDownTimer+=delta;
