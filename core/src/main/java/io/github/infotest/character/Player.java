@@ -43,6 +43,7 @@ public abstract class Player extends Actor{
 
     protected boolean isSprinting;
 
+    protected boolean isFrozen;
     protected boolean hasMoved;
     protected  boolean isHit;
 
@@ -87,11 +88,8 @@ public abstract class Player extends Actor{
 
 
     protected float timeSinceLastT1Skill;
-
     protected float timeSinceLastT2Skill;
-
     protected float timeSinceLastT3Skill;
-
     protected float timeSinceLastT4Skill;
 
     public Player(String id, String name, String className, int maxHealthPoints, int maxMana, int maxAusdauer, Vector2 initialPosition, float speed) {
@@ -119,6 +117,7 @@ public abstract class Player extends Actor{
         this.ausdauer = maxAusdauer;
 
         this.isSprinting = false;
+        this.isFrozen = false;
         this.isHit = false;
         this.isAttacking = false;
         this.normalSpeed = speed;
@@ -291,6 +290,14 @@ public abstract class Player extends Actor{
         this.setMana(this.getMaxMana());
 
         this.resetT1Timer();
+        this.resetT2Timer();
+        this.resetT3Timer();
+        this.resetT4Timer();
+
+        this.resetAttacking();
+        this.resetAttacking2();
+        this.resetAttacking3();
+        this.resetAttacking4();
 
         if (!keepInventory){
             for (Item i : this.getItems()){
@@ -529,5 +536,14 @@ public abstract class Player extends Actor{
     }
     public void updateGold(int gold) {
         this.gold = gold;
+    }
+    public void freeze(){
+        isFrozen = true;
+    }
+    public void unfreeze(){
+        isFrozen = false;
+    }
+    public boolean isFrozen() {
+        return isFrozen;
     }
 }

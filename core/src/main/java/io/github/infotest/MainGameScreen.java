@@ -43,7 +43,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     // Map data
     public static int GLOBAL_SEED; // this will be assigned by the seed from server
     public static final int CELL_SIZE = 32;
-    public static final int MAP_SIZE = 1000;
+    public static final int MAP_SIZE = 10;
     public static int numOfValidTextures = 6;
     public static int numOfValidDeco = 13;
 
@@ -305,7 +305,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 batch.setShader(null);
             }
 
-            gameRenderer.renderMap(batch, camera.zoom, localPlayer.getPosition());
+            gameRenderer.renderMap(batch, delta, camera.zoom, localPlayer.getPosition());
             gameRenderer.renderPlayers(batch, allPlayers, delta);
             gameRenderer.renderGegner(batch, allGegner, delta);
             handleInput(batch, delta);
@@ -372,8 +372,9 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                     float dY = Math.abs(clickPos.y-localPlayer.getY());
                     if (dX < d/2 && dY < d/2) {
                         GameRenderer.blackHole(clickPos.x, clickPos.y, localPlayer.getT4Scale(), localPlayer.getT4Damage(), localPlayer.getT4LT(), localPlayer);
-                        Logger.log("Add Black Hole ["+ d/2+"; "+ dX+"; "+ dY+"]");
+                        localPlayer.drainMana(localPlayer.getT4Cost());
                         localPlayer.resetAttacking4();
+                        localPlayer.unfreeze();
                     }
                 }
             }
@@ -459,34 +460,34 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
         tempTime += delta;
         if (localPlayer.isAlive()) {
-            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.A) && !localPlayer.isFrozen()) {
                 localPlayer.setX(localPlayer.getX() - speed * delta);
                 moved = true;
                 localPlayer.setRotation(new Vector2(-1, 0));
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.D) && !localPlayer.isFrozen()) {
                 localPlayer.setX(localPlayer.getX() + speed * delta);
                 moved = true;
                 localPlayer.setRotation(new Vector2(1, 0));
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.W) && !localPlayer.isFrozen()) {
                 localPlayer.setY(localPlayer.getY() + speed * delta);
                 moved = true;
                 localPlayer.setRotation(new Vector2(0, 1));
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.S) && !localPlayer.isFrozen()) {
                 localPlayer.setY(localPlayer.getY() - speed * delta);
                 moved = true;
                 localPlayer.setRotation(new Vector2(0, -1));
             }
 
-            if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.E) && !localPlayer.isFrozen()) {
                 localPlayer.castSkill(1, serverConnection);
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.Q) && !localPlayer.isFrozen()) {
                 localPlayer.castSkill(4, serverConnection);
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && moved) {
+            if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && moved && !localPlayer.isFrozen()) {
                 localPlayer.sprint(delta);
                 if(!runningSound.isPlaying()){
                     runningSound.play();
@@ -503,7 +504,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                     tempTime = 0;
                 }
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.F)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.F) && !localPlayer.isFrozen()) {
                 if(currentTradingToNPC==null && currentTradingToNPCTimer>=0.3){
                     currentTradingToNPCTimer=0;
                     NPC cNpc = getClosestNPC();
@@ -593,12 +594,13 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
             if(!isDevelopmentMode){
                 if(camera.zoom<=defaultCameraZoom && cameraZoomTimer>=2)camera.zoom+=0.005;
-                if(camera.zoom>=defaultCameraZoom && cameraZoomTimer>=2)camera.zoom-=0.005;
+                if(camera.zoom>=defaultCameraZoom && cameraZoomTimer>=2 && !localPlayer.isAttacking4())camera.zoom-=0.005;
             }
         }
     }
 
     private boolean renderBlackHoleActivation(float delta, float radius) {
+        localPlayer.freeze();
         if (camera.zoom < 1.2){
             camera.zoom += 4*delta;
             return false;
@@ -732,11 +734,5 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     }
     public float getZoom(){
         return camera.zoom;
-    }
-    public void setZoom(float zoom){
-        camera.zoom = zoom;
-    }
-    public Vector3 getClickedPos(){
-        return clickPos;
     }
 }

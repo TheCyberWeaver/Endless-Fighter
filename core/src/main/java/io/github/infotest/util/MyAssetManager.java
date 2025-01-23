@@ -24,15 +24,17 @@ public class MyAssetManager {
         manager.load("worldTexture/TreeTile_snow.png",Texture.class);
         manager.load("worldTexture/Tile4.png",Texture.class);
         manager.load("worldTexture/Tile5.png",Texture.class);
+        manager.load("worldTexture/water_sheet.png",Texture.class);
     }
     public Texture[] getMapAssets(){
-        Texture[] textures=new Texture[6];
+        Texture[] textures=new Texture[7];
         textures[0]=manager.get("worldTexture/Tile1.png",Texture.class);
         textures[1]=manager.get("worldTexture/Tile2.png",Texture.class);
         textures[2]=manager.get("worldTexture/TreeTile.png",Texture.class);
         textures[3]=manager.get("worldTexture/TreeTile_snow.png",Texture.class);
         textures[4]=manager.get("worldTexture/Tile4.png",Texture.class);
         textures[5]=manager.get("worldTexture/Tile5.png",Texture.class);
+        textures[6]=manager.get("worldTexture/water_sheet.png",Texture.class);
         return textures;
     }
 
