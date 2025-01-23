@@ -502,8 +502,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 if (dX <= 32f && dY <= 32f&& !fireball.hasHit()){
                     if(fireball.getOwner().equals(localPlayer)){
                         gegner.takeDamage(fireball.getDamage(),serverConnection);
-                        fireball.setHit();
                     }
+                    fireball.setHit();
                 }
             }
         }
