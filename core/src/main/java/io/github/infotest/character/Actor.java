@@ -4,6 +4,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
+import io.github.infotest.GameSettings;
+import io.github.infotest.MainGameScreen;
+import io.github.infotest.util.Logger;
 import io.github.infotest.util.MyAssetManager;
 import io.github.infotest.util.ServerConnection;
 
@@ -24,15 +27,25 @@ public abstract class Actor {
     protected float lerpSpeed = 20f;
     protected Vector2 rotation;
 
+    protected final float normalSpeed;
+    protected final float speedFaktorOn0 = 1; // normal grass
+    protected final float speedFaktorOn1 = 1; // dark grass
+    protected final float speedFaktorOn2 = 0.7f; // tree
+    protected final float speedFaktorOn3 = 0.7f * 0.5f; // snow tree
+    protected final float speedFaktorOn4 = 0.5f; // snow
+    protected final float speedFaktorOn5 = 0.8f; // ice
+
     // LibGDX related
     protected Texture texture;     // character texture
     protected static BitmapFont font;
+    protected int tileIDUnder; // TileID of the Tile under the player
+    protected int oldTileIDUnder;
 
     public Actor(int maxHealthPoints, Vector2 initialPosition, float speed, Texture texture) {
         this.maxHealthPoints = maxHealthPoints;
         this.healthPoints = maxHealthPoints; // full HP at first
         this.isAlive = true;
-        this.speed = speed;
+        this.normalSpeed = speed;
 
         //Movement related
         this.position = new Vector2(initialPosition);
@@ -49,11 +62,11 @@ public abstract class Actor {
         }
 
     }
-    public Actor(int maxHealthPoints, Vector2 initialPosition, float speed) {
+    public Actor(int maxHealthPoints, Vector2 initialPosition,float speed) {
         this.maxHealthPoints = maxHealthPoints;
         this.healthPoints = maxHealthPoints;
+        this.normalSpeed = speed;
         this.isAlive = true;
-        this.speed = speed;
 
         //Movement related
         this.position = new Vector2(initialPosition);
@@ -102,7 +115,28 @@ public abstract class Actor {
         }
     }
 
-    public abstract void render(Batch batch, float delta);
+    public void render(Batch batch, float delta){
+        if (position.x >= MainGameScreen.MAP_SIZE*MainGameScreen.CELL_SIZE || position.x < 0 || position.y >= MainGameScreen.MAP_SIZE*MainGameScreen.CELL_SIZE || position.y < 0) {
+            tileIDUnder = -1;
+        } else {
+            tileIDUnder = MainGameScreen.GAME_MAP[(int) (position.y/32)][(int) (position.x/32)];
+        }
+        if (!GameSettings.isDevelopmentMode && oldTileIDUnder != tileIDUnder) {
+            float tileSpeedFaktor;
+            switch (tileIDUnder) {
+                case 0: tileSpeedFaktor = speedFaktorOn0; break;
+                case 1: tileSpeedFaktor = speedFaktorOn1; break;
+                case 2: tileSpeedFaktor = speedFaktorOn2; break;
+                case 3: tileSpeedFaktor = speedFaktorOn3; break;
+                case 4: tileSpeedFaktor = speedFaktorOn4; break;
+                case 5: tileSpeedFaktor = speedFaktorOn5; break;
+                default: tileSpeedFaktor = 1f; break;
+            }
+            speed = normalSpeed * tileSpeedFaktor;
+        }
+
+        oldTileIDUnder = tileIDUnder;
+    }
     public abstract void update(float delta);
 
     public void kill(){

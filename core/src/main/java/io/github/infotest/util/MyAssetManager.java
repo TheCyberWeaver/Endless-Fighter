@@ -38,6 +38,29 @@ public class MyAssetManager {
         return textures;
     }
 
+    public void loadMapWaterAssets(){
+        manager.load("worldTexture/waterEdge/bottomRight_water.png",Texture.class);
+        manager.load("worldTexture/waterEdge/right_water.png",Texture.class);
+        manager.load("worldTexture/waterEdge/topRight_water.png",Texture.class);
+        manager.load("worldTexture/waterEdge/top_water.png",Texture.class);
+        manager.load("worldTexture/waterEdge/topLeft_water.png",Texture.class);
+        manager.load("worldTexture/waterEdge/left_water.png",Texture.class);
+        manager.load("worldTexture/waterEdge/bottomLeft_water.png",Texture.class);
+        manager.load("worldTexture/waterEdge/bottom_water.png",Texture.class);
+    }
+    public Texture[] getMapWaterAssets(){
+        Texture[] textures=new Texture[8];
+        textures[0]=manager.get("worldTexture/waterEdge/bottomRight_water.png",Texture.class);
+        textures[1]=manager.get("worldTexture/waterEdge/right_water.png",Texture.class);
+        textures[2]=manager.get("worldTexture/waterEdge/topRight_water.png",Texture.class);
+        textures[3]=manager.get("worldTexture/waterEdge/top_water.png",Texture.class);
+        textures[4]=manager.get("worldTexture/waterEdge/topLeft_water.png",Texture.class);
+        textures[5]=manager.get("worldTexture/waterEdge/left_water.png",Texture.class);
+        textures[6]=manager.get("worldTexture/waterEdge/bottomLeft_water.png",Texture.class);
+        textures[7]=manager.get("worldTexture/waterEdge/bottom_water.png",Texture.class);
+        return textures;
+    }
+
     public void loadMapFadeAssets(){
         manager.load("worldTexture/fade/Tile1_corner.png",Texture.class);
         manager.load("worldTexture/fade/Tile1_bottom.png",Texture.class);

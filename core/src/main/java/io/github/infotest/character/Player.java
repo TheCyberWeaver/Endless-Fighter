@@ -134,6 +134,7 @@ public abstract class Player extends Actor{
     /// game logic
     @Override
     public void render(Batch batch, float delta) {
+        super.render(batch, delta);
         Vector2 predictedPosition = predictPosition();
         //1. draw texture if player has texture
         if (texture != null) {
@@ -222,7 +223,18 @@ public abstract class Player extends Actor{
             if (!isDevelopmentMode) {
                 this.ausdauer -= ausdauerCost * delta;
             }
-            this.speed = this.sprintingSpeed;
+            float tileSpeedFactor;
+            switch(tileIDUnder){
+                case 0: tileSpeedFactor = speedFaktorOn0; break;
+                case 1: tileSpeedFactor = speedFaktorOn1; break;
+                case 2: tileSpeedFactor = speedFaktorOn2; break;
+                case 3: tileSpeedFactor = speedFaktorOn3; break;
+                case 4: tileSpeedFactor = speedFaktorOn4; break;
+                case 5: tileSpeedFactor = speedFaktorOn5; break;
+                default: tileSpeedFactor = 1; break;
+            }
+
+            this.speed = this.sprintingSpeed*tileSpeedFactor;
             if (isDevelopmentMode) {
                 this.speed = 750f;
             }

@@ -21,6 +21,7 @@ public class Gegner extends  Actor{
 
     @Override
     public void render(Batch batch, float delta) {
+        super.render(batch, delta);
         Vector2 predictedPosition = predictPosition();
         if (texture != null) {
             batch.draw(texture, predictedPosition.x, predictedPosition.y);
