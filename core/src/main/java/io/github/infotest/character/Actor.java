@@ -83,7 +83,6 @@ public abstract class Actor {
     }
 
     public void updateTargetPosition(Vector2 newTargetPosition) {
-
         this.targetPosition.set(newTargetPosition);
     }
     public Vector2 predictPosition() {
@@ -96,7 +95,14 @@ public abstract class Actor {
     }
 
     public void interpolatePosition(float deltaTime) {
-        position.lerp(targetPosition, lerpSpeed * deltaTime); // 线性插值
+        Vector2 pos = position.cpy().lerp(targetPosition, lerpSpeed * deltaTime);
+        if (MainGameScreen.GAME_MAP != null) {
+            int x = (int) (pos.x/MainGameScreen.CELL_SIZE);
+            int y = (int) (pos.y/MainGameScreen.CELL_SIZE);
+            if (x<MainGameScreen.MAP_SIZE && x>=0 && y<MainGameScreen.MAP_SIZE && y>=0) {
+                position = pos;
+            }
+        }
     }
 
     public void takeDamage(float damage, ServerConnection serverConnection) {
@@ -160,15 +166,19 @@ public abstract class Actor {
         return position.x;
     }
     public void setX(float x) {
-        position.x = x;
-        targetPosition.x = x;
+        if(x >= 0 && x < MainGameScreen.MAP_SIZE*MainGameScreen.CELL_SIZE){
+            position.x = x;
+            targetPosition.x = x;
+        }
     }
     public float getY() {
         return position.y;
     }
     public void setY(float y) {
-        position.y = y;
-        targetPosition.y=y;
+        if(y >= 0 && y < MainGameScreen.MAP_SIZE*MainGameScreen.CELL_SIZE){
+            position.y = y;
+            targetPosition.y = y;
+        }
     }
     public Vector2 getPosition() {
         return position;
