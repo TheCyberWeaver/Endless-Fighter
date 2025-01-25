@@ -4,6 +4,10 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
+import org.w3c.dom.Text;
+
+import java.util.HashMap;
 
 public class MyAssetManager {
     public final AssetManager manager=new AssetManager();
@@ -163,6 +167,32 @@ public class MyAssetManager {
         textures[3]=manager.get("worldTexture/deco/tree/tree_snow.png",Texture.class);
         textures[4]=manager.get("worldTexture/deco/tree/tree_bottom_snow.png",Texture.class);
         textures[5]=manager.get("worldTexture/deco/tree/tree_top_snow.png",Texture.class);
+        return textures;
+    }
+
+    private HashMap<Texture, Vector2> columnsRows = new HashMap<Texture, Vector2>();
+    public void loadAnimationObjectAssets(){
+        manager.load("animationObjects/decoFountain.png",Texture.class);
+        manager.load("animationObjects/goldTrophy.png",Texture.class);
+        manager.load("animationObjects/summoningChamber.png",Texture.class);
+        manager.load("animationObjects/winTrophy.png",Texture.class);
+    }
+    public void initAnimationObjectColumnsRows(){
+        // x = columns; y = rows
+        columnsRows.put(manager.get("animationObjects/decoFountain.png"),new Vector2(8,1));
+        columnsRows.put(manager.get("animationObjects/goldTrophy.png"),new Vector2(8,1));
+        columnsRows.put(manager.get("animationObjects/summoningChamber.png"),new Vector2(39,1));
+        columnsRows.put(manager.get("animationObjects/winTrophy.png"),new Vector2(8,1));
+    }
+    public Vector2 getColumnsRows(Texture key){
+        return columnsRows.get(key);
+    }
+    public Texture[] getAnimationObjectAssets(){
+        Texture[] textures=new Texture[4];
+        textures[0]=manager.get("animationObjects/decoFountain.png",Texture.class);
+        textures[1]=manager.get("animationObjects/goldTrophy.png",Texture.class);
+        textures[2]=manager.get("animationObjects/summoningChamber.png",Texture.class);
+        textures[3]=manager.get("animationObjects/winTrophy.png",Texture.class);
         return textures;
     }
 

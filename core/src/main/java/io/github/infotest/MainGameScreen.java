@@ -5,6 +5,8 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -48,9 +50,11 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     public static int numOfValidDeco = 13;
 
     public static int[][] GAME_MAP=new int[MAP_SIZE][MAP_SIZE];
+    public static int[][] GAME_MAP_BACKUP=new int[MAP_SIZE][MAP_SIZE];
     public static int[][] ROTATION_MAP=new int[MAP_SIZE][MAP_SIZE];
     public static String[][] FADE_MAP=new String[MAP_SIZE][MAP_SIZE];
     public static int[][] DECO_MAP=new int[MAP_SIZE][MAP_SIZE];
+    public static int[][] DECO_MAP_BACKUP=new int[MAP_SIZE][MAP_SIZE];
     public static float[][] DECO_PROB = new float[numOfValidTextures][numOfValidDeco];
     public static float[][] DECO_SCALE_MAP=new float[MAP_SIZE][MAP_SIZE];
     public static Vector2[][] DECO_OFFSET_MAP=new Vector2[MAP_SIZE][MAP_SIZE];
@@ -68,6 +72,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     public static ArrayList<NPC> allNPCs = new ArrayList<>();
     private int numberOfNPCInTheLastFrame = 0;
     private NPC currentTradingToNPC;
+
+    public static ArrayList<AnimationObjects> animationObjects = new ArrayList<>();
 
     private final Main game;
     public static boolean hasInitializedMap = false;
@@ -197,6 +203,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
         assetManager.loadMapDecoAssets();
         assetManager.loadMapTreeAssets();
 
+        assetManager.loadAnimationObjectAssets();
+
         assetManager.loadPlayerAssets();
 
         assetManager.loadMageAssets();
@@ -225,6 +233,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
         assetManager.manager.finishLoading();
 
         runningSound= assetManager.getRunningSound();
+
+        assetManager.initAnimationObjectColumnsRows();
 
         // connect to server
         //serverConnection = new ServerConnection("http://www.thomas-hub.com:9595", assassinTexture);
@@ -321,6 +331,10 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                     }
                 });
 
+            }
+
+            for (AnimationObjects animationObject : animationObjects) {
+                animationObject.render(batch, delta);
             }
 
             gameRenderer.renderNPCs(batch, delta);

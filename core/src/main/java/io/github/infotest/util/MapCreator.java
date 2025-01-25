@@ -64,6 +64,8 @@ public class MapCreator {
 
         initFadeMap();
         initDecoMap();
+        GAME_MAP_BACKUP = GAME_MAP.clone();
+        DECO_MAP_BACKUP = DECO_MAP.clone();
 //        for (int i = 0; i < DECO_MAP.length; i++) {
 //            Logger.log(Arrays.toString(DECO_MAP[i]));
 //        }
