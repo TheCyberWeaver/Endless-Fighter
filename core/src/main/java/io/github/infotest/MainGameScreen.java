@@ -208,6 +208,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
         assetManager.loadManaBarAssets();
         assetManager.loadAusdauerBarAssets();
 
+        assetManager.loadGegnerAssets();
+
         assetManager.loadNPCMaleAssets();
         assetManager.loadNPCWomenAssets();
         assetManager.loadNPCMarketAssets();

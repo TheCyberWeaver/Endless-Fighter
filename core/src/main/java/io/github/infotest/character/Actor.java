@@ -166,7 +166,7 @@ public abstract class Actor {
         return position.x;
     }
     public void setX(float x) {
-        if(x >= 0 && x < MainGameScreen.MAP_SIZE*MainGameScreen.CELL_SIZE){
+        if(x >= 0 && x < (MainGameScreen.MAP_SIZE+0.4f)*MainGameScreen.CELL_SIZE){
             position.x = x;
             targetPosition.x = x;
         }
@@ -175,7 +175,7 @@ public abstract class Actor {
         return position.y;
     }
     public void setY(float y) {
-        if(y >= 0 && y < MainGameScreen.MAP_SIZE*MainGameScreen.CELL_SIZE){
+        if(y >= 0.6f*MainGameScreen.CELL_SIZE && y < (MainGameScreen.MAP_SIZE+1.6f)*MainGameScreen.CELL_SIZE){
             position.y = y;
             targetPosition.y = y;
         }
