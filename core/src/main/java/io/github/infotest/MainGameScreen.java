@@ -192,11 +192,13 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
             batch.draw(assetManager.getPlayerAssets(), 0, 0, 0, 0, assetManager.getPlayerAssets().getWidth(), assetManager.getPlayerAssets().getWidth(), 32, 32);
             batch.setShader(null);
-            batch.end();
+
 
             handleInput(batch, delta);
 
             doGameLogic(delta);
+
+            batch.end();
 
 
         }

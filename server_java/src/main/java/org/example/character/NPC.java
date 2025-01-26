@@ -2,6 +2,7 @@ package org.example.character;
 
 
 import org.example.util.Vector2;
+import static org.example.GameSocketServer.*;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -32,9 +33,27 @@ public class NPC {
         this.type = type%8;
         this.marketTextureID = marketTextureID;
 
-        itemIDs.add("Apple_1");
-        itemIDs.add("Apple_2");
-        itemIDs.add("Apple_3");
+        itemIDs.add(null);
+        itemIDs.add(null);
+        itemIDs.add(null);
+
+        new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                for(int i=0;i<3;i++){
+                    if(itemIDs.get(i)==null){
+                        System.out.println("Items refilled");
+                        itemIDs.set(i,"Apple_"+UUID.randomUUID().toString());
+                    }
+                }
+
+                needNPCUpdate=true;
+                try {
+                    Thread.sleep(1000);  //
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }).start();
     }
 
     public void pickItem(String itemID) {

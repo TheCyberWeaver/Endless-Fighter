@@ -160,10 +160,9 @@ public class NPC extends Actor {
                 market[itemIndex] = null;
             } else if (item != null) {
                 uiLayer.startSignRendering(0.5f, 1, 20);
-            }
-            if(item!=null){
                 serverConnection.sendPlayerTradeWithNPC(this, item);
             }
+
         }
     }
 
