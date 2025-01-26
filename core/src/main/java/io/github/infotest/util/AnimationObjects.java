@@ -32,45 +32,48 @@ public class AnimationObjects {
     public Animation<TextureRegion> getAnimation() {
         return animation;
     }
+    public float getAnimationTimer() {
+        return animationTimer;
+    }
     public Vector2 getPosition() {
         return position;
     }
 
-    public static void createDecoFountain(float x, float y, MyAssetManager assetManager) {
+    public static AnimationObjects createDecoFountain(float x, float y, MyAssetManager assetManager) {
         Texture animationSheet = assetManager.getAnimationObjectAssets()[0];
         Vector2 columnsRows = assetManager.getColumnsRows(animationSheet);
         AnimationObjects anim = new AnimationObjects(animationSheet, (int) columnsRows.x, (int) columnsRows.y,
             0.15f, Animation.PlayMode.LOOP,
             new Vector2(x, y));
-        MainGameScreen.animationObjects.add(anim);
         removeDecoAndTrees(x, y, animationSheet.getWidth()/columnsRows.x, animationSheet.getHeight()/columnsRows.y);
+        return anim;
     }
-    public static void createGoldTrophy(float x, float y, MyAssetManager assetManager) {
+    public static AnimationObjects createGoldTrophy(float x, float y, MyAssetManager assetManager) {
         Texture animationSheet = assetManager.getAnimationObjectAssets()[1];
         Vector2 columnsRows = assetManager.getColumnsRows(animationSheet);
         AnimationObjects anim =new AnimationObjects(animationSheet, (int) columnsRows.x, (int) columnsRows.y,
             0.1f, Animation.PlayMode.LOOP,
             new Vector2(x, y));
-        MainGameScreen.animationObjects.add(anim);
         removeDecoAndTrees(x, y, animationSheet.getWidth()/columnsRows.x, animationSheet.getHeight()/columnsRows.y);
+        return anim;
     }
-    public static void createSummoningChamber(float x, float y, MyAssetManager assetManager) {
+    public static AnimationObjects createSummoningChamber(float x, float y, MyAssetManager assetManager) {
         Texture animationSheet = assetManager.getAnimationObjectAssets()[2];
         Vector2 columnsRows = assetManager.getColumnsRows(animationSheet);
         AnimationObjects anim = new AnimationObjects(animationSheet, (int) columnsRows.x, (int) columnsRows.y,
             0.1f, Animation.PlayMode.LOOP,
             new Vector2(x, y));
-        MainGameScreen.animationObjects.add(anim);
         removeDecoAndTrees(x, y, animationSheet.getWidth()/columnsRows.x, animationSheet.getHeight()/columnsRows.y);
+        return anim;
     }
-    public static void createWinTrophy(float x, float y, MyAssetManager assetManager) {
+    public static AnimationObjects createWinTrophy(float x, float y, MyAssetManager assetManager) {
         Texture animationSheet = assetManager.getAnimationObjectAssets()[3];
         Vector2 columnsRows = assetManager.getColumnsRows(animationSheet);
         AnimationObjects anim = new AnimationObjects(animationSheet, (int) columnsRows.x, (int) columnsRows.y,
             0.15f, Animation.PlayMode.LOOP,
             new Vector2(x, y));
-        MainGameScreen.animationObjects.add(anim);
         removeDecoAndTrees(x, y, animationSheet.getWidth()/columnsRows.x, animationSheet.getHeight()/columnsRows.y);
+        return anim;
     }
 
     /**

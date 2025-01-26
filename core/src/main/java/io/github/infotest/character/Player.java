@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector2;
+import io.github.infotest.MainGameScreen;
 import io.github.infotest.item.Item;
 import io.github.infotest.util.Factory.ItemFactory;
 import io.github.infotest.util.Logger;
@@ -255,14 +256,14 @@ public abstract class Player extends Actor{
     /// Abilities
     public void gainExperience(float exp) {
         experience += exp;
-        if (experience >= 100 * level) {
+        if (experience >= MainGameScreen.neededExpForLevel(level)) {
             levelUp();
         }
     }
 
     protected void levelUp() {
         level++;
-        experience = 0;
+        experience = experience - MainGameScreen.neededExpForLevel(level);
         maxHealthPoints += 10;
         healthPoints = maxHealthPoints;
     }
@@ -545,6 +546,9 @@ public abstract class Player extends Actor{
     }
     public int getGold() {
         return gold;
+    }
+    public void addGold(int gold) {
+        this.gold+=gold;
     }
     public void updateGold(int gold) {
         this.gold = gold;
