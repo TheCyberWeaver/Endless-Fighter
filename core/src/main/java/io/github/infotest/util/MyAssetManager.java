@@ -4,6 +4,13 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
+
+import java.util.HashMap;
+import com.badlogic.gdx.math.Vector2;
+import org.w3c.dom.Text;
+
+import java.util.HashMap;
 
 public class MyAssetManager {
     public final AssetManager manager = new AssetManager();
@@ -48,6 +55,8 @@ public class MyAssetManager {
         loadGoldBarAsset();
 
 
+
+
         loadNPCMaleAssets();
         loadNPCWomenAssets();
         loadNPCMarketAssets();
@@ -75,6 +84,29 @@ public class MyAssetManager {
 
     public void loadMapAssets() {
         loadTextures(AssetPaths.MAP_ASSETS);
+    }
+
+    public void loadMapWaterAssets(){
+        manager.load("worldTexture/waterEdge/bottomRight_water.png",Texture.class);
+        manager.load("worldTexture/waterEdge/right_water.png",Texture.class);
+        manager.load("worldTexture/waterEdge/topRight_water.png",Texture.class);
+        manager.load("worldTexture/waterEdge/top_water.png",Texture.class);
+        manager.load("worldTexture/waterEdge/topLeft_water.png",Texture.class);
+        manager.load("worldTexture/waterEdge/left_water.png",Texture.class);
+        manager.load("worldTexture/waterEdge/bottomLeft_water.png",Texture.class);
+        manager.load("worldTexture/waterEdge/bottom_water.png",Texture.class);
+    }
+    public Texture[] getMapWaterAssets(){
+        Texture[] textures=new Texture[8];
+        textures[0]=manager.get("worldTexture/waterEdge/bottomRight_water.png",Texture.class);
+        textures[1]=manager.get("worldTexture/waterEdge/right_water.png",Texture.class);
+        textures[2]=manager.get("worldTexture/waterEdge/topRight_water.png",Texture.class);
+        textures[3]=manager.get("worldTexture/waterEdge/top_water.png",Texture.class);
+        textures[4]=manager.get("worldTexture/waterEdge/topLeft_water.png",Texture.class);
+        textures[5]=manager.get("worldTexture/waterEdge/left_water.png",Texture.class);
+        textures[6]=manager.get("worldTexture/waterEdge/bottomLeft_water.png",Texture.class);
+        textures[7]=manager.get("worldTexture/waterEdge/bottom_water.png",Texture.class);
+        return textures;
     }
 
     public void loadMapFadeAssets() {
@@ -161,6 +193,34 @@ public class MyAssetManager {
         loadTextures(AssetPaths.ITEMS);
     }
 
+    private HashMap<Texture, Vector2> columnsRows = new HashMap<Texture, Vector2>();
+    public void loadAnimationObjectAssets(){
+        manager.load("animationObjects/decoFountain.png",Texture.class);
+        manager.load("animationObjects/goldTrophy.png",Texture.class);
+        manager.load("animationObjects/summoningChamber.png",Texture.class);
+        manager.load("animationObjects/winTrophy.png",Texture.class);
+    }
+    public void initAnimationObjectColumnsRows(){
+        // x = columns; y = rows
+        columnsRows.put(manager.get("animationObjects/decoFountain.png"),new Vector2(8,1));
+        columnsRows.put(manager.get("animationObjects/goldTrophy.png"),new Vector2(8,1));
+        columnsRows.put(manager.get("animationObjects/summoningChamber.png"),new Vector2(39,1));
+        columnsRows.put(manager.get("animationObjects/winTrophy.png"),new Vector2(8,1));
+    }
+    public Vector2 getColumnsRows(Texture key){
+        return columnsRows.get(key);
+    }
+    public Texture[] getAnimationObjectAssets(){
+        Texture[] textures=new Texture[4];
+        textures[0]=manager.get("animationObjects/decoFountain.png",Texture.class);
+        textures[1]=manager.get("animationObjects/goldTrophy.png",Texture.class);
+        textures[2]=manager.get("animationObjects/summoningChamber.png",Texture.class);
+        textures[3]=manager.get("animationObjects/winTrophy.png",Texture.class);
+        return textures;
+    }
+
+
+
     // Music / Sound
     public void loadStartGameMusicAssets() {
         manager.load(AssetPaths.START_GAME_MUSIC, Music.class);
@@ -245,8 +305,43 @@ public class MyAssetManager {
         return getTextures(AssetPaths.NPC_WOMAN);
     }
 
-    public Texture[] getNPCMarketAssets() {
-        return getTextures(AssetPaths.NPC_MARKET);
+    public void loadNPCMarketAssets(){
+        manager.load("NPC/market/klein.png", Texture.class);
+        manager.load("NPC/market/kiste.png", Texture.class);
+        manager.load("NPC/market/besondereKiste.png", Texture.class);
+        manager.load("NPC/market/tasche.png", Texture.class);
+        manager.load("NPC/market/koffer.png", Texture.class);
+        manager.load("NPC/market/besonders.png", Texture.class);
+    }
+    public Texture[] getNPCMarketAssets(){
+        Texture[] npcmarket = new Texture[6];
+        npcmarket[0]=manager.get("NPC/market/klein.png", Texture.class);
+        npcmarket[1]=manager.get("NPC/market/kiste.png", Texture.class);
+        npcmarket[2]=manager.get("NPC/market/besondereKiste.png", Texture.class);
+        npcmarket[3]=manager.get("NPC/market/tasche.png", Texture.class);
+        npcmarket[4]=manager.get("NPC/market/koffer.png", Texture.class);
+        npcmarket[5]=manager.get("NPC/market/besonders.png", Texture.class);
+        return npcmarket;
+
+    }
+    public void loadNPCMarketAssets(){
+        manager.load("NPC/market/klein.png", Texture.class);
+        manager.load("NPC/market/kiste.png", Texture.class);
+        manager.load("NPC/market/besondereKiste.png", Texture.class);
+        manager.load("NPC/market/tasche.png", Texture.class);
+        manager.load("NPC/market/koffer.png", Texture.class);
+        manager.load("NPC/market/besonders.png", Texture.class);
+    }
+    public Texture[] getNPCMarketAssets(){
+        Texture[] npcmarket = new Texture[6];
+        npcmarket[0]=manager.get("NPC/market/klein.png", Texture.class);
+        npcmarket[1]=manager.get("NPC/market/kiste.png", Texture.class);
+        npcmarket[2]=manager.get("NPC/market/besondereKiste.png", Texture.class);
+        npcmarket[3]=manager.get("NPC/market/tasche.png", Texture.class);
+        npcmarket[4]=manager.get("NPC/market/koffer.png", Texture.class);
+        npcmarket[5]=manager.get("NPC/market/besonders.png", Texture.class);
+        return npcmarket;
+
     }
 
     public Texture getGegnerAsset() {

@@ -5,6 +5,8 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -33,6 +35,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     private final OrthographicCamera camera;
     public static UI_Layer uiLayer;
 
+    private Random random;
+
     public static Vector3 clickPos = null;
     public static boolean clicked = false;
 
@@ -48,12 +52,16 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     public static int numOfValidDeco = 13;
 
     public static int[][] GAME_MAP=new int[MAP_SIZE][MAP_SIZE];
+    public static int[][] GAME_MAP_BACKUP=new int[MAP_SIZE][MAP_SIZE];
     public static int[][] ROTATION_MAP=new int[MAP_SIZE][MAP_SIZE];
     public static String[][] FADE_MAP=new String[MAP_SIZE][MAP_SIZE];
     public static int[][] DECO_MAP=new int[MAP_SIZE][MAP_SIZE];
+    public static int[][] DECO_MAP_BACKUP=new int[MAP_SIZE][MAP_SIZE];
     public static float[][] DECO_PROB = new float[numOfValidTextures][numOfValidDeco];
     public static float[][] DECO_SCALE_MAP=new float[MAP_SIZE][MAP_SIZE];
     public static Vector2[][] DECO_OFFSET_MAP=new Vector2[MAP_SIZE][MAP_SIZE];
+
+    private static ArrayList<Dungeon> dungeons = new ArrayList<Dungeon>();
 
     // User character
     public static Player localPlayer;
@@ -68,6 +76,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     public static ArrayList<NPC> allNPCs = new ArrayList<>();
     private int numberOfNPCInTheLastFrame = 0;
     private NPC currentTradingToNPC=null;
+
+    public static ArrayList<AnimationObjects> animationObjects = new ArrayList<>();
 
     private final Main game;
     public static boolean hasInitializedMap = false;
@@ -104,6 +114,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
         assetManager.manager.finishLoading();
 
         runningSound= assetManager.getRunningSound();
+
+        assetManager.initAnimationObjectColumnsRows();
 
         // connect to server
         //serverConnection = new ServerConnection("http://www.thomas-hub.com:9595", assassinTexture);
@@ -150,6 +162,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
         gameRenderer = new GameRenderer(this, assetManager, camera);
         gameRenderer.initAnimations();
         gameRenderer.initShaders();
+
+        random = new Random(GLOBAL_SEED);
 
         Logger.log("[MainGameScreen INFO]: Map generated after receiving seed: " + seed);
     }
@@ -617,4 +631,39 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     public float getZoom(){
         return camera.zoom;
     }
+
+    /// DUNGEON HELPER CLASS
+    public class Dungeon{
+        private int gold;
+        private int xp;
+        private Vector2 position;
+        private AnimationObjects animationObject;
+        private AnimationObjects trophy;
+        private boolean isClaimed;
+
+
+        public Dungeon(AnimationObjects animationObject, Vector2 position, int goldMin, int goldMax, int xpMin, int xpMax, Random random){
+            this.gold = goldMin + random.nextInt(goldMax - goldMin);
+            this.xp = xpMin + random.nextInt(xpMax - xpMin);
+            this.position = position;
+            this.animationObject = animationObject;
+
+            float width = animationObject.getAnimation().getKeyFrame(animationObject.getAnimationTimer()).getRegionWidth();
+            float height = animationObject.getAnimation().getKeyFrame(animationObject.getAnimationTimer()).getRegionHeight();
+
+            this.trophy = AnimationObjects.createGoldTrophy(position.x+width/2f, position.y+height/2f, assetManager);
+            isClaimed = false;
+        }
+
+        public void render(Batch batch, float delta){
+            animationObject.render(batch, delta);
+        }
+
+        public void claim(Player p){
+            p.gainExperience(xp);
+            p.addGold(gold);
+            this.isClaimed = true;
+        }
+    }
 }
+

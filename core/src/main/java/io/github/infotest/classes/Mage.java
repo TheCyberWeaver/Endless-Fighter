@@ -115,7 +115,7 @@ public class Mage extends Player {
             case 2: break;
             case 3: break;
             case 4:
-                if(timeSinceLastT4Skill >= blackHoleCooldown ||  localPlayer!=this) {
+                if(timeSinceLastT4Skill >= blackHoleCooldown && mana >= T4Cost ||  localPlayer!=this) {
                     Logger.log("[Mage INFO]: Player [" + this.getName() + "] casts skill " + skillID);
                     timeSinceLastT4Skill = 0;
                     this.isAttacking4 = true;
