@@ -65,6 +65,8 @@ public class MapCreator {
 
         initFadeMap();
         initDecoMap();
+        GAME_MAP_BACKUP = GAME_MAP.clone();
+        DECO_MAP_BACKUP = DECO_MAP.clone();
 //        for (int i = 0; i < DECO_MAP.length; i++) {
 //            Logger.log(Arrays.toString(DECO_MAP[i]));
 //        }
@@ -114,7 +116,7 @@ public class MapCreator {
                 if (left != thisCell && left > 0) str+=left+"l"+";";
 
                 //Logger.log("x:"+x2+"; y:"+y2+"; str:"+str);
-                str = "";
+                //str = "";
 
                 FADE_MAP[y2][x2] = str;
             }

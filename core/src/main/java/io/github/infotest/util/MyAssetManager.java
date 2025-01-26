@@ -4,6 +4,13 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
+
+import java.util.HashMap;
+import com.badlogic.gdx.math.Vector2;
+import org.w3c.dom.Text;
+
+import java.util.HashMap;
 
 public class MyAssetManager {
     public final AssetManager manager = new AssetManager();
@@ -33,18 +40,22 @@ public class MyAssetManager {
         loadMapFadeAssets();
         loadMapDecoAssets();
         loadMapTreeAssets();
+        loadMapWaterAssets();
 
         loadPlayerAssets();
 
         loadMageAssets();
         loadFireballAssets();
         loadFireballSymbol();
+        loadBlackHoleAssets();
 
         loadHealthBarAssets();
         loadManaBarAssets();
         loadAusdauerBarAssets();
         loadSkillBarAsset();
         loadGoldBarAsset();
+
+
 
 
         loadNPCMaleAssets();
@@ -59,6 +70,8 @@ public class MyAssetManager {
 
         loadItemBarAssets();
         loadItemAssets();
+
+        loadAnimationObjectAssets();
 
         loadMainGameMusicAssets();
         loadStartGameMusicAssets();
@@ -76,6 +89,9 @@ public class MyAssetManager {
         loadTextures(AssetPaths.MAP_ASSETS);
     }
 
+    public void loadMapWaterAssets(){
+        loadTextures(AssetPaths.MAP_WATER);
+    }
     public void loadMapFadeAssets() {
         loadTextures(AssetPaths.MAP_FADE_ASSETS);
     }
@@ -110,6 +126,10 @@ public class MyAssetManager {
 
     public void loadFireballSymbol() {
         manager.load(AssetPaths.FIREBALL_SYMBOL, Texture.class);
+    }
+
+    public void loadBlackHoleAssets(){
+        loadTextures(AssetPaths.BLACKHOLE_ASSETS);
     }
 
     public void loadHealthBarAssets() {
@@ -156,6 +176,34 @@ public class MyAssetManager {
         loadTextures(AssetPaths.ITEMS);
     }
 
+    private HashMap<Texture, Vector2> columnsRows = new HashMap<Texture, Vector2>();
+    public void loadAnimationObjectAssets(){
+        loadTextures(AssetPaths.ANIMATION_OBJECTS);
+    }
+    public void initAnimationObjectColumnsRows(){
+        // x = columns; y = rows
+        for(String path:AssetPaths.ANIMATION_OBJECTS){
+            Vector2 vec=new Vector2(8,1);
+            if(path.equals(AssetPaths.ANIMATION_OBJECTS[2])){
+                vec=new Vector2(39,1);
+            }
+            columnsRows.put(manager.get(path),vec);
+        }
+    }
+    public Vector2 getColumnsRows(Texture key){
+        return columnsRows.get(key);
+    }
+    public Texture[] getAnimationObjectAssets(){
+        Texture[] textures=new Texture[4];
+        textures[0]=manager.get("animationObjects/decoFountain.png",Texture.class);
+        textures[1]=manager.get("animationObjects/goldTrophy.png",Texture.class);
+        textures[2]=manager.get("animationObjects/summoningChamber.png",Texture.class);
+        textures[3]=manager.get("animationObjects/winTrophy.png",Texture.class);
+        return textures;
+    }
+
+
+
     // Music / Sound
     public void loadStartGameMusicAssets() {
         manager.load(AssetPaths.START_GAME_MUSIC, Music.class);
@@ -194,7 +242,12 @@ public class MyAssetManager {
         return getTextures(AssetPaths.MAP_TREE_ASSETS);
     }
 
-    public Texture getSkillBarAsset() {
+    public Texture[] getMapWaterAssets(){
+        return getTextures(AssetPaths.MAP_WATER);
+    }
+
+
+        public Texture getSkillBarAsset() {
         return manager.get(AssetPaths.SKILL_BAR, Texture.class);
     }
 
@@ -213,6 +266,8 @@ public class MyAssetManager {
     public Texture[] getFireballAssets() {
         return getTextures(AssetPaths.FIREBALL_ASSETS);
     }
+
+    public Texture[] getBlackHoleAssets() {return getTextures(AssetPaths.BLACKHOLE_ASSETS);}
 
     public Texture getFireballSymbol() {
         return manager.get(AssetPaths.FIREBALL_SYMBOL, Texture.class);
@@ -237,7 +292,6 @@ public class MyAssetManager {
     public Texture[] getNPCWomenAssets() {
         return getTextures(AssetPaths.NPC_WOMAN);
     }
-
     public Texture[] getNPCMarketAssets() {
         return getTextures(AssetPaths.NPC_MARKET);
     }

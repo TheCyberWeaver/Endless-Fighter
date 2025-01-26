@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector2;
+import io.github.infotest.MainGameScreen;
 import io.github.infotest.item.Item;
 import io.github.infotest.util.Factory.ItemFactory;
 import io.github.infotest.util.Logger;
@@ -43,9 +44,15 @@ public abstract class Player extends Actor{
 
     protected boolean isSprinting;
 
+    protected boolean isFrozen;
     protected boolean hasMoved;
     protected  boolean isHit;
+
     protected boolean isAttacking;
+    protected boolean isAttacking2;
+    protected boolean isAttacking3;
+    protected boolean isAttacking4;
+
     protected float animationTime = 0f;
 
     protected float sprintingSpeed = speed*7/4;
@@ -53,6 +60,19 @@ public abstract class Player extends Actor{
 
     protected Vector2 spawnpoint;
     protected Vector2 lastDeathPos;
+
+    protected float T1Cost = 0f;
+    protected float T1Damage = 0f;
+    protected float T1Cooldown = 0f;
+    protected float T1Speed = 0f;
+    protected float T1Scale = 0f;
+    protected float T1LT = 0f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
+
+    protected float T4Cost = 5f;
+    protected float T4Damage = 16f;
+    protected float T4Cooldown = 20f;
+    protected float T4Scale = 3f;
+    protected float T4LT = 2f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
 
 
 
@@ -67,8 +87,11 @@ public abstract class Player extends Actor{
     // near top of Player class
     protected GlyphLayout glyphLayout = new GlyphLayout();
 
-    protected float T1CoolDownTime =0f;
+
     protected float timeSinceLastT1Skill;
+    protected float timeSinceLastT2Skill;
+    protected float timeSinceLastT3Skill;
+    protected float timeSinceLastT4Skill;
 
     public Player(String id, String name, String className, int maxHealthPoints, int maxMana, int maxAusdauer, Vector2 initialPosition, float speed) {
         super(maxHealthPoints,initialPosition,speed);
@@ -95,6 +118,7 @@ public abstract class Player extends Actor{
         this.ausdauer = maxAusdauer;
 
         this.isSprinting = false;
+        this.isFrozen = false;
         this.isHit = false;
         this.isAttacking = false;
         this.normalSpeed = speed;
@@ -102,12 +126,16 @@ public abstract class Player extends Actor{
         this.spawnpoint = initialPosition;
 
         this.timeSinceLastT1Skill = 0;
+        this.timeSinceLastT2Skill = 0;
+        this.timeSinceLastT3Skill = 0;
+        this.timeSinceLastT4Skill = 0;
 
     }
 
     /// game logic
     @Override
     public void render(Batch batch, float delta) {
+        super.render(batch, delta);
         Vector2 predictedPosition = predictPosition();
         //1. draw texture if player has texture
         if (texture != null) {
@@ -182,7 +210,11 @@ public abstract class Player extends Actor{
                 ausdauer = maxAusdauer;
             }
         }
+
         timeSinceLastT1Skill += delta;
+        timeSinceLastT2Skill += delta;
+        timeSinceLastT3Skill += delta;
+        timeSinceLastT4Skill += delta;
     }
 
     public void sprint(float delta){
@@ -191,7 +223,18 @@ public abstract class Player extends Actor{
             if (!isDevelopmentMode) {
                 this.ausdauer -= ausdauerCost * delta;
             }
-            this.speed = this.sprintingSpeed;
+            float tileSpeedFactor;
+            switch(tileIDUnder){
+                case 0: tileSpeedFactor = speedFaktorOn0; break;
+                case 1: tileSpeedFactor = speedFaktorOn1; break;
+                case 2: tileSpeedFactor = speedFaktorOn2; break;
+                case 3: tileSpeedFactor = speedFaktorOn3; break;
+                case 4: tileSpeedFactor = speedFaktorOn4; break;
+                case 5: tileSpeedFactor = speedFaktorOn5; break;
+                default: tileSpeedFactor = 1; break;
+            }
+
+            this.speed = this.sprintingSpeed*tileSpeedFactor;
             if (isDevelopmentMode) {
                 this.speed = 750f;
             }
@@ -212,14 +255,14 @@ public abstract class Player extends Actor{
     /// Abilities
     public void gainExperience(float exp) {
         experience += exp;
-        if (experience >= 100 * level) {
+        if (experience >= MainGameScreen.neededExpForLevel(level)) {
             levelUp();
         }
     }
 
     protected void levelUp() {
         level++;
-        experience = 0;
+        experience = experience - MainGameScreen.neededExpForLevel(level);
         maxHealthPoints += 10;
         healthPoints = maxHealthPoints;
     }
@@ -259,6 +302,14 @@ public abstract class Player extends Actor{
         this.setMana(this.getMaxMana());
 
         this.resetT1Timer();
+        this.resetT2Timer();
+        this.resetT3Timer();
+        this.resetT4Timer();
+
+        this.resetAttacking();
+        this.resetAttacking2();
+        this.resetAttacking3();
+        this.resetAttacking4();
 
         if (!keepInventory){
             for (Item i : this.getItems()){
@@ -287,11 +338,106 @@ public abstract class Player extends Actor{
 
     /// Getter / Setter
     public float getT1SkillCoolDownTime(){
-        return T1CoolDownTime;
+        return T1Cooldown;
     }
     public float getT1SkillCoolDownTimer(){
         return timeSinceLastT1Skill;
     }
+
+//    public float getT2SkillCoolDownTime(){
+//        return T2Cooldown;
+//    }
+    public float getT2SkillCoolDownTimer(){
+        return timeSinceLastT2Skill;
+    }
+
+//    public float getT3SkillCoolDownTime(){
+//        return T3Cooldown;
+//    }
+    public float getT3SkillCoolDownTimer(){
+        return timeSinceLastT3Skill;
+    }
+    public float getT4SkillCoolDownTime(){
+        return T4Cooldown;
+    }
+    public float getT4SkillCoolDownTimer(){
+        return timeSinceLastT4Skill;
+    }
+
+    public float getT1Cost(){
+        return T1Cost;
+    }
+    public float getT1Damage(){
+        return T1Damage;
+    }
+    public float getT1Cooldown(){
+        return T1Cooldown;
+    }
+    public float getT1Speed(){
+        return T1Speed;
+    }
+    public float getT1Scale(){
+        return T1Scale;
+    }
+    public float getT1LT(){
+        return T1LT;
+    }
+
+    public float getT4Cost(){
+        return T4Cost;
+    }
+    public float getT4Damage(){
+        return T4Damage;
+    }
+    public float getT4Cooldown(){
+        return T4Cooldown;
+    }
+    public float getT4Scale(){
+        return T4Scale;
+    }
+    public float getT4LT(){
+        return T4LT;
+    }
+
+    public boolean isAttacking(){
+        return isAttacking;
+    }
+    public boolean isAttacking2(){
+        return isAttacking2;
+    }
+    public boolean isAttacking3(){
+        return isAttacking3;
+    }
+    public boolean isAttacking4(){
+        return isAttacking4;
+    }
+
+    public void resetAttacking(){
+        isAttacking = false;
+    }
+    public void resetAttacking2(){
+        isAttacking2 = false;
+    }
+    public void resetAttacking3(){
+        isAttacking3 = false;
+    }
+    public void resetAttacking4(){
+        isAttacking4 = false;
+    }
+
+    public void resetT1Timer(){
+        timeSinceLastT1Skill = 0;
+    }
+    public void resetT2Timer(){
+        timeSinceLastT2Skill = 0;
+    }
+    public void resetT3Timer(){
+        timeSinceLastT3Skill = 0;
+    }
+    public void resetT4Timer(){
+        timeSinceLastT4Skill = 0;
+    }
+
     public String getClassName() {
         return className;
     }
@@ -391,13 +537,9 @@ public abstract class Player extends Actor{
     public void setAlive(){
         isAlive = true;
     }
-    public void resetT1Timer(){
-        timeSinceLastT1Skill = 0;
-    }
     public void setHasMoved(boolean hasMoved) {
         this.hasMoved = hasMoved;
     }
-
     public boolean isSeeAllActive() {
         return seeAllActive;
     }
@@ -409,8 +551,20 @@ public abstract class Player extends Actor{
     public void updateGold(float gold) {
         this.gold = gold;
     }
+    public void addGold(float gold) {
+        this.gold+=gold;
+    }
     public void updateGold(float gold, ServerConnection serverConnection) {
         this.gold = gold;
         serverConnection.sendPlayerUpdateGold(localPlayer);
+    }
+    public void freeze(){
+        isFrozen = true;
+    }
+    public void unfreeze(){
+        isFrozen = false;
+    }
+    public boolean isFrozen() {
+        return isFrozen;
     }
 }

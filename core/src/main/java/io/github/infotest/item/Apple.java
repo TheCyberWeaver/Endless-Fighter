@@ -10,7 +10,7 @@ public class Apple extends Item {
     private float healthRecovery;
 
     public Apple(String id, String name,MyAssetManager assetManager, float healthRecovery) {
-        super(id,"apple","just an apple", assetManager.getLoadingScreenTexture());
+        super(id,"apple","just an apple", assetManager.getItemAssets()[0]);
         this. healthRecovery = healthRecovery;
     }
 

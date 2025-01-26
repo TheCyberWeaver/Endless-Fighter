@@ -17,47 +17,70 @@ import io.github.infotest.character.NPC;
 import io.github.infotest.character.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Random;
 
 import static io.github.infotest.MainGameScreen.*;
 
 public class GameRenderer {
 
-    private final Texture[] textures;
+    private final Texture[] tileTextures;
     private final Texture[] fadeTexture;
     private final Texture[] decoTexture;
     private final Texture[] treeTexture;
 
     // Fireball animation-related fields
     private static ArrayList<AbilityInstance> activeFireballs;
+    private static ArrayList<AbilityInstance> activeBlackHoles;
     private static HashMap<Player, Vector3> activeArrows;
+
     private final float fireballFrameDuration = 0.1f;
+    private final float blackHoleFrameDuration = 0.1f;
+    private final float waterFrameDuration = 0.2f;
 
     private Animation<TextureRegion>[] fireballAnimations;
+    private Animation<TextureRegion>[] blackHoleAnimation;
 
     private final MainGameScreen mainGameScreen;
+    private final OrthographicCamera camera;
     private final MyAssetManager assetManager;
 
     private ShaderProgram nightEffectShader;
 
+    private Animation<TextureRegion> waterAnimation;
 
-    public GameRenderer(MainGameScreen mainGameScreen, MyAssetManager assetManager) {
+    private Animation<TextureRegion> bottomRightAnimation;
+    private Animation<TextureRegion> rightAnimation;
+    private Animation<TextureRegion> topRightAnimation;
+    private Animation<TextureRegion> topAnimation;
+    private Animation<TextureRegion> topLeftAnimation;
+    private Animation<TextureRegion> leftAnimation;
+    private Animation<TextureRegion> bottomLeftAnimation;
+    private Animation<TextureRegion> bottomAnimation;
+
+    private float waterAnimationTime;
+
+
+    public GameRenderer(MainGameScreen mainGameScreen, MyAssetManager assetManager, OrthographicCamera camera) {
         this.mainGameScreen = mainGameScreen;
+        this.camera = camera;
         this.assetManager = assetManager;
-        this.textures = assetManager.getMapAssets();
+        this.tileTextures = assetManager.getMapAssets();
         this.fadeTexture = assetManager.getMapFadeAssets();
         this.decoTexture = assetManager.getMapDecoAssets();
         this.treeTexture = assetManager.getMapTreeAssets();
 
         activeFireballs = new ArrayList<>();
+        activeBlackHoles = new ArrayList<>();
         activeArrows = new HashMap<Player, Vector3>();
 
     }
 
     public void initAnimations() {
+        /// FIREBALL
         Texture[] fireball_sheets = assetManager.getFireballAssets();
         fireballAnimations = new Animation[fireball_sheets.length];
+
         int frameCols;
         int frameRows = 1;
 
@@ -85,8 +108,59 @@ public class GameRenderer {
         frameCols = 7;
         fireballAnimations[3] = sheetsToAnimation(frameCols, frameRows, fireball_sheet_endHit, fireballFrameDuration);
         fireballAnimations[3].setPlayMode(Animation.PlayMode.NORMAL);
+
+
+        /// BLACK HOLE
+        Texture[] blackHole_sheets = assetManager.getBlackHoleAssets();
+        blackHoleAnimation = new Animation[blackHole_sheets.length];
+
+        // FG
+        Texture fg_sheet = blackHole_sheets[0];
+        frameCols = 4;
+        frameRows = 5;
+        Animation<TextureRegion> tempBH = sheetsToAnimation(frameCols, frameRows, fg_sheet, blackHoleFrameDuration);
+        tempBH.setPlayMode(Animation.PlayMode.LOOP);
+        blackHoleAnimation[0] = tempBH;
+
+        // BG
+        Texture bg_sheet = blackHole_sheets[1];
+        frameCols = 5;
+        frameRows = 6;
+        tempBH = sheetsToAnimation(frameCols, frameRows, bg_sheet, blackHoleFrameDuration);
+        tempBH.setPlayMode(Animation.PlayMode.LOOP);
+        blackHoleAnimation[1] = tempBH;
+
+
+        waterAnimation = sheetsToAnimation(8, 1, assetManager.getMapAssets()[6], waterFrameDuration);
+        waterAnimation.setPlayMode(Animation.PlayMode.LOOP);
+
+        bottomRightAnimation = sheetsToAnimation(7, 1, assetManager.getMapWaterAssets()[0], waterFrameDuration*7/8);
+        rightAnimation = sheetsToAnimation(7, 1, assetManager.getMapWaterAssets()[1], waterFrameDuration*7/8);
+        topRightAnimation = sheetsToAnimation(7, 1, assetManager.getMapWaterAssets()[2], waterFrameDuration*7/8);
+        topAnimation = sheetsToAnimation(7, 1, assetManager.getMapWaterAssets()[3], waterFrameDuration*7/8);
+        topLeftAnimation = sheetsToAnimation(7, 1, assetManager.getMapWaterAssets()[4], waterFrameDuration*7/8);
+        leftAnimation = sheetsToAnimation(7, 1, assetManager.getMapWaterAssets()[5], waterFrameDuration*7/8);
+        bottomLeftAnimation = sheetsToAnimation(7, 1, assetManager.getMapWaterAssets()[6], waterFrameDuration*7/8);
+        bottomAnimation = sheetsToAnimation(7, 1, assetManager.getMapWaterAssets()[7], waterFrameDuration*7/8);
+
+        bottomRightAnimation.setPlayMode(Animation.PlayMode.LOOP);
+        rightAnimation.setPlayMode(Animation.PlayMode.LOOP);
+        topRightAnimation.setPlayMode(Animation.PlayMode.LOOP);
+        topAnimation.setPlayMode(Animation.PlayMode.LOOP);
+        topLeftAnimation.setPlayMode(Animation.PlayMode.LOOP);
+        leftAnimation.setPlayMode(Animation.PlayMode.LOOP);
+        bottomLeftAnimation.setPlayMode(Animation.PlayMode.LOOP);
+        bottomAnimation.setPlayMode(Animation.PlayMode.LOOP);
     }
 
+    /**
+     *  Convertes Animation Sheets to Animations (from left to right; from top to bottom)
+     * @param frameCols Columns of Sheet
+     * @param frameRows Rows of Sheet
+     * @param fireball_sheet Sheet itself
+     * @param frameDuration Duration each frame should be displayed
+     * @return Returns the Animation
+     */
     public static Animation<TextureRegion> sheetsToAnimation(int frameCols, int frameRows, Texture fireball_sheet, float frameDuration) {
         TextureRegion[][] tempFrames2 = TextureRegion.split(fireball_sheet,
             fireball_sheet.getWidth() / frameCols,
@@ -103,7 +177,9 @@ public class GameRenderer {
     }
 
 
-    public void renderMap(SpriteBatch batch, float zoom, Vector2 pos) {
+    public void renderMap(SpriteBatch batch, float delta, float zoom, Vector2 pos) {
+        Texture[] waterAssets = assetManager.getMapWaterAssets();
+
         // Define fade textures for different tiles
         Texture[] tile1FADE = new Texture[5];
         System.arraycopy(fadeTexture, 0, tile1FADE, 0, 5);
@@ -130,12 +206,61 @@ public class GameRenderer {
                 int worldX = playerX - widthCell / 2 + x;
                 int worldY = playerY - heightCell / 2 + y;
 
+                if (worldX < 0 || worldX >= MAP_SIZE || worldY < 0 || worldY >= MAP_SIZE) {
+                    if (worldX == MAP_SIZE && worldY == -1) {
+                        batch.draw(getEdgeTexture(worldX, worldY), worldX*CELL_SIZE, worldY*CELL_SIZE);
+                        batch.draw(bottomRightAnimation.getKeyFrame(waterAnimationTime), worldX*CELL_SIZE, worldY*CELL_SIZE);
+                        continue;
+                    }
+                    if (worldX == MAP_SIZE && worldY > -1 && worldY < MAP_SIZE) {
+                        batch.draw(getEdgeTexture(worldX, worldY), worldX*CELL_SIZE, worldY*CELL_SIZE);
+                        batch.draw(rightAnimation.getKeyFrame(waterAnimationTime), worldX*CELL_SIZE, worldY*CELL_SIZE);
+                        continue;
+                    }
+                    if (worldX == MAP_SIZE && worldY == MAP_SIZE) {
+                        batch.draw(getEdgeTexture(worldX, worldY), worldX*CELL_SIZE, worldY*CELL_SIZE);
+                        batch.draw(topRightAnimation.getKeyFrame(waterAnimationTime), worldX*CELL_SIZE, worldY*CELL_SIZE);
+                        continue;
+                    }
+                    if (worldX > -1 && worldX < MAP_SIZE && worldY == MAP_SIZE) {
+                        batch.draw(getEdgeTexture(worldX, worldY), worldX*CELL_SIZE, worldY*CELL_SIZE);
+                        batch.draw(topAnimation.getKeyFrame(waterAnimationTime), worldX*CELL_SIZE, worldY*CELL_SIZE);
+                        continue;
+                    }
+                    if (worldX == -1 && worldY == MAP_SIZE) {
+                        batch.draw(getEdgeTexture(worldX, worldY), worldX*CELL_SIZE, worldY*CELL_SIZE);
+                        batch.draw(topLeftAnimation.getKeyFrame(waterAnimationTime), worldX*CELL_SIZE, worldY*CELL_SIZE);
+                        continue;
+                    }
+                    if (worldX == -1 && worldY > -1 && worldY < MAP_SIZE) {
+                        batch.draw(getEdgeTexture(worldX, worldY), worldX*CELL_SIZE, worldY*CELL_SIZE);
+                        batch.draw(leftAnimation.getKeyFrame(waterAnimationTime), worldX*CELL_SIZE, worldY*CELL_SIZE);
+                        continue;
+                    }
+                    if (worldX == -1 && worldY == -1) {
+                        batch.draw(getEdgeTexture(worldX, worldY), worldX*CELL_SIZE, worldY*CELL_SIZE);
+                        batch.draw(bottomLeftAnimation.getKeyFrame(waterAnimationTime), worldX*CELL_SIZE, worldY*CELL_SIZE);
+                        continue;
+                    }
+                    if (worldX > -1 && worldX < MAP_SIZE && worldY == -1) {
+                        batch.draw(getEdgeTexture(worldX, worldY), worldX*CELL_SIZE, worldY*CELL_SIZE);
+                        batch.draw(bottomAnimation.getKeyFrame(waterAnimationTime), worldX*CELL_SIZE, worldY*CELL_SIZE);
+                        continue;
+                    }
+                    Sprite waterFrame = new Sprite(waterAnimation.getKeyFrame(waterAnimationTime));
+                    waterFrame.setPosition(worldX * CELL_SIZE, worldY * CELL_SIZE);
+                    waterFrame.setRegionWidth(CELL_SIZE);
+                    waterFrame.setRegionHeight(CELL_SIZE);
+                    waterFrame.draw(batch);
+                    continue;
+                }
+
                 // Clamp coordinates to map bounds
                 worldX = Math.max(0, Math.min(worldX, GAME_MAP[0].length - 1));
                 worldY = Math.max(0, Math.min(worldY, GAME_MAP.length - 1));
 
                 int rotation = 90 * ROTATION_MAP[worldY][worldX];
-                Sprite cellTexture = new Sprite(textures[GAME_MAP[worldY][worldX]]);
+                Sprite cellTexture = new Sprite(tileTextures[GAME_MAP[worldY][worldX]]);
                 cellTexture.setPosition(worldX * CELL_SIZE, worldY * CELL_SIZE);
                 cellTexture.setRotation(rotation);
                 cellTexture.setRegionWidth(CELL_SIZE);
@@ -144,7 +269,7 @@ public class GameRenderer {
 
                 // Render high graphics (fade transitions)
                 if (GameSettings.highGrafik) {
-                    String str = FADE_MAP[worldY][worldX];
+                    String str = MainGameScreen.FADE_MAP[worldY][worldX];
                     int topLeft = -1, top = -1, topRight = -1, right = -1;
                     int bottomRight = -1, bottom = -1, bottomLeft = -1, left = -1;
 
@@ -228,8 +353,45 @@ public class GameRenderer {
                 }
             }
         }
+
+        waterAnimationTime += delta;
     }
 
+    private Texture getEdgeTexture(int worldX, int worldY) {
+
+        if (worldX == MAP_SIZE) {
+            if (worldY == MAP_SIZE) {
+                return tileTextures[checkTileID(GAME_MAP[MAP_SIZE - 1][MAP_SIZE - 1])];
+            } else if (worldY == -1) {
+                return tileTextures[checkTileID(GAME_MAP[0][MAP_SIZE - 1])];
+            } else if (worldY >= 0 && worldY < MAP_SIZE) {
+                return tileTextures[checkTileID(GAME_MAP[worldY][MAP_SIZE - 1])];
+            }
+        } else if (worldX == -1) {
+            if (worldY == MAP_SIZE) {
+                return tileTextures[checkTileID(GAME_MAP[MAP_SIZE - 1][0])];
+            } else if (worldY == -1) {
+                return tileTextures[checkTileID(GAME_MAP[0][0])];
+            } else if (worldY >= 0 && worldY < MAP_SIZE) {
+                return tileTextures[checkTileID(GAME_MAP[worldY][0])];
+            }
+        } else if (worldX >= 0 && worldX < MAP_SIZE) {
+            if (worldY == MAP_SIZE) {
+                return tileTextures[checkTileID(GAME_MAP[MAP_SIZE - 1][worldX])];
+            } else if (worldY == -1) {
+                return tileTextures[checkTileID(GAME_MAP[0][worldX])];
+            } else if (worldY >= 0 && worldY < MAP_SIZE) {
+                return null; // Keine Textur für gültige Koordinaten innerhalb der Karte
+            }
+        }
+        return null; // Fallback, falls keine Bedingung zutrifft
+    }
+    @Deprecated
+    private int checkTileID(int tileID){
+        if (tileID == 2) return 0;
+        if (tileID == 3) return 4;
+        return tileID;
+    }
     private void drawTransition(SpriteBatch batch, int worldX, int worldY, Texture[] tile1FADE, Texture[] tile2FADE, Texture[] tile4FADE, Texture[] tile5FADE, int tileType, float rotation) {
         Sprite transitionSprite = null;
 
@@ -276,6 +438,12 @@ public class GameRenderer {
                     if (GAME_MAP[worldY-1][worldX] == 2){
                         batch.draw(treeTexture[2], worldX*32, worldY*32);
                     }
+                }
+                if (worldY == MAP_SIZE-1 && GAME_MAP[worldY][worldX] == 2){
+                    batch.draw(treeTexture[2], worldX*32, (worldY+1)*32);
+                }
+                if (worldY == MAP_SIZE-1 && GAME_MAP[worldY][worldX] == 3){
+                    batch.draw(treeTexture[5], worldX*32, (worldY+1)*32);
                 }
                 if (GAME_MAP[worldY][worldX] == 2) {
                     if (worldY > 0 && GAME_MAP[worldY-1][worldX] == 2) {
@@ -348,6 +516,7 @@ public class GameRenderer {
     public void renderAnimations(SpriteBatch batch, float deltaTime, ShapeRenderer shapeRenderer) {
         time += deltaTime;
         renderFireballs(batch, deltaTime, fireballAnimations, shapeRenderer);
+        renderBlackHoles(batch, deltaTime, blackHoleAnimation);
         renderArrows(batch, deltaTime);
     }
 
@@ -444,6 +613,45 @@ public class GameRenderer {
             }
         }
         activeFireballs.removeAll(toRemove);
+    }
+
+    private void renderBlackHoles(SpriteBatch batch, float deltaTime, Animation<TextureRegion>[] blackHoleAnimation) {
+        ArrayList<AbilityInstance> toRemove = new ArrayList<>();
+
+        Animation<TextureRegion> blackHoleFG = blackHoleAnimation[0];
+        Animation<TextureRegion> blackHoleBG = blackHoleAnimation[1];
+
+        for (AbilityInstance blackHole : activeBlackHoles) {
+            if (blackHole.elapsedTime > blackHole.lt){
+                if (blackHole.scale < 0.1f){
+                    toRemove.add(blackHole);
+                    continue;
+                } else {
+                    blackHole.scale -= 0.75f*deltaTime;
+                }
+            }
+            Sprite currentFrameBG = new Sprite(blackHoleBG.getKeyFrame(blackHole.elapsedTime));
+            currentFrameBG.setOrigin(currentFrameBG.getRegionWidth()/2f, currentFrameBG.getRegionHeight()/2f);
+            currentFrameBG.setScale(blackHole.scale);
+            currentFrameBG.setPosition(blackHole.x-currentFrameBG.getRegionWidth()/2f - 25, blackHole.y - 36);
+
+            Sprite currentFrameFG = new Sprite(blackHoleFG.getKeyFrame(blackHole.elapsedTime));
+            currentFrameFG.setOrigin(currentFrameFG.getRegionWidth()/2f, currentFrameFG.getRegionHeight()/2f);
+            currentFrameFG.setScale(blackHole.scale);
+            currentFrameFG.setPosition(blackHole.x-currentFrameBG.getRegionWidth()/2f, blackHole.y);
+
+            Sprite currentFrameFG2 = new Sprite(currentFrameFG);
+            currentFrameFG2.setOrigin(currentFrameFG.getRegionWidth()/2f, currentFrameFG.getRegionHeight()/2f);
+            currentFrameFG2.rotate(90);
+            currentFrameFG2.setPosition(blackHole.x-currentFrameBG.getRegionWidth()/2f, blackHole.y);
+
+            currentFrameBG.draw(batch);
+            currentFrameFG.draw(batch);
+            currentFrameFG2.draw(batch);
+
+            blackHole.elapsedTime += deltaTime;
+        }
+        activeBlackHoles.removeAll(toRemove);
     }
 
     ShapeRenderer shapeRenderer = MainGameScreen.shapeRenderer;
@@ -560,6 +768,9 @@ public class GameRenderer {
     public static void fireball(float pX, float pY, float velocityX, float velocityY, Vector2 rotation, float scale, float damage, float speed, float lt, Player player) {
         activeFireballs.add(new AbilityInstance(pX, pY, velocityX, velocityY, rotation, scale, damage, speed, lt, player));
     }
+    public static void blackHole(float pX, float pY, float scale, float damage, float lt, Player player){
+        activeBlackHoles.add(new AbilityInstance(pX, pY, 0, 0, new Vector2(), scale, scale, damage, lt, player));
+    }
 
     private void updateAllArrows() {
         if (localPlayer.isSeeAllActive()) {
@@ -588,7 +799,6 @@ public class GameRenderer {
         );
         activeArrows.put(player, temp);
     }
-
 
     /// SHADER LOGIC
     public void initShaders() {
@@ -645,15 +855,15 @@ public class GameRenderer {
     /// Helper class for tracking ability instances
     public static class AbilityInstance {
         private float x, y;
-        float velocityX, velocityY;
-        Vector2 rotation;
-        float elapsedTime;
-        float scale;
-        float damage;
-        float lt;
-        float endTimer;
-        boolean hasHit;
-        Player owner;
+        private final float velocityX, velocityY;
+        private final Vector2 rotation;
+        private float elapsedTime;
+        private float scale;
+        private final float damage;
+        private final float lt;
+        private float endTimer;
+        private boolean hasHit;
+        private final Player owner;
 
         private float speedFactor = 32f;
 

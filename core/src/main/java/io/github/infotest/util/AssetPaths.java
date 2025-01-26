@@ -1,5 +1,7 @@
 package io.github.infotest.util;
 
+import com.badlogic.gdx.graphics.Texture;
+
 public class AssetPaths {
 
     // Single-file asset paths
@@ -21,7 +23,8 @@ public class AssetPaths {
         "worldTexture/TreeTile.png",
         "worldTexture/TreeTile_snow.png",
         "worldTexture/Tile4.png",
-        "worldTexture/Tile5.png"
+        "worldTexture/Tile5.png",
+        "worldTexture/water_sheet.png"
     };
 
     public static final String[] MAP_FADE_ASSETS = {
@@ -90,6 +93,10 @@ public class AssetPaths {
         "player/mage/fireball/fireball_sheet_endTime.png",
         "player/mage/fireball/fireball_sheet_endHit.png"
     };
+    public static final String[] BLACKHOLE_ASSETS = {
+        "player/mage/abilities/blackHole1_sheet.png",
+        "player/mage/abilities/blackHole2_sheet.png"
+    };
 
     // Bars
     public static final String[] HEALTH_BAR = {
@@ -143,6 +150,22 @@ public class AssetPaths {
         "NPC/market/tasche.png",
         "NPC/market/koffer.png",
         "NPC/market/besonders.png"
+    };
+    public static final String[] ANIMATION_OBJECTS = {
+        "animationObjects/decoFountain.png",
+        "animationObjects/goldTrophy.png",
+        "animationObjects/summoningChamber.png",
+        "animationObjects/winTrophy.png"
+    };
+    public static final String[] MAP_WATER = {
+        "worldTexture/waterEdge/bottomRight_water.png",
+        "worldTexture/waterEdge/right_water.png",
+        "worldTexture/waterEdge/topRight_water.png",
+        "worldTexture/waterEdge/top_water.png",
+        "worldTexture/waterEdge/topLeft_water.png",
+        "worldTexture/waterEdge/left_water.png",
+        "worldTexture/waterEdge/bottomLeft_water.png",
+        "worldTexture/waterEdge/bottom_water.png",
     };
 
     // Items
