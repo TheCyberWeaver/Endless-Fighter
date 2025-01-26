@@ -151,6 +151,22 @@ public class AssetPaths {
         "NPC/market/koffer.png",
         "NPC/market/besonders.png"
     };
+    public static final String[] ANIMATION_OBJECTS = {
+        "animationObjects/decoFountain.png",
+        "animationObjects/goldTrophy.png",
+        "animationObjects/summoningChamber.png",
+        "animationObjects/winTrophy.png"
+    };
+    public static final String[] MAP_WATER = {
+        "worldTexture/waterEdge/bottomRight_water.png",
+        "worldTexture/waterEdge/right_water.png",
+        "worldTexture/waterEdge/topRight_water.png",
+        "worldTexture/waterEdge/top_water.png",
+        "worldTexture/waterEdge/topLeft_water.png",
+        "worldTexture/waterEdge/left_water.png",
+        "worldTexture/waterEdge/bottomLeft_water.png",
+        "worldTexture/waterEdge/bottom_water.png",
+    };
 
     // Items
     public static final String[] ITEMS = {
