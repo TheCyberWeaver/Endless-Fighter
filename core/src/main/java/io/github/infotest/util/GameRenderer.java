@@ -176,6 +176,11 @@ public class GameRenderer {
         return new Animation<>(frameDuration, temp_fireball_sheet);
     }
 
+    public void updateAllBlackHoles(float delta){
+        for (AbilityInstance abilityInstance : activeBlackHoles){
+            abilityInstance.update(delta);
+        }
+    }
 
     public void renderMap(SpriteBatch batch, float delta, float zoom, Vector2 pos) {
         Texture[] waterAssets = assetManager.getMapWaterAssets();
@@ -751,10 +756,10 @@ public class GameRenderer {
 
     /// ABILITY HELPER
     public static void fireball(float pX, float pY, float velocityX, float velocityY, Vector2 rotation, float scale, float damage, float speed, float lt, Player player) {
-        activeFireballs.add(new AbilityInstance(pX, pY, velocityX, velocityY, rotation, scale, damage, speed, lt, player));
+        activeFireballs.add(new AbilityInstance(pX, pY, 1, velocityX, velocityY, rotation, scale, damage, speed, lt, player));
     }
     public static void blackHole(float pX, float pY, float scale, float damage, float lt, Player player){
-        activeBlackHoles.add(new AbilityInstance(pX, pY, 0, 0, new Vector2(), scale, scale, damage, lt, player));
+        activeBlackHoles.add(new AbilityInstance(pX, pY, 4, 0, 0, new Vector2(), scale, scale, damage, lt, player));
     }
 
     private void updateAllArrows() {
@@ -849,12 +854,14 @@ public class GameRenderer {
         private float endTimer;
         private boolean hasHit;
         private final Player owner;
+        private final int id;
 
         private float speedFactor = 32f;
 
-        AbilityInstance(float x, float y, float velocityX, float velocityY, Vector2 rotation, float scale, float damage, float speed, float lt, Player player) {
+        AbilityInstance(float x, float y, int id, float velocityX, float velocityY, Vector2 rotation, float scale, float damage, float speed, float lt, Player player) {
             this.x = x;
             this.y = y;
+            this.id = id;
             this.velocityX = velocityX;
             this.velocityY = velocityY;
             this.rotation = rotation;
@@ -874,6 +881,24 @@ public class GameRenderer {
                 this.y += velocityY * deltaTime * speedFactor;
             }
         }
+
+        public void update(float deltaTime) {
+            if (id == 4) { // Assuming 4 represents the black hole
+                for (Player p : allPlayers.values()) {
+                    float dist = Vector2.dst(x, y, p.getX(), p.getY());
+                    float radius = 480f;
+
+                    if (dist <= radius) {
+                        // Use an exponential function for suction factor
+                        float factor = (float) Math.pow(1 - (dist / radius), 2); // Exponential factor
+                        if (factor < 0) factor = 0; // Ensure factor is non-negative
+
+                        p.suck(new Vector2(x, y), factor);
+                    }
+                }
+            }
+        }
+
 
         public float getX() {
             return x;

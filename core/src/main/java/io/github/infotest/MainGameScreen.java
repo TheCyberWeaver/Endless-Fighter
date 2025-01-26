@@ -410,7 +410,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
             Gdx.gl.glLineWidth(1); // Reset the line width to 1 pixel
 
             doGameLogic(delta);
-
+            gameRenderer.updateAllBlackHoles(delta);
 
         }
         else{

@@ -293,6 +293,16 @@ public abstract class Player extends Actor{
         return true;
     }
 
+    /**
+     * Sucks player to given pos based on the factor
+     * @param pos Target Pos
+     * @param factor Factor
+     */
+    public void suck(Vector2 pos, float factor) {
+        //TODO
+    }
+
+
     public void respawn(){
         this.setLastDeathPos(this.getPosition());
         Vector2 spawnpoint = this.getSpawnpoint();
