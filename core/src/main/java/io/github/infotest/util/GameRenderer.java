@@ -17,7 +17,6 @@ import io.github.infotest.character.NPC;
 import io.github.infotest.character.Player;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import static io.github.infotest.MainGameScreen.*;
@@ -29,7 +28,6 @@ public class GameRenderer {
     private final Texture[] decoTexture;
     private final Texture[] treeTexture;
 
-    // Fireball animation-related fields
     private static ArrayList<AbilityInstance> activeFireballs;
     private static ArrayList<AbilityInstance> activeBlackHoles;
     private static HashMap<Player, Vector3> activeArrows;
@@ -38,8 +36,9 @@ public class GameRenderer {
     private final float blackHoleFrameDuration = 0.1f;
     private final float waterFrameDuration = 0.2f;
 
-    private Animation<TextureRegion>[] fireballAnimations;
-    private Animation<TextureRegion>[] blackHoleAnimation;
+    private static Animation<TextureRegion>[] fireballAnimations;
+    private static Animation<TextureRegion> flameThrowerAnimation;
+    private static Animation<TextureRegion>[] blackHoleAnimation;
 
     private final MainGameScreen mainGameScreen;
     private final OrthographicCamera camera;
@@ -59,6 +58,7 @@ public class GameRenderer {
     private Animation<TextureRegion> bottomAnimation;
 
     private float waterAnimationTime;
+    private static float flameThrowerAnimationTime;
 
 
     public GameRenderer(MainGameScreen mainGameScreen, MyAssetManager assetManager, OrthographicCamera camera) {
@@ -109,6 +109,9 @@ public class GameRenderer {
         fireballAnimations[3] = sheetsToAnimation(frameCols, frameRows, fireball_sheet_endHit, fireballFrameDuration);
         fireballAnimations[3].setPlayMode(Animation.PlayMode.NORMAL);
 
+        ///  FLAME THROWER
+        flameThrowerAnimation = GameRenderer.sheetsToAnimation(5, 2, assetManager.getFlameThrowerAssets(), 0.1f);
+        flameThrowerAnimation.setPlayMode(Animation.PlayMode.LOOP);
 
         /// BLACK HOLE
         Texture[] blackHole_sheets = assetManager.getBlackHoleAssets();
@@ -360,6 +363,7 @@ public class GameRenderer {
         }
 
         waterAnimationTime += delta;
+        flameThrowerAnimationTime += delta;
     }
 
     private Texture getEdgeTexture(int worldX, int worldY) {
@@ -758,6 +762,20 @@ public class GameRenderer {
     public static void fireball(float pX, float pY, float velocityX, float velocityY, Vector2 rotation, float scale, float damage, float speed, float lt, Player player) {
         activeFireballs.add(new AbilityInstance(pX, pY, 1, velocityX, velocityY, rotation, scale, damage, speed, lt, player));
     }
+    public static void renderFlameThrower(Batch batch, Vector2 pDirection, Player player) {
+        float distance = pDirection.len();
+        Vector2 direction = pDirection.cpy().nor();
+
+        Sprite flameThrower = new Sprite(flameThrowerAnimation.getKeyFrame(flameThrowerAnimationTime));
+        flameThrower.setPosition(player.getX() - flameThrower.getWidth(), player.getY() - flameThrower.getHeight()/2);
+        flameThrower.setOrigin(flameThrower.getWidth(), flameThrower.getHeight()/2);
+        flameThrower.rotate(direction.angleDeg());
+        flameThrower.setScale(Math.max(Math.min(
+            distance/flameThrowerAnimation.getKeyFrame(flameThrowerAnimationTime).getRegionWidth(),
+            localPlayer.getT3ScaleWidth()), 0.75f),
+            localPlayer.getT3ScaleHeight());
+        flameThrower.draw(batch);
+    }
     public static void blackHole(float pX, float pY, float scale, float damage, float lt, Player player){
         activeBlackHoles.add(new AbilityInstance(pX, pY, 4, 0, 0, new Vector2(), scale, scale, damage, lt, player));
     }
@@ -841,6 +859,14 @@ public class GameRenderer {
         batch.setShader(nightEffectShader);
     }
 
+
+    ///  GETTER
+    public static Animation<TextureRegion> getFlameThrowerAnimation(){
+        return flameThrowerAnimation;
+    }
+    public static float getFlameThrowerAnimationTime(){
+        return flameThrowerAnimationTime;
+    }
 
     /// Helper class for tracking ability instances
     public static class AbilityInstance {

@@ -235,6 +235,13 @@ public class MyAssetManager {
         return fireball_sheets;
     }
 
+    public void loadFlameThrowerAssets(){
+        manager.load("player/mage/abilities/flameThrower_sheet.png", Texture.class);
+    }
+    public Texture getFlameThrowerAssets(){
+        return manager.get("player/mage/abilities/flameThrower_sheet.png", Texture.class);
+    }
+
     public void loadBlackHoleAssets(){
         manager.load("player/mage/abilities/blackHole1_sheet.png",Texture.class);
         manager.load("player/mage/abilities/blackHole2_sheet.png",Texture.class);

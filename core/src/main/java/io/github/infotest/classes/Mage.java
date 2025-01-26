@@ -1,6 +1,5 @@
 package io.github.infotest.classes;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
@@ -37,9 +36,16 @@ public class Mage extends Player {
     private float fireballScale = 3f;
     private float fireballLT = 2f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
 
+    private float flameThrowerCost = 20f;
+    private float flameThrowerBaseDamage = 2f; // damage every 0.5 sec
+    private float flameThrowerCooldown = 1f; //15
+    private float flameThrowerScaleWidth = 4f;
+    private float flameThrowerScaleHeight = 1f;
+    private float flameThrowerLT = 10f;
+
     private float blackHoleCost = 30f;
     private float blackHoleDamage = 2f;
-    private float blackHoleCooldown = 1f; //20
+    private float blackHoleCooldown = 25f;
     private float blackHoleScale = 1f;
     private float blackHoleLT = 4f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
 
@@ -70,6 +76,13 @@ public class Mage extends Player {
         this.T1Speed = fireballSpeed;
         this.T1Scale = fireballScale;
         this.T1LT =fireballLT;
+
+        this.T3Cost = flameThrowerCost;
+        this.T3Damage = flameThrowerBaseDamage;
+        this.T3Cooldown = flameThrowerCooldown;
+        this.T3ScaleWidth = flameThrowerScaleWidth;
+        this.T3ScaleHeight = flameThrowerScaleHeight;
+        this.T3LT =flameThrowerLT;
 
         this.T4Cost = blackHoleCost;
         this.T4Damage = blackHoleDamage;
@@ -111,7 +124,14 @@ public class Mage extends Player {
                 }
                 break;
             case 2: break;
-            case 3: break;
+            case 3:
+                if (timeSinceLastT3Skill >= flameThrowerCooldown && mana >= T3Cost || localPlayer!=this) {
+                    mana -= T3Cost;
+                    Logger.log("[Mage INFO]: Player [" + this.getName() + "] casts skill " + skillID);
+                    timeSinceLastT3Skill = 0;
+                    isAttacking3 = true;
+                }
+                break;
             case 4:
                 if(timeSinceLastT4Skill >= blackHoleCooldown && mana >= T4Cost ||  localPlayer!=this) {
                     Logger.log("[Mage INFO]: Player [" + this.getName() + "] casts skill " + skillID);
@@ -170,6 +190,7 @@ public class Mage extends Player {
         currentFrame.setScale(0.75f);
         currentFrame.draw(batch);
 
+        MainGameScreen.isRenderingFlameThrower = isAttacking3;
         MainGameScreen.isRenderingBlackHoleActivation = isAttacking4;
 
         animationTime += delta;

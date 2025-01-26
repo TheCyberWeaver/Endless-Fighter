@@ -6,9 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -27,6 +25,7 @@ import java.util.*;
 import com.badlogic.gdx.utils.Timer;
 
 import static io.github.infotest.GameSettings.*;
+import static io.github.infotest.MainGameScreen.localPlayer;
 
 public class MainGameScreen implements Screen, InputProcessor, ServerConnection.SeedListener {
     private SpriteBatch batch;
@@ -41,6 +40,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     public static boolean clicked = false;
 
     private boolean isRenderingWithNightShader = false;
+
+    public static boolean isRenderingFlameThrower = false;
     public static boolean isRenderingBlackHoleActivation = false;
 
 
@@ -213,6 +214,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
         assetManager.loadMageAssets();
         assetManager.loadFireballAssets();
+        assetManager.loadFlameThrowerAssets();
         assetManager.loadFireballSymbol();
         assetManager.loadBlackHoleAssets();
 
@@ -388,6 +390,17 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 uiLayer.addSignTimer(delta);
             }
 
+            if (isRenderingFlameThrower){
+                if (!(localPlayer.getFlameThrowerActiveTimer() <= localPlayer.getT3LT())){
+                    localPlayer.resetFlameThrowerActiveTimer();
+                    localPlayer.resetAttacking3();
+                }
+                Vector3 mouseWorldPos = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+                Vector2 direction = new Vector2( localPlayer.getX() - mouseWorldPos.x, -(mouseWorldPos.y - localPlayer.getY()));
+                GameRenderer.renderFlameThrower(batch, direction, localPlayer);
+                checkFlameThrowerCollision(direction, localPlayer, delta);
+            }
+
             float d = 32*32;
             if (isRenderingBlackHoleActivation && renderBlackHoleActivation(delta, d)) {
                 if (clickPos != null) {
@@ -506,6 +519,9 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
             if (Gdx.input.isKeyPressed(Input.Keys.E) && !localPlayer.isFrozen()) {
                 localPlayer.castSkill(1, serverConnection);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.C) && !localPlayer.isFrozen()) {
+                localPlayer.castSkill(3, serverConnection);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.Q) && !localPlayer.isFrozen()) {
                 localPlayer.castSkill(4, serverConnection);
@@ -746,6 +762,31 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                     fireball.setHit();
                 }
             }
+        }
+    }
+    public static void checkFlameThrowerCollision(Vector2 direction, Player localPlayer, float delta) {
+        float distance = direction.len();
+        Animation<TextureRegion> flameThrowerAnimation = GameRenderer.getFlameThrowerAnimation();
+        float flameThrowerAnimationTime = GameRenderer.getFlameThrowerAnimationTime();
+        float dstToWidth = flameThrowerAnimation.getKeyFrame(flameThrowerAnimationTime).getRegionWidth()/distance;
+        float damageScale = Math.max(Math.min(dstToWidth,2f), 0.3f);
+        float damage = localPlayer.getT3Damage()*(17f/20f) + (localPlayer.getT3Damage()-1)*damageScale;
+
+        for (Player p : allPlayers.values()){
+            if (p.equals(localPlayer)){
+                continue;
+            }
+            Vector2 directionP = new Vector2(p.getX()-localPlayer.getX(), p.getY()-localPlayer.getY());
+            float distanceP = directionP.len();
+
+            direction.nor();
+            directionP.nor();
+
+            float alpha = (float) Math.toDegrees(Math.asin(flameThrowerAnimation.getKeyFrame(flameThrowerAnimationTime).getRegionHeight()/distance));
+            if (directionP.angleDeg(direction) <= alpha && distanceP <= distance){
+                p.takeDamage(2*damage*delta);
+            }
+            Logger.log("alpha: "+alpha+", direction: "+direction.angleDeg(directionP));
         }
     }
 

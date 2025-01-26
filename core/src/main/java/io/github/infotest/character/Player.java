@@ -68,11 +68,18 @@ public abstract class Player extends Actor{
     protected float T1Scale = 0f;
     protected float T1LT = 0f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
 
-    protected float T4Cost = 5f;
-    protected float T4Damage = 16f;
-    protected float T4Cooldown = 20f;
-    protected float T4Scale = 3f;
-    protected float T4LT = 2f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
+    protected float T3Cost = 0f;
+    protected float T3Damage = 0f;
+    protected float T3Cooldown = 0f;
+    protected float T3ScaleWidth = 0f;
+    protected float T3ScaleHeight = 0f;
+    protected float T3LT = 0f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
+
+    protected float T4Cost = 0f;
+    protected float T4Damage = 0f;
+    protected float T4Cooldown = 0f;
+    protected float T4Scale = 0f;
+    protected float T4LT = 0f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
 
 
 
@@ -92,6 +99,8 @@ public abstract class Player extends Actor{
     protected float timeSinceLastT2Skill;
     protected float timeSinceLastT3Skill;
     protected float timeSinceLastT4Skill;
+
+    private float flameThrowerActiveTimer = 0f;
 
     public Player(String id, String name, String className, int maxHealthPoints, int maxMana, int maxAusdauer, Vector2 initialPosition, float speed) {
         super(maxHealthPoints,initialPosition,speed);
@@ -216,6 +225,8 @@ public abstract class Player extends Actor{
         timeSinceLastT2Skill += delta;
         timeSinceLastT3Skill += delta;
         timeSinceLastT4Skill += delta;
+
+        flameThrowerActiveTimer += delta;
     }
 
     public void sprint(float delta){
@@ -361,15 +372,8 @@ public abstract class Player extends Actor{
     public float getT2SkillCoolDownTimer(){
         return timeSinceLastT2Skill;
     }
-
-//    public float getT3SkillCoolDownTime(){
-//        return T3Cooldown;
-//    }
     public float getT3SkillCoolDownTimer(){
         return timeSinceLastT3Skill;
-    }
-    public float getT4SkillCoolDownTime(){
-        return T4Cooldown;
     }
     public float getT4SkillCoolDownTimer(){
         return timeSinceLastT4Skill;
@@ -392,6 +396,32 @@ public abstract class Player extends Actor{
     }
     public float getT1LT(){
         return T1LT;
+    }
+
+    public float getT3Cost(){
+        return T3Cost;
+    }
+    public float getT3Damage(){
+        return T3Damage;
+    }
+    public float getT3Cooldown(){
+        return T3Cooldown;
+    }
+    public float getT3ScaleWidth(){
+        return T3ScaleWidth;
+    }
+    public float getT3ScaleHeight(){
+        return T3ScaleHeight;
+    }
+    public float getT3LT(){
+        return T3LT;
+    }
+
+    public float getFlameThrowerActiveTimer(){
+        return flameThrowerActiveTimer;
+    }
+    public void resetFlameThrowerActiveTimer(){
+        flameThrowerActiveTimer = 0f;
     }
 
     public float getT4Cost(){
