@@ -82,6 +82,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
     private final Main game;
     public static boolean hasInitializedMap = false;
+    public static boolean hasInitializedMapBackup = false;
+    public static boolean hasInitializedSpawn = false;
 
     //Timer
     private float debugTimer=0;
@@ -304,6 +306,16 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     @Override
     public void render(float delta) {
 
+        if (hasInitializedMap && hasInitializedMapBackup && !hasInitializedSpawn){
+            Texture chamber = assetManager.getAnimationObjectAssets()[2];
+            Vector2 columnRows = assetManager.getColumnsRows(chamber);
+            animationObjects.add(AnimationObjects.createSummoningChamber(
+                MAP_SIZE*CELL_SIZE/2f-(chamber.getWidth()/columnRows.x)/2f-5,
+                MAP_SIZE*CELL_SIZE/2f-(chamber.getHeight()/columnRows.y)/2f-40,
+                assetManager));
+            hasInitializedSpawn = true;
+        }
+
         //Logger.log(player);
 
         // clear screen
@@ -311,6 +323,17 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         if(localPlayer !=null && gameRenderer!=null){
+
+            if (!localPlayer.isRendered) {
+                localPlayer.freeze();
+                if (animationObjects.get(0).getAnimationTimer()>= animationObjects.get(0).getAnimation().getFrameDuration()*20f) {
+                    localPlayer.isRendered = true;
+                    localPlayer.unfreeze();
+                }
+            }
+
+            //TODO sync animation server wide
+
             // update camera position
             camera.position.set(localPlayer.getX(), localPlayer.getY(), 0);
             camera.update();
@@ -327,6 +350,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
             }
 
             gameRenderer.renderMap(batch, delta, camera.zoom, localPlayer.getPosition());
+            gameRenderer.updateAnimationObjects(batch, delta);
             gameRenderer.renderPlayers(batch, allPlayers, delta);
             gameRenderer.renderGegner(batch, allGegner, delta);
             handleInput(batch, delta);
@@ -339,10 +363,6 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                     }
                 });
 
-            }
-
-            for (AnimationObjects animationObject : animationObjects) {
-                animationObject.render(batch, delta);
             }
 
             gameRenderer.renderNPCs(batch, delta);

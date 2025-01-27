@@ -427,6 +427,12 @@ public class GameRenderer {
         }
     }
 
+    public void updateAnimationObjects(Batch batch, float delta) {
+        for (AnimationObjects animationObject : animationObjects) {
+            animationObject.render(batch, delta);
+        }
+    }
+
     public void renderTrees(Batch batch, float zoom, Vector2 pos){
         int widthCell = (int) Math.ceil(Gdx.graphics.getWidth() * zoom / CELL_SIZE);
         int heightCell = (int) Math.ceil(Gdx.graphics.getHeight() * zoom / CELL_SIZE);
@@ -493,6 +499,7 @@ public class GameRenderer {
             return;
         }
         for (Player player : players.values()) {
+            if (!player.isRendered){continue;}
             player.interpolatePosition(deltaTime);
             player.render(batch, deltaTime);
         }

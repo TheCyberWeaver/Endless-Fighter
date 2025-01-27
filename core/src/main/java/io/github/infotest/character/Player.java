@@ -81,7 +81,7 @@ public abstract class Player extends Actor{
     protected float T4Scale = 0f;
     protected float T4LT = 0f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
 
-
+    public boolean  isRendered = false;
 
     //Assassin Att
     protected boolean seeAllActive = false;
@@ -207,6 +207,12 @@ public abstract class Player extends Actor{
     @Override
     public void update(float delta){
 
+        if (flameThrowerActiveTimer > T3LT){
+            flameThrowerActiveTimer = 0;
+            isAttacking3 = false;
+            MainGameScreen.isRenderingFlameThrower = false;
+        }
+
 //        if (mana < maxMana) {
 //            mana += manaRegen * delta;
 //            if (mana > maxMana) {
@@ -226,7 +232,7 @@ public abstract class Player extends Actor{
         timeSinceLastT3Skill += delta;
         timeSinceLastT4Skill += delta;
 
-        flameThrowerActiveTimer += delta;
+        if (MainGameScreen.isRenderingFlameThrower) flameThrowerActiveTimer += delta;
     }
 
     public void sprint(float delta){
