@@ -779,11 +779,6 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
             float width = flameThrowerAnimation.getKeyFrame(flameThrowerAnimationTime).getRegionWidth();
             float height = flameThrowerAnimation.getKeyFrame(flameThrowerAnimationTime).getRegionHeight();
-            batch.end();
-            shapeRenderer.end();
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            shapeRenderer.setColor(Color.RED);
-            batch.begin();
 
             Vector2 b = new Vector2(p.getX()-localPlayer.getX(), p.getY()-localPlayer.getY());
             Vector2 v = new Vector2(-direction.cpy().x, -direction.cpy().y);
@@ -796,19 +791,6 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
             Vector2 temp = v.cpy().nor();
             Vector2 u = new Vector2(temp.y*height/2f, -temp.x*height/2f);
-
-            shapeRenderer.line(localPlayer.getPosition(), p.getPosition());
-            shapeRenderer.line(new Vector2(mousePos.x, mousePos.y), localPlayer.getPosition());
-
-            shapeRenderer.end();
-            batch.end();
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            shapeRenderer.setColor(Color.YELLOW);
-            batch.begin();
-
-            shapeRenderer.line(localPlayer.getPosition(), localPlayer.getPosition().add(u));
-            shapeRenderer.line(localPlayer.getPosition(), localPlayer.getPosition().add(v));
-
 
             float n = (-(v.y*b.x-v.x*b.y))/(u.y*v.x-v.y*u.x);
             float m = (u.y*b.x-u.x*b.y)/(u.y*v.x-v.y*u.x);
