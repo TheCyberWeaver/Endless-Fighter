@@ -73,6 +73,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
     // player list
     public static HashMap<String, Player> allPlayers = new HashMap<>();
+    private static HashMap<String, Player> allPlayers_old = new HashMap<>();
     public static ArrayList<Gegner> allGegner = new ArrayList<>();
     public static ArrayList<NPC> allNPCs = new ArrayList<>();
     private int numberOfNPCInTheLastFrame = 0;
@@ -332,7 +333,22 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 }
             }
 
-            //TODO sync animation server wide
+            for (Player player : allPlayers.values()) {
+                if (player.equals(localPlayer)) {continue;}
+                if (player.isJoining){
+                    if (player.joiningTimer == 0)animationObjects.get(0).triggerAnimation();
+                    if (player.joiningTimer > animationObjects.get(0).getAnimation().getFrameDuration()*20) {
+                        player.isJoining = false;
+                        player.isRendered = true;
+                    }
+                    player.joiningTimer += delta;
+                }
+                if (!allPlayers_old.containsValue(player)) {
+                    player.isRendered = false;
+                    player.isJoining = true;
+                }
+                allPlayers_old = (HashMap<String, Player>) allPlayers.clone();
+            }
 
             // update camera position
             camera.position.set(localPlayer.getX(), localPlayer.getY(), 0);

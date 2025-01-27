@@ -82,6 +82,8 @@ public abstract class Player extends Actor{
     protected float T4LT = 0f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
 
     public boolean  isRendered = false;
+    public boolean isJoining = false;
+    public float joiningTimer = 0f;
 
     //Assassin Att
     protected boolean seeAllActive = false;
