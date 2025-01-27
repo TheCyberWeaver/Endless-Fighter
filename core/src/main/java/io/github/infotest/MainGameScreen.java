@@ -398,7 +398,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 Vector3 mouseWorldPos = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
                 Vector2 direction = new Vector2( localPlayer.getX() - mouseWorldPos.x, -(mouseWorldPos.y - localPlayer.getY()));
                 GameRenderer.renderFlameThrower(batch, direction, localPlayer);
-                checkFlameThrowerCollision(direction, localPlayer, delta);
+                checkFlameThrowerCollision(batch, direction, localPlayer, delta, mouseWorldPos);
             }
 
             float d = 32*32;
@@ -764,7 +764,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
             }
         }
     }
-    public static void checkFlameThrowerCollision(Vector2 direction, Player localPlayer, float delta) {
+    public void checkFlameThrowerCollision(Batch batch, Vector2 direction, Player localPlayer, float delta, Vector3 mousePos) {
         float distance = direction.len();
         Animation<TextureRegion> flameThrowerAnimation = GameRenderer.getFlameThrowerAnimation();
         float flameThrowerAnimationTime = GameRenderer.getFlameThrowerAnimationTime();
@@ -776,17 +776,47 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
             if (p.equals(localPlayer)){
                 continue;
             }
-            Vector2 directionP = new Vector2(p.getX()-localPlayer.getX(), p.getY()-localPlayer.getY());
-            float distanceP = directionP.len();
 
-            direction.nor();
-            directionP.nor();
+            float width = flameThrowerAnimation.getKeyFrame(flameThrowerAnimationTime).getRegionWidth();
+            float height = flameThrowerAnimation.getKeyFrame(flameThrowerAnimationTime).getRegionHeight();
+            batch.end();
+            shapeRenderer.end();
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.setColor(Color.RED);
+            batch.begin();
 
-            float alpha = (float) Math.toDegrees(Math.asin(flameThrowerAnimation.getKeyFrame(flameThrowerAnimationTime).getRegionHeight()/distance));
-            if (directionP.angleDeg(direction) <= alpha && distanceP <= distance){
-                p.takeDamage(2*damage*delta);
+            Vector2 b = new Vector2(p.getX()-localPlayer.getX(), p.getY()-localPlayer.getY());
+            Vector2 v = new Vector2(-direction.cpy().x, -direction.cpy().y);
+            if (v.len() < width){
+                v.nor().scl(width);
             }
-            Logger.log("alpha: "+alpha+", direction: "+direction.angleDeg(directionP));
+            if (v.len() > width*localPlayer.getT3ScaleWidth()){
+                v.nor().scl(width*localPlayer.getT3ScaleWidth());
+            }
+
+            Vector2 temp = v.cpy().nor();
+            Vector2 u = new Vector2(temp.y*height/2f, -temp.x*height/2f);
+
+            shapeRenderer.line(localPlayer.getPosition(), p.getPosition());
+            shapeRenderer.line(new Vector2(mousePos.x, mousePos.y), localPlayer.getPosition());
+
+            shapeRenderer.end();
+            batch.end();
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.setColor(Color.YELLOW);
+            batch.begin();
+
+            shapeRenderer.line(localPlayer.getPosition(), localPlayer.getPosition().add(u));
+            shapeRenderer.line(localPlayer.getPosition(), localPlayer.getPosition().add(v));
+
+
+            float n = (-(v.y*b.x-v.x*b.y))/(u.y*v.x-v.y*u.x);
+            float m = (u.y*b.x-u.x*b.y)/(u.y*v.x-v.y*u.x);
+
+            if (n>=-1 && n<=1 && m>=0 && m<=1){
+                p.takeDamage(damage*delta, serverConnection);
+            }
+
         }
     }
 

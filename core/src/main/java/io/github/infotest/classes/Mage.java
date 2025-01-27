@@ -37,8 +37,8 @@ public class Mage extends Player {
     private float fireballLT = 2f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
 
     private float flameThrowerCost = 20f;
-    private float flameThrowerBaseDamage = 2f; // damage every 0.5 sec
-    private float flameThrowerCooldown = 1f; //15
+    private float flameThrowerBaseDamage = 2f; // damage every sec
+    private float flameThrowerCooldown = 15f;
     private float flameThrowerScaleWidth = 4f;
     private float flameThrowerScaleHeight = 1f;
     private float flameThrowerLT = 10f;
@@ -129,6 +129,7 @@ public class Mage extends Player {
                     mana -= T3Cost;
                     Logger.log("[Mage INFO]: Player [" + this.getName() + "] casts skill " + skillID);
                     timeSinceLastT3Skill = 0;
+                    MainGameScreen.isRenderingFlameThrower = true;
                     isAttacking3 = true;
                 }
                 break;
@@ -190,7 +191,6 @@ public class Mage extends Player {
         currentFrame.setScale(0.75f);
         currentFrame.draw(batch);
 
-        MainGameScreen.isRenderingFlameThrower = isAttacking3;
         MainGameScreen.isRenderingBlackHoleActivation = isAttacking4;
 
         animationTime += delta;

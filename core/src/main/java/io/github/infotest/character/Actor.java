@@ -163,7 +163,7 @@ public abstract class Actor {
         return rotation;
     }
     public float getX() {
-        return position.x;
+        return position.cpy().x;
     }
     public void setX(float x) {
         if(x >= 0 && x < (MainGameScreen.MAP_SIZE+0.4f)*MainGameScreen.CELL_SIZE){
@@ -172,7 +172,7 @@ public abstract class Actor {
         }
     }
     public float getY() {
-        return position.y;
+        return position.cpy().y;
     }
     public void setY(float y) {
         if(y >= 0.6f*MainGameScreen.CELL_SIZE && y < (MainGameScreen.MAP_SIZE+1.6f)*MainGameScreen.CELL_SIZE){
@@ -181,7 +181,7 @@ public abstract class Actor {
         }
     }
     public Vector2 getPosition() {
-        return position;
+        return position.cpy();
     }
     public void setPosition(Vector2 position) {
         this.position = position;
