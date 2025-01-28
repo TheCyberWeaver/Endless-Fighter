@@ -7,7 +7,7 @@ public class Coffee extends Item {
     private float ausdauerRecovery;
 
     public Coffee (MyAssetManager assetManager, float ausdauerRecovery) {
-        super("coffee","just an coffee", assetManager.getLoadingScreenTexture());
+        super("coffee","just a coffee", assetManager.getLoadingScreenTexture());
         this ausdauerRecovery = ausdauerRecovery;
     }
 
