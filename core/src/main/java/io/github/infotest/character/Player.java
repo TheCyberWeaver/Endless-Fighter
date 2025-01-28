@@ -193,16 +193,17 @@ public abstract class Player extends Actor{
 
     }
 
+    
 
     @Override
     public void update(float delta){
 
-//        if (mana < maxMana) {
-//            mana += manaRegen * delta;
-//            if (mana > maxMana) {
-//                mana = maxMana;
-//            }
-//        }
+       if (mana < maxMana) {
+            mana += manaRegen * delta;
+            if (mana > maxMana) {
+                mana = maxMana;
+            }
+        }
 
         if (ausdauer < maxAusdauer && !isSprinting) {
             ausdauer += ausdauerRegen*delta;
@@ -454,7 +455,7 @@ public abstract class Player extends Actor{
         return mana;
     }
     public void setMana(float mana) {
-        this.mana = mana;
+       this.mana = Math.min (mana, maxMana);  //Max Wert nicht überschreiten
     }
     public float getMaxMana() {
         return maxMana;
@@ -465,8 +466,12 @@ public abstract class Player extends Actor{
     public float getAusdauer() {
         return ausdauer;
     }
+    
     public float getMaxAusdauer() {
         return maxAusdauer;
+    }
+    public void setAusdauer(float ausdauer) {
+       this.ausdauer = Math.min (ausdauer, maxAusdauer);  //Max Wert nicht überschreiten
     }
     public float getAusdauerRegen() {
         return ausdauerRegen;
