@@ -146,7 +146,6 @@ public abstract class Player extends Actor{
         float textWidth = layout.width;
         font.draw(batch, name, predictedPosition.x - textWidth/2f  , predictedPosition.y + 50);
 
-
         // 3) Speech bubble logic
         if (isSpeechBubbleVisible && speechBubbleMessage != null) {
             // Update timer
@@ -250,6 +249,14 @@ public abstract class Player extends Actor{
         this.speed = this.normalSpeed;
         if (isDevelopmentMode) {
             this.speed = 500f;
+        }
+    }
+
+    public void useItem(int index, ServerConnection serverConnection){
+        if (items.get(index) != null) {
+            items.get(index).use(this);
+            serverConnection.sendItemUse(this, index, items.get(index).id);
+            items.set(index, null);
         }
     }
 

@@ -508,6 +508,21 @@ public class ServerConnection {
             e.printStackTrace();
         }
     }
+    public void sendItemUse(Player player, int itemIndex, String itemID){
+        JSONObject data = new JSONObject();
+        try {
+            String id = player.id;
+            if (id != null){
+                data.put("actionType", "ItemUse");
+                data.put("playerID", id);
+                data.put("itemID", itemID);
+                data.put("itemIndex", itemIndex);
+                socket.emit("playerAction", data);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
     public void sendTakeDamage(Player player, float damage){
         JSONObject takeDamageData = new JSONObject();
         try {

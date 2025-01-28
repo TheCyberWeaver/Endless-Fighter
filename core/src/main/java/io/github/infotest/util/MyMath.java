@@ -6,7 +6,7 @@ public class MyMath {
     /**
      * Die Methode prüft, ob sich point_2 im aufgespannten Rechtecks der waagerechten und
      * des Senkrechten Vektors mit doppelter Länge des Radius.
-     * @param point1 Punkt 1
+     * @param point1 Punkt 1 (starting point of square)
      * @param point2 Punkt 2
      * @param radius die halbe Seitenlänge des Rechtecks
      * @return gibt true zurück, wenn sich Punkt 2 im Rechteck befindet und false, wenn nicht

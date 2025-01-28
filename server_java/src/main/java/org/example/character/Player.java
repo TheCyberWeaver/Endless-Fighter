@@ -111,9 +111,17 @@ public class Player {
     public void takeDamage(float damage) {
         this.hp -= damage;
     }
-
     public void professionAttack(Player target, float damage) {
         target.hp -= damage;
+    }
+    public void updateItems(ArrayList<String> itemIDs) {
+        this.itemIDs = itemIDs;
+    }
+    public void removeItem(String itemID) {
+        this.itemIDs.set(itemID.indexOf(itemID),null);
+    }
+    public void removeItem(int index) {
+        this.itemIDs.set(index,null);
     }
 }
 

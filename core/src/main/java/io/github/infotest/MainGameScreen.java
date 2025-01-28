@@ -393,6 +393,31 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 currentTradingToNPC.closeMarket();
                 currentTradingToNPC = null;
             }
+
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_1) && !localPlayer.isFrozen()) {
+                localPlayer.useItem(0, serverConnection);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_2) && !localPlayer.isFrozen()) {
+                localPlayer.useItem(1, serverConnection);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_3) && !localPlayer.isFrozen()) {
+                localPlayer.useItem(2, serverConnection);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_4) && !localPlayer.isFrozen()) {
+                localPlayer.useItem(3, serverConnection);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_5) && !localPlayer.isFrozen()) {
+                localPlayer.useItem(4, serverConnection);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_6) && !localPlayer.isFrozen()) {
+                localPlayer.useItem(5, serverConnection);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_7) && !localPlayer.isFrozen()) {
+                localPlayer.useItem(6, serverConnection);
+            }
+
+
+
             //suicide
             if (Gdx.input.isKeyPressed(Input.Keys.K)) {
                 localPlayer.kill(serverConnection);

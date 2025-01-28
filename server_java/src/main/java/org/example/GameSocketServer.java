@@ -40,6 +40,11 @@ public class GameSocketServer {
      * Stores all connected players
      */
     public static final Map<String, Player> allPlayers = new ConcurrentHashMap<>();
+    /**
+     * Stores all inventorys of all connected Players
+     */
+    public static final Map<Player, ArrayList<String>> inventorys = new ConcurrentHashMap<>();
+
     //NPC
     public static ArrayList<NPC> allNPCs = new ArrayList<>();
 
@@ -106,6 +111,15 @@ public class GameSocketServer {
 //                newPlayer.pickItem(item.get(i).getAsString());
 //            }
             allPlayers.put(socketId, newPlayer);
+            ArrayList<String> startingInv = new ArrayList<>();
+            startingInv.add("null");
+            startingInv.add("null");
+            startingInv.add("null");
+            startingInv.add("null");
+            startingInv.add("null");
+            startingInv.add("null");
+            startingInv.add("null");
+            inventorys.put(newPlayer, startingInv);
             System.out.println("[INFO]: " + newPlayer.name + " " + newPlayer.classtype + " joins the world");
 
 
@@ -121,6 +135,7 @@ public class GameSocketServer {
             Player p = allPlayers.get(socketId);
             if (p != null) {
                 System.out.println("[INFO]: " + p.name + " " + p.classtype + " leaves the world");
+                inventorys.remove(p);
             }
             allPlayers.remove(socketId);
             needPlayerUpdate=true;
@@ -193,6 +208,13 @@ public class GameSocketServer {
                     break;
                 case "AOE":
                     // TODO
+                    break;
+                case "ItemUse":
+                    //String itemId = json.get("itemID").getAsString();
+                    int index = json.get("itemIndex").getAsInt();
+                    Player player = allPlayers.get(socketId);
+                    inventorys.get(player).set(index, null);
+                    player.removeItem(index);
                     break;
                 case "PlayerDeath":
                     targetId = json.get("targetId").getAsString();
