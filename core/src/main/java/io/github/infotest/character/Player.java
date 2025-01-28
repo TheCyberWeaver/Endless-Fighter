@@ -222,9 +222,6 @@ public abstract class Player extends Actor{
                 mana = maxMana;
             }
         } 
-        if (potionActive) {
-            mana += (manaRecovery + d)
-        }
 
         if (ausdauer < maxAusdauer && !isSprinting) {
             ausdauer += ausdauerRegen*delta;
