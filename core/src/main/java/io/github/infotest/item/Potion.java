@@ -5,7 +5,7 @@ import io.github.infotest.util.MyAssetManager;
 public class Potion extends Item {
     public String color;
 
-    public Potion(MyAssetManager assetManager, float manaRegen, float duration) {
+    public Potion(MyAssetManager assetManager) {
         super("potion","just a potion", assetManager.getLoadingScreenTexture());
     }
 
