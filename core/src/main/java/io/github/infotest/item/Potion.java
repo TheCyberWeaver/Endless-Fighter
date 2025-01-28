@@ -4,17 +4,17 @@ import io.github.infotest.util.MyAssetManager;
 
 public class Potion extends Item {
     public String color;
-    private float manaRecovery;
+    private float manaRegen;
     private float duration;
 
-    public Potion(MyAssetManager assetManager, float manaRecovery, float duration) {
+    public Potion(MyAssetManager assetManager, float manaRegen, float duration) {
         super("potion","just a potion", assetManager.getLoadingScreenTexture());
-        this.manaRecovery = manaRecovery;
+        this.manaRegen = manaRegen;
         this.duration = duration;
     }
 
-    public float getManaRecovery(){
-        return manaRecovery;
+    public float getManaRegen(){
+        return manaRegen;
     }
 
     public float getDuration(){
