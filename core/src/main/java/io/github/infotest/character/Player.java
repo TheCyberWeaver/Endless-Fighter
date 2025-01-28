@@ -195,22 +195,6 @@ public abstract class Player extends Actor{
     }
 
 
-     public void setMana(float mana){
-         this.mana = Math.min (mana, maxMana);  //Max Wert nicht überschreiten
-     }
-
-    public float getMana(){
-        return mana;
-    }
-
-     public void setAusdauer(float ausdauer){
-         this.ausdauer = Math.min (ausdauer, maxAusdauer);  //Max Wert nicht überschreiten
-     }
-
-    public float getAusdauer(){
-        return ausdauer;
-    }
-    
 
 
     @Override
