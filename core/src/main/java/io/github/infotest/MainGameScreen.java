@@ -49,7 +49,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     /**
     * Speichert für jede Zelle eine HashMap mit Richtung zur Nachbarzelle und Nachbartyp.
     */
-    public static HashMap<Vector2,Integer>[][] FADE_MAP=new HashMap<Vector2,Integer>[MAP_SIZE][MAP_SIZE];
+    public static HashMap<Vector2,Integer>[][] FADE_MAP=new HashMap[MAP_SIZE][MAP_SIZE];
     public static int[][] DECO_MAP=new int[MAP_SIZE][MAP_SIZE];
     public static float[][] DECO_PROB = new float[numOfValidTextures][numOfValidDeco];
     public static float[][] DECO_SCALE_MAP=new float[MAP_SIZE][MAP_SIZE];

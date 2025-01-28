@@ -133,23 +133,23 @@ public class GameRenderer {
                 if (GameSettings.highGrafik) {
                     HashMap<Vector2,Integer> nachbarn = MainGameScreen.FADE_MAP[worldY][worldX];
                     // enthält nur Nachbarn, die für das Fading relevant sind
-                    for(Vector2 v: nachbarn.getKeys()){
+                    for(Vector2 v: nachbarn.keySet()){
                         int tileType = nachbarn.get(v);
                         int orientType = 0; // corner, bottom, left, right, top
-                        if(v.getX() == 0 || v.getY() == 0){
-                            int x = v.getX(); 
-                            int y = v.getY();
-                            orientType = x*(3*(x+1)-2) + y* (2*(y+1)-3);
+                        if(v.x == 0 || v.y == 0){
+                            int x1 = (int) v.x;
+                            int y1 = (int) v.y;
+                            orientType = x1*(3*(x1+1)-2) + y1* (2*(y1+1)-3);
                         }
                         int rot = 0;
-                        if(v.getX() != 0 && v.getY() != 0){                            
-                            int x = v.getX(); 
-                            int y = v.getY();
-                            if( x == -1 && y == -1){
+                        if(v.x != 0 && v.y != 0){
+                            int x1 = (int) v.x;
+                            int y2 = (int) v.y;
+                            if( x1 == -1 && y2 == -1){
                                 rot = 90;
-                            } else if(x == -1 && y == 1){
+                            } else if(x1 == -1 && y2 == 1){
                                 rot = 180;
-                            } else if(x == -1 && y == 1){
+                            } else if(x1 == -1 && y2 == 1){
                                 rot = 270;
                         }
                         drawTransition(batch, worldX, worldY, tileType, orientType, rot);
@@ -169,11 +169,11 @@ public class GameRenderer {
             }
         }
         if (GameSettings.highGrafik) {
-            for (int y = -7; y < heightCell + 7; y++) {
-                for (int x = -7; x < widthCell + 7; x++) {
+            for (int yG = -7; yG < heightCell + 7; yG++) {
+                for (int xG = -7; xG < widthCell + 7; xG++) {
 
-                    int worldX = playerX - widthCell / 2 + x;
-                    int worldY = playerY - heightCell / 2 + y;
+                    int worldX = playerX - widthCell / 2 + xG;
+                    int worldY = playerY - heightCell / 2 + yG;
 
                     // Clamp coordinates to map bounds
                     worldX = Math.max(0, Math.min(worldX, GAME_MAP[0].length - 1));
@@ -202,6 +202,7 @@ public class GameRenderer {
                 }
             }
         }
+    }
     }
 
     private void drawTransition(SpriteBatch batch, int worldX, int worldY, int tileType, int orientType, float rotation) {

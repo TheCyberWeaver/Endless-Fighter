@@ -2,10 +2,7 @@ package io.github.infotest.util;
 
 import com.badlogic.gdx.math.Vector2;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static io.github.infotest.MainGameScreen.*;
 
@@ -97,17 +94,17 @@ public class MapCreator {
                 int bottomLeft; // für c4
                 int left; // für l
 
-                FADE_MAP[y2][x2] = new HashMap<Vector2,Integer>();
+                FADE_MAP[y2][x2] = new HashMap<>();
 
                 for(int i =-1; i <= 1; i++){ // iteriere über alle Nachbarzellen
                     for(int j = -1; j<= 1; j++){
-                        if(x2+i < 0 || x2+i > MAP_SIZE || y2+j < 0 || y2 +j > MAP_SIZE){
+                        if(x2+i < 0 || x2+i >= MAP_SIZE || y2+j < 0 || y2 +j >= MAP_SIZE){
                             continue; // Nachbarzelle ist ausserhalb der Welt
                         }
                         if(GAME_MAP[y2][x2] >= GAME_MAP[y2+j][x2+i]){
                             continue; // Nachbarzelle kann fürs Fading ignoriert werden
                         }
-                        FADE_MAP[y2][x2].put(new Vector(i,j),GAME_MAP[y2+j][x2+i]);
+                        FADE_MAP[y2][x2].put(new Vector2(i,j),GAME_MAP[y2+j][x2+i]);
                     }
                 }
             }
