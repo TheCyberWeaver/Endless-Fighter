@@ -32,6 +32,7 @@ public abstract class Player extends Actor{
     protected float mana;
     protected float maxMana;
     protected float manaRegen = 2f;
+    
 
     protected float gold=0;
 
@@ -41,7 +42,7 @@ public abstract class Player extends Actor{
     protected float maxAusdauer;
     protected float ausdauerRegen = 3f;
     protected float ausdauerCost = 10f; //Ausdauer kosten pro Sekunde
-
+    
     protected boolean isSprinting;
 
     protected boolean isFrozen;
@@ -194,15 +195,36 @@ public abstract class Player extends Actor{
     }
 
 
+     public void setMana(float mana){
+         this.mana = Math.min (mana, maxMana);  //Max Wert nicht überschreiten
+     }
+
+    public float getMana(){
+        return mana;
+    }
+
+     public void setAusdauer(float ausdauer){
+         this.ausdauer = Math.min (ausdauer, maxAusdauer);  //Max Wert nicht überschreiten
+     }
+
+    public float getAusdauer(){
+        return ausdauer;
+    }
+    
+
+
     @Override
     public void update(float delta){
 
-//        if (mana < maxMana) {
-//            mana += manaRegen * delta;
-//            if (mana > maxMana) {
-//                mana = maxMana;
-//            }
-//        }
+        if (mana < maxMana) {
+            mana += manaRegen * delta;
+            if (mana > maxMana) {
+                mana = maxMana;
+            }
+        } 
+        if (potionActive) {
+            mana += (manaRecovery + d)
+        }
 
         if (ausdauer < maxAusdauer && !isSprinting) {
             ausdauer += ausdauerRegen*delta;
