@@ -14,7 +14,7 @@ public class Apple extends Item {
         this. healthRegen = healthRegen;
     }
 
-    public void eat (Actor actor){
+    public void use (Actor actor){
         actor.heal (healthRegen);
         healthRegen = 0;
     }
