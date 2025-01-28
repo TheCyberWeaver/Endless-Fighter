@@ -7,20 +7,20 @@ import io.github.infotest.util.MyAssetManager;
 
 public class Apple extends Item {
     public String color;
-    private float healthRecovery;
+    private float healthRegen;
 
-    public Apple(String id, String name,MyAssetManager assetManager, float healthRecovery) {
+    public Apple(String id, String name,MyAssetManager assetManager, float healthRegen) {
         super(id,"apple","just an apple", assetManager.getItemAssets()[0]);
-        this. healthRecovery = healthRecovery;
+        this. healthRegen = healthRegen;
     }
 
     public void eat (Actor actor){
-        actor.heal (healthRecovery);
-        healthRecovery = 0;
+        actor.heal (healthRegen);
+        healthRegen = 0;
     }
 
-    public float getHealthRecovery(){
-        return healthRecovery;
+    public float getHealthRegen(){
+        return healthRegen;
     }
 
     public void render(){
