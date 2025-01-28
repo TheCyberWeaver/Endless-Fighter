@@ -15,7 +15,8 @@ public class Apple extends Item {
     }
 
     public void eat (Actor actor){
-        //actor.heal (healthRecovery);
+        actor.heal (healthRecovery);
+        healthRecovery = 0;
     }
 
     public float getHealthRecovery(){
