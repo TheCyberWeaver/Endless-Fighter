@@ -132,9 +132,27 @@ public class GameRenderer {
                 // Render high graphics (fade transitions)
                 if (GameSettings.highGrafik) {
                     HashMap<Vector2,Integer> nachbarn = MainGameScreen.FADE_MAP[worldY][worldX];
-
+                    // enthält nur Nachbarn, die für das Fading relevant sind
                     for(Vector2 v: nachbarn.getKeys()){
-                        int type = nachbarn.get(v);
+                        int tileType = nachbarn.get(v);
+                        int orientType = 0; // corner, bottom, left, right, top
+                        if(v.getX() == 0 || v.getY() == 0){
+                            int x = v.getX(); 
+                            int y = v.getY();
+                            orientType = x*(3*(x+1)-2) + y* (2*(y+1)-3);
+                        }
+                        int rot = 0;
+                        if(v.getX() != 0 && v.getY() != 0){                            
+                            int x = v.getX(); 
+                            int y = v.getY();
+                            if( x == -1 && y == -1){
+                                rot = 90;
+                            } else if(x == -1 && y == 1){
+                                rot = 180;
+                            } else if(x == -1 && y == 1){
+                                rot = 270;
+                        }
+                        drawTransition(batch, worldX, worldY, tileType, orientType, rot);
                     }
                     /*
                     // Render transitions
@@ -186,7 +204,7 @@ public class GameRenderer {
         }
     }
 
-    private void drawTransition(SpriteBatch batch, int worldX, int worldY, int tileType, float rotation) {
+    private void drawTransition(SpriteBatch batch, int worldX, int worldY, int tileType, int orientType, float rotation) {
         Sprite transitionSprite = null;
         // Define fade textures for different tiles
         Texture[] tile1FADE = new Texture[5];
@@ -203,16 +221,16 @@ public class GameRenderer {
 
         switch (tileType) {
             case 1:
-                transitionSprite = new Sprite(tile1FADE[0]);
+                transitionSprite = new Sprite(tile1FADE[orientType]);
                 break;
             case 2:
-                transitionSprite = new Sprite(tile2FADE[0]);
+                transitionSprite = new Sprite(tile2FADE[orientType]);
                 break;
             case 5:
-                transitionSprite = new Sprite(tile4FADE[0]);
+                transitionSprite = new Sprite(tile4FADE[orientType]);
                 break;
             case 6:
-                transitionSprite = new Sprite(tile5FADE[0]);
+                transitionSprite = new Sprite(tile5FADE[orientType]);
                 break;
         }
 
