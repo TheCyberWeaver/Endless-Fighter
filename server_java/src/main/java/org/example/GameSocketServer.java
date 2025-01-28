@@ -10,6 +10,7 @@ import org.example.character.Gegner;
 import org.example.character.Player;
 import org.example.character.NPC;
 import org.example.util.MapCreator;
+import org.example.util.MyExceptionListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,25 +28,30 @@ public class GameSocketServer {
     // Map data
 
     public static final int CELL_SIZE = 32;
-    public static final int MAP_SIZE = 1000;
+    public static final int MAP_SIZE = 100;
     public static int numOfValidTextures = 4;
     public static int[][] GAME_MAP=new int[MAP_SIZE][MAP_SIZE];
 
 
 
-    private static boolean needPlayerUpdate = true;
-    private static boolean needNPCUpdate = true;
-    private static boolean needGegnerUpdate = true;
+    public static boolean needPlayerUpdate = true;
+    public static boolean needNPCUpdate = true;
+    public static boolean needGegnerUpdate = true;
     /**
      * Stores all connected players
      */
-    private static final Map<String, Player> players = new ConcurrentHashMap<>();
+    public static final Map<String, Player> allPlayers = new ConcurrentHashMap<>();
+    /**
+     * Stores all inventorys of all connected Players
+     */
+    public static final Map<Player, ArrayList<String>> inventorys = new ConcurrentHashMap<>();
+
     //NPC
-    private static ArrayList<NPC> npcs= new ArrayList<>();
+    public static ArrayList<NPC> allNPCs = new ArrayList<>();
 
-    private static ArrayList<Gegner> gegners= new ArrayList<>();
+    public static ArrayList<Gegner> allGegner = new ArrayList<>();
 
-    private static SocketIOServer server;
+    public static SocketIOServer server;
     public static void runServer() {
         running = true;
         // 0. Initialize the Server
@@ -105,7 +111,16 @@ public class GameSocketServer {
 //            for (int i=0; i<item.size(); i++){
 //                newPlayer.pickItem(item.get(i).getAsString());
 //            }
-            players.put(socketId, newPlayer);
+            allPlayers.put(socketId, newPlayer);
+            ArrayList<String> startingInv = new ArrayList<>();
+            startingInv.add("null");
+            startingInv.add("null");
+            startingInv.add("null");
+            startingInv.add("null");
+            startingInv.add("null");
+            startingInv.add("null");
+            startingInv.add("null");
+            inventorys.put(newPlayer, startingInv);
             System.out.println("[INFO]: " + newPlayer.name + " " + newPlayer.classtype + " joins the world");
 
 
@@ -118,11 +133,12 @@ public class GameSocketServer {
         // 5. When a client disconnects
         server.addDisconnectListener(client -> {
             String socketId = client.getSessionId().toString();
-            Player p = players.get(socketId);
+            Player p = allPlayers.get(socketId);
             if (p != null) {
                 System.out.println("[INFO]: " + p.name + " " + p.classtype + " leaves the world");
+                inventorys.remove(p);
             }
-            players.remove(socketId);
+            allPlayers.remove(socketId);
             needPlayerUpdate=true;
             // Send the playerLeft event to all clients
             server.getBroadcastOperations().sendEvent("playerLeft", socketId);
@@ -131,7 +147,7 @@ public class GameSocketServer {
         // 6. Player coordinates update
         server.addEventListener("updatePosition", Object.class, (client, data, ackSender) -> {
             String socketId = client.getSessionId().toString();
-            Player player = players.get(socketId);
+            Player player = allPlayers.get(socketId);
             if (player != null) {
                 Gson gson = new Gson();
                 JsonObject json = gson.toJsonTree(data).getAsJsonObject();
@@ -176,7 +192,7 @@ public class GameSocketServer {
         // 9. Handle various player actions
         server.addEventListener("playerAction", Object.class, (client, data, ackSender) -> {
             String socketId = client.getSessionId().toString();
-            Player messageFromPlayer = players.get(socketId);
+            Player messageFromPlayer = allPlayers.get(socketId);
             if (messageFromPlayer == null) {
                 return;
             }
@@ -194,17 +210,24 @@ public class GameSocketServer {
                 case "AOE":
                     // TODO
                     break;
+                case "ItemUse":
+                    //String itemId = json.get("itemID").getAsString();
+                    int index = json.get("itemIndex").getAsInt();
+                    Player player = allPlayers.get(socketId);
+                    inventorys.get(player).set(index, null);
+                    player.removeItem(index);
+                    break;
                 case "PlayerDeath":
                     targetId = json.get("targetId").getAsString();
-                    targetPlayer = players.get(targetId);
+                    targetPlayer = allPlayers.get(targetId);
                     if (targetPlayer != null) {
                         targetPlayer.isAlive=false;
                         // Notify all clients
                         server.getBroadcastOperations().sendEvent("playerAction",
                             new ActionData(targetId, "PlayerDeath", "0", "0"));
 
-                        if(players.get(targetPlayer.lastAttackedBy)!=null) {
-                            players.get(targetPlayer.lastAttackedBy).gold+= targetPlayer.gold;
+                        if(allPlayers.get(targetPlayer.lastAttackedBy)!=null) {
+                            allPlayers.get(targetPlayer.lastAttackedBy).gold+= targetPlayer.gold;
                         }
                         else{
                             System.out.println("[Warning]: Cannot find attack Source Player");
@@ -221,7 +244,7 @@ public class GameSocketServer {
                 case "PlayerShowMessage":
                     targetId = json.get("targetId").getAsString();
                     String message = json.get("message").getAsString();
-                    targetPlayer = players.get(targetId);
+                    targetPlayer = allPlayers.get(targetId);
                     if (targetPlayer != null) {
                         // Notify all clients
                         server.getBroadcastOperations().sendEvent("playerAction",
@@ -256,7 +279,7 @@ public class GameSocketServer {
                     // Retrieve targetId and damage from data
                     targetId = json.get("targetId").getAsString();
                     float damage = json.get("damage").getAsFloat();
-                    targetPlayer = players.get(targetId);
+                    targetPlayer = allPlayers.get(targetId);
                     if (targetPlayer != null) {
                         targetPlayer.takeDamage(damage);
                         targetPlayer.lastAttackedBy=socketId;
@@ -284,7 +307,7 @@ public class GameSocketServer {
 
             String NPCID = json.get("NPCID").getAsString();
             NPC npc = null;
-            for(NPC npctmp : npcs) {
+            for(NPC npctmp : allNPCs) {
                 if( npctmp.id.equals(NPCID)){
                     npc=npctmp;
                 }
@@ -294,7 +317,7 @@ public class GameSocketServer {
 
 
             String socketId = client.getSessionId().toString();
-            Player player = players.get(socketId);
+            Player player = allPlayers.get(socketId);
             if (player != null && npc != null) {
                 System.out.println("[Trading]: Player"+player.name+" is traded ["+itemID+"] with "+npc.id);
                 player.pickItem(itemID);
@@ -311,13 +334,38 @@ public class GameSocketServer {
 
             Gson gson = new Gson();
             JsonObject json = gson.toJsonTree(data).getAsJsonObject();
-            int gold = Integer.parseInt(json.get("gold").getAsString());
+            int gold = Integer.parseInt(json.get("Gold").getAsString());
 
             String socketId = client.getSessionId().toString();
-            Player player = players.get(socketId);
+            Player player = allPlayers.get(socketId);
             player.gold=gold;
 
             needPlayerUpdate=true;
+        });
+
+        server.addEventListener("AttackGegner", Object.class, (client, data, ackSender) -> {
+
+            Gson gson = new Gson();
+            JsonObject json = gson.toJsonTree(data).getAsJsonObject();
+            String gegnerID = json.get("gegnerID").getAsString();
+            float damage = Float.parseFloat(json.get("damage").getAsString());
+
+            Gegner gegner = null;
+
+            for(Gegner gegnerTMP : allGegner) {
+                if( gegnerTMP.id.equals(gegnerID)){
+                    gegner=gegnerTMP;
+                }
+            }
+            String socketId = client.getSessionId().toString();
+            Player player = allPlayers.get(socketId);
+
+            if(gegner!=null&& player!=null) {
+                if(gegner.isAlive()){
+                    gegner.takeDamage(damage,player);
+                    needGegnerUpdate=true;
+                }
+            }
         });
 
 
@@ -331,8 +379,10 @@ public class GameSocketServer {
                 // 定时广播：此处如果只做广播，则无需更新逻辑，仅调用 broadcastAllPlayers
                 broadcastAllPlayers(server);
 
-                for(Gegner gegner : gegners) {
-                    gegner.update();
+                for(Gegner gegner : allGegner) {
+                    if(gegner.isAlive()){
+                        gegner.update(0.016f);
+                    }
                 }
 
                 // 控制广播频率，比如每 1 秒广播一次
@@ -355,8 +405,8 @@ public class GameSocketServer {
     private static void serverInitialization(){
         MapCreator mapCreator=new MapCreator(seed);
         mapCreator.initializePerlinNoiseMap();
-        npcs = mapCreator.spawnNPCs();
-        gegners = mapCreator.spawnGegners();
+        allNPCs = mapCreator.spawnNPCs();
+        allGegner = mapCreator.spawnGegners();
     }
 
     private static void broadcastDeathMessage(SocketIOServer server, String deathMessage,String targetId){
@@ -367,15 +417,15 @@ public class GameSocketServer {
      */
     private static void broadcastAllPlayers(SocketIOServer server) {
         if(needPlayerUpdate){
-            server.getBroadcastOperations().sendEvent("updateAllPlayers", players);
+            server.getBroadcastOperations().sendEvent("updateAllPlayers", allPlayers);
             needPlayerUpdate=false;
         }
         if(needNPCUpdate){
-            server.getBroadcastOperations().sendEvent("updateAllNPCs", npcs);
+            server.getBroadcastOperations().sendEvent("updateAllNPCs", allNPCs);
             needNPCUpdate=false;
         }
         if(needGegnerUpdate){
-            server.getBroadcastOperations().sendEvent("updateAllGegners", gegners);
+            server.getBroadcastOperations().sendEvent("updateAllGegners", allGegner);
             //needGegnerUpdate=false;
         }
     }
@@ -444,7 +494,6 @@ public class GameSocketServer {
         }
     }
 
-    // 这个加一个 getter，供 GUI 显示
     public static String getServerVersion(){
         return serverVersion;
     }

@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import static io.github.infotest.MainGameScreen.CELL_SIZE;
 
 import static io.github.infotest.GameSettings.*;
+import static io.github.infotest.MainGameScreen.localPlayer;
+import static io.github.infotest.util.Overlay.UI_Layer.whitePixel;
 
 public abstract class Player extends Actor{
 
     // basic things
-    public String id;
-    protected String name;
     protected String className;
     protected int level;
     protected float experience;
@@ -33,7 +33,7 @@ public abstract class Player extends Actor{
     protected float maxMana;
     protected float manaRegen = 2f;
 
-    protected int gold=0;
+    protected float gold=0;
 
     protected int INV_SIZE = 7;
 
@@ -155,7 +155,7 @@ public abstract class Player extends Actor{
         //2. render Player name
         GlyphLayout layout = new GlyphLayout(font, name);
         float textWidth = layout.width;
-        font.draw(batch, name, predictedPosition.x + (CELL_SIZE /2f) - textWidth/2f  , predictedPosition.y + 80);
+        font.draw(batch, name, predictedPosition.x - textWidth/2f  , predictedPosition.y + 50);
 
         // 3) Speech bubble logic
         if (isSpeechBubbleVisible && speechBubbleMessage != null) {
@@ -271,6 +271,14 @@ public abstract class Player extends Actor{
         }
     }
 
+    public void useItem(int index, ServerConnection serverConnection){
+        if (items.get(index) != null) {
+            items.get(index).use(this);
+            serverConnection.sendItemUse(this, index, items.get(index).id);
+            items.set(index, null);
+        }
+    }
+
 
     /// Abilities
     public void gainExperience(float exp) {
@@ -380,8 +388,15 @@ public abstract class Player extends Actor{
     public float getT2SkillCoolDownTimer(){
         return timeSinceLastT2Skill;
     }
+
+//    public float getT3SkillCoolDownTime(){
+//        return T3Cooldown;
+//    }
     public float getT3SkillCoolDownTimer(){
         return timeSinceLastT3Skill;
+    }
+    public float getT4SkillCoolDownTime(){
+        return T4Cooldown;
     }
     public float getT4SkillCoolDownTimer(){
         return timeSinceLastT4Skill;
@@ -502,8 +517,11 @@ public abstract class Player extends Actor{
     public float getMana() {
         return mana;
     }
+    public void addMana(float amount) {
+        mana = Math.min(mana + amount, maxMana);
+    }
     public void setMana(float mana) {
-        this.mana = mana;
+       this.mana = Math.min (mana, maxMana);  //Max Wert nicht überschreiten
     }
     public float getMaxMana() {
         return maxMana;
@@ -516,6 +534,12 @@ public abstract class Player extends Actor{
     }
     public float getMaxAusdauer() {
         return maxAusdauer;
+    }
+    public void addAusdauer(float amount) {
+        Math.min(maxAusdauer + amount, maxAusdauer);
+    }
+    public void setAusdauer(float ausdauer) {
+       this.ausdauer = Math.min (ausdauer, maxAusdauer);  //Max Wert nicht überschreiten
     }
     public float getAusdauerRegen() {
         return ausdauerRegen;
@@ -592,14 +616,20 @@ public abstract class Player extends Actor{
     public boolean isSeeAllActive() {
         return seeAllActive;
     }
-    public int getGold() {
+
+    public float getGold() {
         return gold;
     }
-    public void addGold(int gold) {
+
+    public void updateGold(float gold) {
+        this.gold = gold;
+    }
+    public void addGold(float gold) {
         this.gold+=gold;
     }
-    public void updateGold(int gold) {
+    public void updateGold(float gold, ServerConnection serverConnection) {
         this.gold = gold;
+        serverConnection.sendPlayerUpdateGold(localPlayer);
     }
     public void freeze(){
         isFrozen = true;

@@ -6,7 +6,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -14,6 +16,7 @@ import io.github.infotest.character.Gegner;
 import io.github.infotest.character.NPC;
 import io.github.infotest.character.Player;
 import io.github.infotest.item.Item;
+import io.github.infotest.item.Potion;
 import io.github.infotest.util.*;
 import io.github.infotest.util.Overlay.UI_Layer;
 import io.github.infotest.util.Factory.PlayerFactory;
@@ -77,7 +80,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     public static ArrayList<Gegner> allGegner = new ArrayList<>();
     public static ArrayList<NPC> allNPCs = new ArrayList<>();
     private int numberOfNPCInTheLastFrame = 0;
-    private NPC currentTradingToNPC;
+    private NPC currentTradingToNPC=null;
 
     public static ArrayList<AnimationObjects> animationObjects = new ArrayList<>();
 
@@ -199,46 +202,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
         shapeRenderer = new ShapeRenderer();
 
         assetManager = new MyAssetManager();
-
-        assetManager.loadLoadingScreen();
-
-        assetManager.loadMapAssets();
-        assetManager.loadMapWaterAssets();
-        assetManager.loadSkillBarAsset();
-        assetManager.loadGoldBarAsset();
-
-        assetManager.loadMapFadeAssets();
-        assetManager.loadMapDecoAssets();
-        assetManager.loadMapTreeAssets();
-
-        assetManager.loadAnimationObjectAssets();
-
-        assetManager.loadPlayerAssets();
-
-        assetManager.loadMageAssets();
-        assetManager.loadFireballAssets();
-        assetManager.loadFlameThrowerAssets();
-        assetManager.loadFireballSymbol();
-        assetManager.loadBlackHoleAssets();
-
-        assetManager.loadHealthBarAssets();
-        assetManager.loadManaBarAssets();
-        assetManager.loadAusdauerBarAssets();
-
-        assetManager.loadGegnerAssets();
-
-        assetManager.loadNPCMaleAssets();
-        assetManager.loadNPCWomenAssets();
-        assetManager.loadNPCMarketAssets();
-
-        assetManager.loadSignsAssets();
-        assetManager.loadArrowAssets();
-
-        assetManager.loadItemBarAssets();
-        assetManager.loadItemAssets();
-
-        assetManager.loadMainGameMusicAssets();
-
+        assetManager.loadAllMainGameAssets();
         assetManager.manager.finishLoading();
 
         runningSound= assetManager.getRunningSound();
@@ -257,13 +221,12 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
         Gdx.input.setInputProcessor(this);
 
 
-
         Vector2 spawnPosition = new Vector2(MAP_SIZE / 2f * CELL_SIZE, MAP_SIZE / 2f * CELL_SIZE);
         //Logger.log(""class: "+ game.getPlayerClass());
         localPlayer = PlayerFactory.createPlayer(serverConnection.getMySocketId(),game.getUsername(),game.getPlayerClass(),spawnPosition,assetManager);
         //Logger.log("class: "+ player.getClass());
 
-        // send initial position to server
+        // send initial position to server and init camera
         if (localPlayer != null) {
             serverConnection.sendPlayerInit(localPlayer);
         }
@@ -278,7 +241,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
             localPlayer.setSpeed(500);
         }
 
-        currentTradingToNPC = null;
+        camera.zoom = 1f;
+        camera.update();
 
         backgroundMusic =assetManager.getMainGameBackgroundMusic();
         backgroundMusic.setLooping(true);
@@ -288,7 +252,6 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     public void onSeedReceived(int seed) {
         // map initialization
         MapCreator mapCreator = new MapCreator(seed);
-        //GLOBAL_SEED = seed;
         mapCreator.initializePerlinNoiseMap();
 
         localPlayer.setId(serverConnection.getMySocketId());
@@ -381,6 +344,10 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
             }
 
+            for (AnimationObjects animationObject : animationObjects) {
+                animationObject.render(batch, delta);
+            }
+
             gameRenderer.renderNPCs(batch, delta);
             gameRenderer.renderAnimations(batch,delta,shapeRenderer);
             gameRenderer.renderTrees(batch, camera.zoom, localPlayer.getPosition());
@@ -404,28 +371,79 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 uiLayer.renderMarketItems(batch, currentTradingToNPC.getMarket(), currentTradingToNPC.getNPC_marketMapValue(currentTradingToNPC.getMarketTextureID()));
                 handleUIInput(batch, delta);
             }
-            // Render INV_FULL sign
-            if (uiLayer.isRenderingSign()){
-                Vector3 worldCoordinates = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-                float worldX = worldCoordinates.x;
-                float worldY = worldCoordinates.y;
-                float time = uiLayer.getSignTimer();
-                if (time <= uiLayer.getDuration()){
-                    batch.draw(assetManager.getSignsAssets(), worldX, worldY);
-                } else if (time > uiLayer.getDuration() && time-uiLayer.getSignTimer()< uiLayer.getFadeDuration()) {
-                    float alpha = MyMath.getExpValue(uiLayer.getBase(), uiLayer.getFadeDuration(), time-uiLayer.getDuration());
-                    batch.setColor(1,1,1,alpha);
-                    batch.draw(assetManager.getSignsAssets(), worldX, worldY);
-                    batch.setColor(1,1,1,1);
-                    if (Float.isNaN(alpha)){
-                        uiLayer.resetTimer();
-                        uiLayer.resetRenderingSign();
-                    }
 
+            batch.draw(assetManager.getPlayerAssets(), 0, 0, 0, 0, assetManager.getPlayerAssets().getWidth(), assetManager.getPlayerAssets().getWidth(), 32, 32);
+            batch.setShader(null);
+            batch.end();
+
+
+            handleInput(batch, delta);
+
+            doGameLogic(delta);
+            shapeRenderer.end();
+            Gdx.gl.glLineWidth(1); // Reset the line width to 1 pixel
+
+        }
+        else{
+            batch.begin();
+            batch.draw(assetManager.getLoadingScreenTexture(),
+                0, 0,
+                Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.end();
+        }
+
+        uiLayer.render();
+
+
+
+    }
+    private void doGameLogic(float delta) {
+        if (numberOfNPCInTheLastFrame < allNPCs.size()) {
+            //Sort list based on y coordinate (dsc)
+            allNPCs.sort(new Comparator<NPC>() {
+                @Override
+                public int compare(NPC npc1, NPC npc2) {
+                    return Float.compare(npc2.getPosition().y, npc1.getPosition().y);
                 }
-                uiLayer.addSignTimer(delta);
-            }
+            });
 
+        }
+
+        // Render INV_FULL sign
+        if (uiLayer.isRenderingSign()){
+            Vector3 worldCoordinates = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+            float worldX = worldCoordinates.x;
+            float worldY = worldCoordinates.y;
+            float time = uiLayer.getSignTimer();
+            if (time <= uiLayer.getDuration()){
+                batch.draw(assetManager.getSignsAssets(), worldX, worldY);
+            } else if (time > uiLayer.getDuration() && time-uiLayer.getSignTimer()< uiLayer.getFadeDuration()) {
+                float alpha = MyMath.getExpValue(uiLayer.getBase(), uiLayer.getFadeDuration(), time-uiLayer.getDuration());
+                batch.setColor(1,1,1,alpha);
+                batch.draw(assetManager.getSignsAssets(), worldX, worldY);
+                batch.setColor(1,1,1,1);
+                if (Float.isNaN(alpha)){
+                    uiLayer.resetTimer();
+                    uiLayer.resetRenderingSign();
+            }
+            uiLayer.addSignTimer(delta);
+        }
+
+        localPlayer.update(delta);
+        float d = 32*32;
+        if (isRenderingBlackHoleActivation && renderBlackHoleActivation(delta, d)) {
+            if (clickPos != null) {
+                float dX = Math.abs(clickPos.x-localPlayer.getX());
+                float dY = Math.abs(clickPos.y-localPlayer.getY());
+                if (dX < d/2 && dY < d/2) {
+                    GameRenderer.blackHole(clickPos.x, clickPos.y, localPlayer.getT4Scale(), localPlayer.getT4Damage(), localPlayer.getT4LT(), localPlayer);
+                    localPlayer.drainMana(localPlayer.getT4Cost());
+                    localPlayer.resetAttacking4();
+                    localPlayer.unfreeze();
+                }
+            }
+        }
+        shapeRenderer.end();
             if (isRenderingFlameThrower){
                 if (!(localPlayer.getFlameThrowerActiveTimer() <= localPlayer.getT3LT())){
                     localPlayer.resetFlameThrowerActiveTimer();
@@ -486,6 +504,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
         }
 
         checkFireballCollisions();
+        checkPlayerDeath();
 
         if (localPlayer.getHealthPoints() <= 0 && localPlayer.isAlive()) {
             localPlayer.kill(serverConnection);
@@ -509,6 +528,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
         numberOfNPCInTheLastFrame = allNPCs.size();
         clicked = false;
+        clickPos = null;
     }
 
     Vector3 oldPosition = null;
@@ -536,6 +556,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
         tempTime += delta;
         if (localPlayer.isAlive()) {
+            //Basic Movement
             if (Gdx.input.isKeyPressed(Input.Keys.A) && !localPlayer.isFrozen()) {
                 localPlayer.setX(localPlayer.getX() - speed * delta);
                 moved = true;
@@ -556,16 +577,18 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 moved = true;
                 localPlayer.setRotation(new Vector2(0, -1));
             }
-
+            //Skill T1
             if (Gdx.input.isKeyPressed(Input.Keys.E) && !localPlayer.isFrozen()) {
                 localPlayer.castSkill(1, serverConnection);
             }
+            //Skill T2
             if (Gdx.input.isKeyPressed(Input.Keys.C) && !localPlayer.isFrozen()) {
                 localPlayer.castSkill(3, serverConnection);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.Q) && !localPlayer.isFrozen()) {
                 localPlayer.castSkill(4, serverConnection);
             }
+            //Sprint
             if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && moved && !localPlayer.isFrozen()) {
                 localPlayer.sprint(delta);
                 if(!runningSound.isPlaying()){
@@ -577,12 +600,14 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                     runningSound.stop();
                 }
             }
+            //control night shader
             if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                 if (tempTime >= 0.5f) {
                     isRenderingWithNightShader = !isRenderingWithNightShader;
                     tempTime = 0;
                 }
             }
+            //interact with NPC
             if (Gdx.input.isKeyPressed(Input.Keys.F) && !localPlayer.isFrozen()) {
                 if(currentTradingToNPC==null && currentTradingToNPCTimer>=0.3){
                     currentTradingToNPCTimer=0;
@@ -606,6 +631,36 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 currentTradingToNPC.closeMarket();
                 currentTradingToNPC = null;
             }
+
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_1) && !localPlayer.isFrozen()) {
+                localPlayer.useItem(0, serverConnection);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_2) && !localPlayer.isFrozen()) {
+                localPlayer.useItem(1, serverConnection);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_3) && !localPlayer.isFrozen()) {
+                localPlayer.useItem(2, serverConnection);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_4) && !localPlayer.isFrozen()) {
+                localPlayer.useItem(3, serverConnection);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_5) && !localPlayer.isFrozen()) {
+                localPlayer.useItem(4, serverConnection);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_6) && !localPlayer.isFrozen()) {
+                localPlayer.useItem(5, serverConnection);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_7) && !localPlayer.isFrozen()) {
+                localPlayer.useItem(6, serverConnection);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_8) && !localPlayer.isFrozen()) {
+                localPlayer.addItem(new Potion(Potion.TYPE.MANA, 10, assetManager));
+            }
+
+
+
+
+            //suicide
             if (Gdx.input.isKeyPressed(Input.Keys.K)) {
                 localPlayer.kill(serverConnection);
                 // Schedule a task to show the EndScreen after 3 seconds
@@ -653,17 +708,21 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 }
                 Logger.log("-----[Debug END]-----");
 
+                boolean debugPlayer=true;
+                boolean debugNPC=true;
+                boolean debugGegner=true;
+                debugGameStatus(debugPlayer,debugNPC,debugGegner);
+
+
                 debugTimer = 0;
             }
 
-
+            //Taunt
             if (Gdx.input.isKeyPressed(Input.Keys.T) && showMessageTimer >= 1) {
-
                 localPlayer.showMessage(ToxicLines.getToxicLines(),serverConnection);
                 //TODO show different messages
                 showMessageTimer = 0;
             }
-
 
             localPlayer.setHasMoved(moved);
             if (moved && localPlayer.isAlive()) {
@@ -767,15 +826,12 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
         // release rendering resources
         batch.dispose();
-
         assetManager.manager.dispose();
         shapeRenderer.dispose();
-
-        // gameRenderer.dispose();
     }
 
     /// GAME LOGIC
-    public void checkFireballCollisions() {
+    private void checkFireballCollisions() {
         for (GameRenderer.AbilityInstance fireball : gameRenderer.getActiveFireballs()) {
             for (Player p : allPlayers.values()){
                 if (p.equals(fireball.getOwner())){
@@ -797,11 +853,73 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 float dX = Math.abs(gegner.getX() - fireball.getX());
                 float dY = Math.abs(gegner.getY() - fireball.getY());
 
-                if (dX <= 7f && dY <= 7f){
-                    gegner.takeDamage(fireball.getDamage(),serverConnection);
+                if (dX <= 32f && dY <= 32f&& !fireball.hasHit()){
+                    if(fireball.getOwner().equals(localPlayer)){
+                        gegner.takeDamage(fireball.getDamage(),serverConnection);
+                    }
                     fireball.setHit();
                 }
             }
+        }
+    }
+    private void checkPlayerDeath(){
+        if (localPlayer.getHealthPoints() <= 0 && localPlayer.isAlive()) {
+            localPlayer.kill(serverConnection);
+            // Schedule a task to show the EndScreen after 3 seconds
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    backgroundMusic.stop();
+                    // Switch to the EndScreen, passing player's survival time, etc.
+                    game.endGame(survivalTimer);
+                }
+            }, waitAfterDeath); // 3 seconds delay
+        }
+    }
+    private void debugGameStatus(boolean debugPlayer, boolean debugNPC, boolean debugGegner){
+        if(debugPlayer){
+            Logger.log("-----[Debug: showing player status]-----");
+            Logger.log("socketID | Name | HP | ItemsLength | alive");
+            for (Map.Entry<String, Player> stringPlayerEntry : allPlayers.entrySet()) {
+                Player tmpPlayer = stringPlayerEntry.getValue();
+                Logger.log(stringPlayerEntry.getKey() + " " + tmpPlayer.getName() + " " + tmpPlayer.getHealthPoints() + " " + tmpPlayer.getItems().size() + " " + tmpPlayer.isAlive());
+                StringBuilder str = new StringBuilder();
+                for (Item i : tmpPlayer.getItems()) {
+                    if (i == null) {
+                        str.append("null ");
+                    } else {
+                        str.append(i).append(" ");
+                    }
+                }
+                Logger.log("-> Items: " + str);
+            }
+            Logger.log("-----[Debug END]-----");
+        }
+
+        if(debugNPC){
+            Logger.log("-----[Debug: showing npc status]-----");
+            for (NPC npc : allNPCs) {
+
+                Logger.log(npc.getName() + " " + npc.getHealthPoints() +" "+ npc.getMarket().length);
+                StringBuilder str = new StringBuilder();
+                for (Item i : npc.getMarket()) {
+                    if (i == null) {
+                        str.append("null ");
+                    } else {
+                        str.append(i.id).append(" ");
+                    }
+                }
+                Logger.log("-> Items: " + str);
+            }
+            Logger.log("-----[Debug END]-----");
+        }
+
+        if(debugGegner){
+            Logger.log("-----[Debug: showing Gegner status]-----");
+            for (Gegner gegner : allGegner) {
+                Logger.log(gegner.toString());
+            }
+            Logger.log("-----[Debug END]-----");
         }
     }
     public void checkFlameThrowerCollision(Batch batch, Vector2 direction, Player localPlayer, float delta, Vector3 mousePos) {

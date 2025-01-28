@@ -33,6 +33,8 @@ public class UI_Layer implements ApplicationListener {
     ShapeRenderer shapeRenderer;
     Vector2 windowSize;
 
+    public static Texture whitePixel;
+
     private final Texture[] healthbar;
     private final Texture[] manabar;
     private final Texture[] ausdauerbar;
@@ -69,6 +71,9 @@ public class UI_Layer implements ApplicationListener {
     }
 
     public void create() {
+
+
+        whitePixel = new Texture(Gdx.files.internal("ui/whitePixel.png"));
         this.batch = new SpriteBatch();
         this.shapeRenderer = new ShapeRenderer();
 
@@ -87,6 +92,7 @@ public class UI_Layer implements ApplicationListener {
     }
 
     public void render() {
+        float delta = Gdx.graphics.getDeltaTime();
 
         viewport.apply();
         batch.setProjectionMatrix(uiCamera.combined);
@@ -110,7 +116,7 @@ public class UI_Layer implements ApplicationListener {
             renderSkillSymbol();
             renderSkillBar();
 
-            renderItemBarAndItems();
+            renderItemBarAndItems(delta);
 
             renderGoldBar();
             batch.end();
@@ -162,7 +168,7 @@ public class UI_Layer implements ApplicationListener {
     private void renderSkillBar(){
         batch.draw(assetManager.getSkillBarAsset(),0,0,500,500);
     }
-    private void renderItemBarAndItems(){
+    private void renderItemBarAndItems(float delta){
         Texture texture=assetManager.getItemBarAssets();
         float scale=0.75f;
         float itemBarStartX=viewport.getWorldWidth()/2-texture.getWidth()*scale/2f;
@@ -171,7 +177,7 @@ public class UI_Layer implements ApplicationListener {
         for(int itemIndex=0 ; itemIndex<localPlayer.getItems().size() ; itemIndex++) {
             Item item=localPlayer.getItems().get(itemIndex);
             if(item!=null){
-                item.render(batch,itemBarStartX+scale*(134+itemIndex*121),80*scale, scale);
+                item.render(batch,delta,itemBarStartX+scale*(134+itemIndex*121),80*scale, scale);
             }
         }
     }

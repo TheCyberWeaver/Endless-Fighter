@@ -5,184 +5,188 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+
+import java.util.HashMap;
+import com.badlogic.gdx.math.Vector2;
 import org.w3c.dom.Text;
 
 import java.util.HashMap;
 
 public class MyAssetManager {
-    public final AssetManager manager=new AssetManager();
-    public MyAssetManager(){
+    public final AssetManager manager = new AssetManager();
 
+    // Helper: loads all strings in array as Textures
+    private void loadTextures(String[] paths) {
+        for (String path : paths) {
+            manager.load(path, Texture.class);
+        }
     }
-    public void loadLoadingScreen(){
-        manager.load("ui/loadingscreen.png", Texture.class);
-    }
-    public Texture getLoadingScreenTexture(){
-        return manager.get("ui/loadingscreen.png", Texture.class);
+    // Helper: gets an array of Textures for the given array of paths
+    private Texture[] getTextures(String[] paths) {
+        Texture[] result = new Texture[paths.length];
+        for (int i = 0; i < paths.length; i++) {
+            result[i] = manager.get(paths[i], Texture.class);
+        }
+        return result;
+    // -----------
+    // LOAD all methods
+    // -----------
+    public void loadAllMainGameAssets() {
+        loadLoadingScreen();
+
+        loadMapAssets();
+        loadMapFadeAssets();
+        loadMapDecoAssets();
+        loadMapTreeAssets();
+        loadMapWaterAssets();
+
+        loadPlayerAssets();
+
+        loadMageAssets();
+        loadFireballAssets();
+        loadFireballSymbol();
+        loadBlackHoleAssets();
+
+        loadHealthBarAssets();
+        loadManaBarAssets();
+        loadAusdauerBarAssets();
+        loadSkillBarAsset();
+        loadGoldBarAsset();
+
+
+
+
+        loadNPCMaleAssets();
+        loadNPCWomenAssets();
+        loadNPCMarketAssets();
+
+        loadGegnerAsset();
+
+        loadSignsAssets();
+
+        loadArrowAssets();
+
+        loadItemBarAssets();
+        loadItemAssets();
+
+        loadAnimationObjectAssets();
+
+        loadMainGameMusicAssets();
+        loadStartGameMusicAssets();
     }
 
-    public void loadMapAssets(){
-        manager.load("worldTexture/Tile1.png",Texture.class);
-        manager.load("worldTexture/Tile2.png",Texture.class);
-        manager.load("worldTexture/TreeTile.png",Texture.class);
-        manager.load("worldTexture/TreeTile_snow.png",Texture.class);
-        manager.load("worldTexture/Tile4.png",Texture.class);
-        manager.load("worldTexture/Tile5.png",Texture.class);
-        manager.load("worldTexture/water_sheet.png",Texture.class);
+
+    // -----------
+    // LOAD methods
+    // -----------
+    public void loadLoadingScreen() {
+        manager.load(AssetPaths.LOADING_SCREEN, Texture.class);
     }
-    public Texture[] getMapAssets(){
-        Texture[] textures=new Texture[7];
-        textures[0]=manager.get("worldTexture/Tile1.png",Texture.class);
-        textures[1]=manager.get("worldTexture/Tile2.png",Texture.class);
-        textures[2]=manager.get("worldTexture/TreeTile.png",Texture.class);
-        textures[3]=manager.get("worldTexture/TreeTile_snow.png",Texture.class);
-        textures[4]=manager.get("worldTexture/Tile4.png",Texture.class);
-        textures[5]=manager.get("worldTexture/Tile5.png",Texture.class);
-        textures[6]=manager.get("worldTexture/water_sheet.png",Texture.class);
-        return textures;
+
+    public void loadMapAssets() {
+        loadTextures(AssetPaths.MAP_ASSETS);
     }
 
     public void loadMapWaterAssets(){
-        manager.load("worldTexture/waterEdge/bottomRight_water.png",Texture.class);
-        manager.load("worldTexture/waterEdge/right_water.png",Texture.class);
-        manager.load("worldTexture/waterEdge/topRight_water.png",Texture.class);
-        manager.load("worldTexture/waterEdge/top_water.png",Texture.class);
-        manager.load("worldTexture/waterEdge/topLeft_water.png",Texture.class);
-        manager.load("worldTexture/waterEdge/left_water.png",Texture.class);
-        manager.load("worldTexture/waterEdge/bottomLeft_water.png",Texture.class);
-        manager.load("worldTexture/waterEdge/bottom_water.png",Texture.class);
+        loadTextures(AssetPaths.MAP_WATER);
     }
-    public Texture[] getMapWaterAssets(){
-        Texture[] textures=new Texture[8];
-        textures[0]=manager.get("worldTexture/waterEdge/bottomRight_water.png",Texture.class);
-        textures[1]=manager.get("worldTexture/waterEdge/right_water.png",Texture.class);
-        textures[2]=manager.get("worldTexture/waterEdge/topRight_water.png",Texture.class);
-        textures[3]=manager.get("worldTexture/waterEdge/top_water.png",Texture.class);
-        textures[4]=manager.get("worldTexture/waterEdge/topLeft_water.png",Texture.class);
-        textures[5]=manager.get("worldTexture/waterEdge/left_water.png",Texture.class);
-        textures[6]=manager.get("worldTexture/waterEdge/bottomLeft_water.png",Texture.class);
-        textures[7]=manager.get("worldTexture/waterEdge/bottom_water.png",Texture.class);
-        return textures;
+    public void loadMapFadeAssets() {
+        loadTextures(AssetPaths.MAP_FADE_ASSETS);
     }
 
-    public void loadMapFadeAssets(){
-        manager.load("worldTexture/fade/Tile1_corner.png",Texture.class);
-        manager.load("worldTexture/fade/Tile1_bottom.png",Texture.class);
-        manager.load("worldTexture/fade/Tile1_left.png",Texture.class);
-        manager.load("worldTexture/fade/Tile1_right.png",Texture.class);
-        manager.load("worldTexture/fade/Tile1_top.png",Texture.class);
-
-        manager.load("worldTexture/fade/Tile2_corner.png",Texture.class);
-        manager.load("worldTexture/fade/Tile2_bottom.png",Texture.class);
-        manager.load("worldTexture/fade/Tile2_left.png",Texture.class);
-        manager.load("worldTexture/fade/Tile2_right.png",Texture.class);
-        manager.load("worldTexture/fade/Tile2_top.png",Texture.class);
-
-        manager.load("worldTexture/fade/Tile4_corner.png",Texture.class);
-        manager.load("worldTexture/fade/Tile4_bottom.png",Texture.class);
-        manager.load("worldTexture/fade/Tile4_left.png",Texture.class);
-        manager.load("worldTexture/fade/Tile4_right.png",Texture.class);
-        manager.load("worldTexture/fade/Tile4_top.png",Texture.class);
-
-        manager.load("worldTexture/fade/Tile5_corner.png",Texture.class);
-        manager.load("worldTexture/fade/Tile5_bottom.png",Texture.class);
-        manager.load("worldTexture/fade/Tile5_left.png",Texture.class);
-        manager.load("worldTexture/fade/Tile5_right.png",Texture.class);
-        manager.load("worldTexture/fade/Tile5_top.png",Texture.class);
-    }
-    public Texture[] getMapFadeAssets(){
-        Texture[] textures=new Texture[20];
-        textures[0]=manager.get("worldTexture/fade/Tile1_corner.png",Texture.class);
-        textures[1]=manager.get("worldTexture/fade/Tile1_bottom.png",Texture.class);
-        textures[2]=manager.get("worldTexture/fade/Tile1_left.png",Texture.class);
-        textures[3]=manager.get("worldTexture/fade/Tile1_right.png",Texture.class);
-        textures[4]=manager.get("worldTexture/fade/Tile1_top.png",Texture.class);
-
-        textures[5]=manager.get("worldTexture/fade/Tile2_corner.png",Texture.class);
-        textures[6]=manager.get("worldTexture/fade/Tile2_bottom.png",Texture.class);
-        textures[7]=manager.get("worldTexture/fade/Tile2_left.png",Texture.class);
-        textures[8]=manager.get("worldTexture/fade/Tile2_right.png",Texture.class);
-        textures[9]=manager.get("worldTexture/fade/Tile2_top.png",Texture.class);
-
-        textures[10]=manager.get("worldTexture/fade/Tile4_corner.png",Texture.class);
-        textures[11]=manager.get("worldTexture/fade/Tile4_bottom.png",Texture.class);
-        textures[12]=manager.get("worldTexture/fade/Tile4_left.png",Texture.class);
-        textures[13]=manager.get("worldTexture/fade/Tile4_right.png",Texture.class);
-        textures[14]=manager.get("worldTexture/fade/Tile4_top.png",Texture.class);
-
-        textures[15]=manager.get("worldTexture/fade/Tile5_corner.png",Texture.class);
-        textures[16]=manager.get("worldTexture/fade/Tile5_bottom.png",Texture.class);
-        textures[17]=manager.get("worldTexture/fade/Tile5_left.png",Texture.class);
-        textures[18]=manager.get("worldTexture/fade/Tile5_right.png",Texture.class);
-        textures[19]=manager.get("worldTexture/fade/Tile5_top.png",Texture.class);
-        return textures;
+    public void loadMapDecoAssets() {
+        loadTextures(AssetPaths.MAP_DECO_ASSETS);
     }
 
-    public void loadMapDecoAssets(){
-        manager.load("worldTexture/deco/stone1.png",Texture.class);
-        manager.load("worldTexture/deco/stone2.png",Texture.class);
-        manager.load("worldTexture/deco/stone3.png",Texture.class);
-        manager.load("worldTexture/deco/stone4.png",Texture.class);
-        manager.load("worldTexture/deco/stone5.png",Texture.class);
-        manager.load("worldTexture/deco/stone6.png",Texture.class);
-        manager.load("worldTexture/deco/stone7.png",Texture.class);
-        manager.load("worldTexture/deco/stone8.png",Texture.class);
-        manager.load("worldTexture/deco/stone9.png",Texture.class);
-        manager.load("worldTexture/deco/stone_big.png",Texture.class);
-        manager.load("worldTexture/deco/fallenTree.png",Texture.class);
-        manager.load("worldTexture/deco/mushroom1.png",Texture.class);
-        manager.load("worldTexture/deco/mushroom2.png",Texture.class);
-    }
-    public Texture[] getMapDecoAssets(){
-        Texture[] textures=new Texture[13];
-        textures[0]=manager.get("worldTexture/deco/stone1.png",Texture.class);
-        textures[1]=manager.get("worldTexture/deco/stone2.png",Texture.class);
-        textures[2]=manager.get("worldTexture/deco/stone3.png",Texture.class);
-        textures[3]=manager.get("worldTexture/deco/stone4.png",Texture.class);
-        textures[4]=manager.get("worldTexture/deco/stone5.png",Texture.class);
-        textures[5]=manager.get("worldTexture/deco/stone6.png",Texture.class);
-        textures[6]=manager.get("worldTexture/deco/stone7.png",Texture.class);
-        textures[7]=manager.get("worldTexture/deco/stone8.png",Texture.class);
-        textures[8]=manager.get("worldTexture/deco/stone9.png",Texture.class);
-        textures[9]=manager.get("worldTexture/deco/stone_big.png",Texture.class);
-        textures[10]=manager.get("worldTexture/deco/fallenTree.png",Texture.class);
-        textures[11]=manager.get("worldTexture/deco/mushroom1.png",Texture.class);
-        textures[12]=manager.get("worldTexture/deco/mushroom2.png",Texture.class);
-        return textures;
+    public void loadMapTreeAssets() {
+        loadTextures(AssetPaths.MAP_TREE_ASSETS);
     }
 
-    public void loadMapTreeAssets(){
-        manager.load("worldTexture/deco/tree/tree.png",Texture.class);
-        manager.load("worldTexture/deco/tree/tree_bottom.png",Texture.class);
-        manager.load("worldTexture/deco/tree/tree_top.png",Texture.class);
-        manager.load("worldTexture/deco/tree/tree_snow.png",Texture.class);
-        manager.load("worldTexture/deco/tree/tree_bottom_snow.png",Texture.class);
-        manager.load("worldTexture/deco/tree/tree_top_snow.png",Texture.class);
+    public void loadSkillBarAsset() {
+        manager.load(AssetPaths.SKILL_BAR, Texture.class);
     }
-    public Texture[] getMapTreeAssets(){
-        Texture[] textures=new Texture[6];
-        textures[0]=manager.get("worldTexture/deco/tree/tree.png",Texture.class);
-        textures[1]=manager.get("worldTexture/deco/tree/tree_bottom.png",Texture.class);
-        textures[2]=manager.get("worldTexture/deco/tree/tree_top.png",Texture.class);
-        textures[3]=manager.get("worldTexture/deco/tree/tree_snow.png",Texture.class);
-        textures[4]=manager.get("worldTexture/deco/tree/tree_bottom_snow.png",Texture.class);
-        textures[5]=manager.get("worldTexture/deco/tree/tree_top_snow.png",Texture.class);
-        return textures;
+
+    public void loadGoldBarAsset() {
+        manager.load(AssetPaths.GOLD_BAR, Texture.class);
+    }
+
+    public void loadPlayerAssets() {
+        manager.load(AssetPaths.PLAYER_ASSASSIN, Texture.class);
+    }
+
+    public void loadMageAssets() {
+        loadTextures(AssetPaths.MAGE_ASSETS);
+    }
+
+    public void loadFireballAssets() {
+        loadTextures(AssetPaths.FIREBALL_ASSETS);
+    }
+
+    public void loadFireballSymbol() {
+        manager.load(AssetPaths.FIREBALL_SYMBOL, Texture.class);
+    }
+
+    public void loadBlackHoleAssets(){
+        loadTextures(AssetPaths.BLACKHOLE_ASSETS);
+    }
+
+    public void loadHealthBarAssets() {
+        loadTextures(AssetPaths.HEALTH_BAR);
+    }
+
+    public void loadManaBarAssets() {
+        loadTextures(AssetPaths.MANA_BAR);
+    }
+
+    public void loadAusdauerBarAssets() {
+        loadTextures(AssetPaths.AUSDAUER_BAR);
+    }
+
+    public void loadNPCMaleAssets() {
+        loadTextures(AssetPaths.NPC_MALE);
+    }
+
+    public void loadNPCWomenAssets() {
+        loadTextures(AssetPaths.NPC_WOMAN);
+    }
+
+    public void loadNPCMarketAssets() {
+        loadTextures(AssetPaths.NPC_MARKET);
+    }
+
+    public void loadGegnerAsset() {
+        manager.load(AssetPaths.GEGNER, Texture.class);
+    }
+
+    public void loadSignsAssets() {
+        manager.load(AssetPaths.SIGN_INV_FULL, Texture.class);
+    }
+
+    public void loadArrowAssets() {
+        manager.load(AssetPaths.ARROW, Texture.class);
+    }
+
+    public void loadItemBarAssets() {
+        manager.load(AssetPaths.ITEM_BAR, Texture.class);
+    }
+
+    public void loadItemAssets() {
+        loadTextures(AssetPaths.ITEMS);
     }
 
     private HashMap<Texture, Vector2> columnsRows = new HashMap<Texture, Vector2>();
     public void loadAnimationObjectAssets(){
-        manager.load("animationObjects/decoFountain.png",Texture.class);
-        manager.load("animationObjects/goldTrophy.png",Texture.class);
-        manager.load("animationObjects/summoningChamber.png",Texture.class);
-        manager.load("animationObjects/winTrophy.png",Texture.class);
+        loadTextures(AssetPaths.ANIMATION_OBJECTS);
     }
     public void initAnimationObjectColumnsRows(){
         // x = columns; y = rows
-        columnsRows.put(manager.get("animationObjects/decoFountain.png"),new Vector2(8,1));
-        columnsRows.put(manager.get("animationObjects/goldTrophy.png"),new Vector2(8,1));
-        columnsRows.put(manager.get("animationObjects/summoningChamber.png"),new Vector2(39,1));
-        columnsRows.put(manager.get("animationObjects/winTrophy.png"),new Vector2(8,1));
+        for(String path:AssetPaths.ANIMATION_OBJECTS){
+            Vector2 vec=new Vector2(8,1);
+            if(path.equals(AssetPaths.ANIMATION_OBJECTS[2])){
+                vec=new Vector2(39,1);
+            }
+            columnsRows.put(manager.get(path),vec);
+        }
     }
     public Vector2 getColumnsRows(Texture key){
         return columnsRows.get(key);
@@ -196,259 +200,143 @@ public class MyAssetManager {
         return textures;
     }
 
-    public void loadPlayerAssets(){
-        manager.load("assassin.png", Texture.class);
-    }
-    public Texture getPlayerAssets(){
-        return manager.get("assassin.png", Texture.class);
+
+
+    // Music / Sound
+    public void loadStartGameMusicAssets() {
+        manager.load(AssetPaths.START_GAME_MUSIC, Music.class);
     }
 
-    public void loadMageAssets(){
-        manager.load("player/mage/Attack1.png",Texture.class);
-        manager.load("player/mage/Death.png",Texture.class);
-        manager.load("player/mage/Hit.png",Texture.class);
-        manager.load("player/mage/Idle.png",Texture.class);
-        manager.load("player/mage/Run.png",Texture.class);
-    }
-    public Texture[] getMageAssets(){
-        Texture[] mageTextures=new Texture[5];
-        mageTextures[0]=manager.get("player/mage/Attack1.png",Texture.class);
-        mageTextures[1]=manager.get("player/mage/Death.png",Texture.class);
-        mageTextures[2]=manager.get("player/mage/Hit.png",Texture.class);
-        mageTextures[3]=manager.get("player/mage/Idle.png",Texture.class);
-        mageTextures[4]=manager.get("player/mage/Run.png",Texture.class);
-        return mageTextures;
+    public void loadMainGameMusicAssets() {
+        manager.load(AssetPaths.MAIN_GAME_MUSIC, Music.class);
+        manager.load(AssetPaths.DEATH_SOUND,      Sound.class);
+        manager.load(AssetPaths.FIREBALL_SOUND,   Sound.class);
+        manager.load(AssetPaths.COME_BACK_SOUND,  Sound.class);
+        manager.load(AssetPaths.NORMAL_ATTACK,    Sound.class);
+        manager.load(AssetPaths.RUNNING_SOUND,    Music.class);
+        manager.load(AssetPaths.TAUNT_SOUND,      Sound.class);
     }
 
-    public void loadFireballAssets(){
-        manager.load("fireball_sheet_start.png", Texture.class);
-        manager.load("fireball_sheet_fly.png", Texture.class);
-        manager.load("fireball_sheet_endTime.png", Texture.class);
-        manager.load("fireball_sheet_endHit.png", Texture.class);
-    }
-    public Texture[] getFireballAssets(){
-        Texture[] fireball_sheets=new Texture[4];
-        fireball_sheets[0]=manager.get("fireball_sheet_start.png", Texture.class);
-        fireball_sheets[1]=manager.get("fireball_sheet_fly.png", Texture.class);
-        fireball_sheets[2]=manager.get("fireball_sheet_endTime.png", Texture.class);
-        fireball_sheets[3]=manager.get("fireball_sheet_endHit.png", Texture.class);
-        return fireball_sheets;
+    // -----------
+    // GET methods
+    // -----------
+    public Texture getLoadingScreenTexture() {
+        return manager.get(AssetPaths.LOADING_SCREEN, Texture.class);
     }
 
-    public void loadFlameThrowerAssets(){
-        manager.load("player/mage/abilities/flameThrower_sheet.png", Texture.class);
-    }
-    public Texture getFlameThrowerAssets(){
-        return manager.get("player/mage/abilities/flameThrower_sheet.png", Texture.class);
+    public Texture[] getMapAssets() {
+        return getTextures(AssetPaths.MAP_ASSETS);
     }
 
-    public void loadBlackHoleAssets(){
-        manager.load("player/mage/abilities/blackHole1_sheet.png",Texture.class);
-        manager.load("player/mage/abilities/blackHole2_sheet.png",Texture.class);
+    public Texture[] getMapFadeAssets() {
+        return getTextures(AssetPaths.MAP_FADE_ASSETS);
     }
-    public Texture[] getBlackHoleAssets(){
-        Texture[] textures=new Texture[2];
-        textures[0] = manager.get("player/mage/abilities/blackHole1_sheet.png", Texture.class);
-        textures[1] = manager.get("player/mage/abilities/blackHole2_sheet.png", Texture.class);
-        return textures;
+
+    public Texture[] getMapDecoAssets() {
+        return getTextures(AssetPaths.MAP_DECO_ASSETS);
+    }
+
+    public Texture[] getMapTreeAssets() {
+        return getTextures(AssetPaths.MAP_TREE_ASSETS);
+    }
+
+    public Texture[] getMapWaterAssets(){
+        return getTextures(AssetPaths.MAP_WATER);
     }
 
 
-    public void loadFireballSymbol(){
-        manager.load("player/mage/mageFireballSymbol.png", Texture.class);
-    }
-    public Texture getFireballSymbol(){
-        return manager.get("player/mage/mageFireballSymbol.png", Texture.class);
-    }
-    public void loadSkillBarAsset(){
-        manager.load("ui/skillbar.png", Texture.class);
-    }
-    public Texture getSkillBarAsset(){
-        return manager.get("ui/skillbar.png", Texture.class);
-    }
-    public void loadGoldBarAsset(){
-        manager.load("ui/goldbar.png", Texture.class);
-    }
-    public Texture getGoldBarAsset(){
-        return manager.get("ui/goldbar.png", Texture.class);
-    }
-    public void loadHealthBarAssets(){
-        manager.load("ui/healthbar/healthbar_full_start.png", Texture.class);
-        manager.load("ui/healthbar/healthbar_empty_start.png", Texture.class);
-        manager.load("ui/healthbar/healthbar_full_middle.png", Texture.class);
-        manager.load("ui/healthbar/healthbar_empty_middle.png", Texture.class);
-    }
-    public Texture[] getHealthBarAssets(){
-        Texture[] healthbar = new Texture[4];
-        healthbar[0]=manager.get("ui/healthbar/healthbar_full_start.png", Texture.class);
-        healthbar[1]=manager.get("ui/healthbar/healthbar_empty_start.png", Texture.class);
-        healthbar[2]=manager.get("ui/healthbar/healthbar_full_middle.png", Texture.class);
-        healthbar[3]=manager.get("ui/healthbar/healthbar_empty_middle.png", Texture.class);
-        return healthbar;
+        public Texture getSkillBarAsset() {
+        return manager.get(AssetPaths.SKILL_BAR, Texture.class);
     }
 
-    public void loadManaBarAssets(){
-        manager.load("ui/manabar/manabar_full_start.png", Texture.class);
-        manager.load("ui/manabar/manabar_empty_start.png", Texture.class);
-        manager.load("ui/manabar/manabar_full_middle.png", Texture.class);
-        manager.load("ui/manabar/manabar_empty_middle.png", Texture.class);
-    }
-    public Texture[] getManaBarAssets(){
-        Texture[] mana_bar = new Texture[4];
-        mana_bar[0]=manager.get("ui/manabar/manabar_full_start.png", Texture.class);
-        mana_bar[1]=manager.get("ui/manabar/manabar_empty_start.png", Texture.class);
-        mana_bar[2]=manager.get("ui/manabar/manabar_full_middle.png", Texture.class);
-        mana_bar[3]=manager.get("ui/manabar/manabar_empty_middle.png", Texture.class);
-        return mana_bar;
+    public Texture getGoldBarAsset() {
+        return manager.get(AssetPaths.GOLD_BAR, Texture.class);
     }
 
-    public void loadAusdauerBarAssets(){
-        manager.load("ui/ausdauerbar/ausdauerbar_full_start.png", Texture.class);
-        manager.load("ui/ausdauerbar/ausdauerbar_empty_start.png", Texture.class);
-        manager.load("ui/ausdauerbar/ausdauerbar_full_middle.png", Texture.class);
-        manager.load("ui/ausdauerbar/ausdauerbar_empty_middle.png", Texture.class);
-    }
-    public Texture[] getAusdauerBarAssets(){
-        Texture[] ausdauerbar = new Texture[4];
-        ausdauerbar[0]=manager.get("ui/ausdauerbar/ausdauerbar_full_start.png", Texture.class);
-        ausdauerbar[1]=manager.get("ui/ausdauerbar/ausdauerbar_empty_start.png", Texture.class);
-        ausdauerbar[2]=manager.get("ui/ausdauerbar/ausdauerbar_full_middle.png", Texture.class);
-        ausdauerbar[3]=manager.get("ui/ausdauerbar/ausdauerbar_empty_middle.png", Texture.class);
-        return ausdauerbar;
+    public Texture getPlayerAssets() {
+        return manager.get(AssetPaths.PLAYER_ASSASSIN, Texture.class);
     }
 
-    public void loadNPCMaleAssets(){
-        manager.load("NPC/male/NPC_Male_1.png", Texture.class);
-        manager.load("NPC/male/NPC_Male_2.png", Texture.class);
-        manager.load("NPC/male/NPC_Male_3.png", Texture.class);
-        manager.load("NPC/male/NPC_Male_4.png", Texture.class);
-        manager.load("NPC/male/NPC_Male_5.png", Texture.class);
-        manager.load("NPC/male/NPC_Male_6.png", Texture.class);
-        manager.load("NPC/male/NPC_Male_7.png", Texture.class);
-        manager.load("NPC/male/NPC_Male_8.png", Texture.class);
-    }
-    public Texture[] getNPCMaleAssets(){
-        Texture[] npcmale = new Texture[8];
-        npcmale[0]=manager.get("NPC/male/NPC_Male_1.png", Texture.class);
-        npcmale[1]=manager.get("NPC/male/NPC_Male_2.png", Texture.class);
-        npcmale[2]=manager.get("NPC/male/NPC_Male_3.png", Texture.class);
-        npcmale[3]=manager.get("NPC/male/NPC_Male_4.png", Texture.class);
-        npcmale[4]=manager.get("NPC/male/NPC_Male_5.png", Texture.class);
-        npcmale[5]=manager.get("NPC/male/NPC_Male_6.png", Texture.class);
-        npcmale[6]=manager.get("NPC/male/NPC_Male_7.png", Texture.class);
-        npcmale[7]=manager.get("NPC/male/NPC_Male_8.png", Texture.class);
-        return npcmale;
+    public Texture[] getMageAssets() {
+        return getTextures(AssetPaths.MAGE_ASSETS);
     }
 
-    public void loadNPCWomenAssets(){
-        manager.load("NPC/woman/NPC_Women_1.png", Texture.class);
-        manager.load("NPC/woman/NPC_Women_2.png", Texture.class);
-        manager.load("NPC/woman/NPC_Women_3.png", Texture.class);
-        manager.load("NPC/woman/NPC_Women_4.png", Texture.class);
-        manager.load("NPC/woman/NPC_Women_5.png", Texture.class);
-        manager.load("NPC/woman/NPC_Women_6.png", Texture.class);
-        manager.load("NPC/woman/NPC_Women_7.png", Texture.class);
-        manager.load("NPC/woman/NPC_Women_8.png", Texture.class);
-    }
-    public Texture[] getNPCWomenAssets(){
-        Texture[] npcwomen = new Texture[8];
-        npcwomen[0]=manager.get("NPC/woman/NPC_Women_1.png", Texture.class);
-        npcwomen[1]=manager.get("NPC/woman/NPC_Women_2.png", Texture.class);
-        npcwomen[2]=manager.get("NPC/woman/NPC_Women_3.png", Texture.class);
-        npcwomen[3]=manager.get("NPC/woman/NPC_Women_4.png", Texture.class);
-        npcwomen[4]=manager.get("NPC/woman/NPC_Women_5.png", Texture.class);
-        npcwomen[5]=manager.get("NPC/woman/NPC_Women_6.png", Texture.class);
-        npcwomen[6]=manager.get("NPC/woman/NPC_Women_7.png", Texture.class);
-        npcwomen[7]=manager.get("NPC/woman/NPC_Women_8.png", Texture.class);
-        return npcwomen;
+    public Texture[] getFireballAssets() {
+        return getTextures(AssetPaths.FIREBALL_ASSETS);
     }
 
-    public void loadNPCMarketAssets(){
-        manager.load("NPC/market/klein.png", Texture.class);
-        manager.load("NPC/market/kiste.png", Texture.class);
-        manager.load("NPC/market/besondereKiste.png", Texture.class);
-        manager.load("NPC/market/tasche.png", Texture.class);
-        manager.load("NPC/market/koffer.png", Texture.class);
-        manager.load("NPC/market/besonders.png", Texture.class);
-    }
-    public Texture[] getNPCMarketAssets(){
-        Texture[] npcmarket = new Texture[6];
-        npcmarket[0]=manager.get("NPC/market/klein.png", Texture.class);
-        npcmarket[1]=manager.get("NPC/market/kiste.png", Texture.class);
-        npcmarket[2]=manager.get("NPC/market/besondereKiste.png", Texture.class);
-        npcmarket[3]=manager.get("NPC/market/tasche.png", Texture.class);
-        npcmarket[4]=manager.get("NPC/market/koffer.png", Texture.class);
-        npcmarket[5]=manager.get("NPC/market/besonders.png", Texture.class);
-        return npcmarket;
+    public Texture[] getBlackHoleAssets() {return getTextures(AssetPaths.BLACKHOLE_ASSETS);}
 
+    public Texture getFireballSymbol() {
+        return manager.get(AssetPaths.FIREBALL_SYMBOL, Texture.class);
     }
 
-    public void loadGegnerAssets(){
-        manager.load("Gegner.png", Texture.class);
-    }
-    public Texture getGegnerAsset(){
-        return manager.get("Gegner.png", Texture.class);
+    public Texture[] getHealthBarAssets() {
+        return getTextures(AssetPaths.HEALTH_BAR);
     }
 
-    public void loadSignsAssets(){
-        manager.load("Ur_Inv_Is_Full_Sign.png", Texture.class);
-    }
-    public Texture getSignsAssets(){
-        return manager.get("Ur_Inv_Is_Full_Sign.png", Texture.class);
+    public Texture[] getManaBarAssets() {
+        return getTextures(AssetPaths.MANA_BAR);
     }
 
-    public void loadArrowAssets(){
-        manager.load("arrow.png", Texture.class);
-    }
-    public Texture getArrowAssets(){
-        return manager.get("arrow.png", Texture.class);
+    public Texture[] getAusdauerBarAssets() {
+        return getTextures(AssetPaths.AUSDAUER_BAR);
     }
 
-    public void loadItemBarAssets(){
-        manager.load("ui/itembar.png", Texture.class);
-    }
-    public Texture getItemBarAssets(){
-        return manager.get("ui/itembar.png", Texture.class);
-    }
-    public void loadItemAssets(){
-        manager.load("item/apple.png", Texture.class);
+    public Texture[] getNPCMaleAssets() {
+        return getTextures(AssetPaths.NPC_MALE);
     }
 
-    public void loadStartGameMusicAssets(){
-        manager.load("music/StartGameMusic_1.mp3", Music.class);
+    public Texture[] getNPCWomenAssets() {
+        return getTextures(AssetPaths.NPC_WOMAN);
     }
-    public Music getStartGameMusicAssets(){
-        return manager.get("music/StartGameMusic_1.mp3", Music.class);
+    public Texture[] getNPCMarketAssets() {
+        return getTextures(AssetPaths.NPC_MARKET);
     }
-    public void loadMainGameMusicAssets(){
-        manager.load("music/mainGameMusic_1.mp3", Music.class);
-        manager.load("music/death.mp3", Sound.class);
-        manager.load("music/castFireball.mp3", Sound.class);
-        manager.load("music/come_back_and_face_me.mp3", Sound.class);
-        manager.load("music/normalAttack.mp3", Sound.class);
-        manager.load("music/running.mp3", Music.class);
-        manager.load("music/taunt.mp3", Sound.class);
-        //manager.load("music/mainGameMusic_2.mp3", Sound.class);
+
+    public Texture getGegnerAsset() {
+        return manager.get(AssetPaths.GEGNER, Texture.class);
     }
-    public Music getMainGameBackgroundMusic(){
-        return manager.get("music/mainGameMusic_1.mp3", Music.class);
+
+    public Texture getSignsAssets() {
+        return manager.get(AssetPaths.SIGN_INV_FULL, Texture.class);
     }
-    public Sound getDeathSound(){
-        return manager.get("music/death.mp3", Sound.class);
+
+    public Texture getArrowAssets() {
+        return manager.get(AssetPaths.ARROW, Texture.class);
     }
-    public Sound getCastFireballSound(){
-        return manager.get("music/castFireball.mp3", Sound.class);
+
+    public Texture getItemBarAssets() {
+        return manager.get(AssetPaths.ITEM_BAR, Texture.class);
     }
-    public Sound getComeBackSound(){
-        return manager.get("music/come_back_and_face_me.mp3", Sound.class);
+
+    public Texture[] getItemAssets() {
+        return getTextures(AssetPaths.ITEMS);
     }
-    public Sound getNormalAttackSound(){
-        return manager.get("music/normalAttack.mp3", Sound.class);
+
+    // Music / Sound
+    public Music getStartGameMusicAssets() {
+        return manager.get(AssetPaths.START_GAME_MUSIC, Music.class);
     }
-    public Music getRunningSound(){
-        return manager.get("music/running.mp3", Music.class);
+    public Music getMainGameBackgroundMusic() {
+        return manager.get(AssetPaths.MAIN_GAME_MUSIC, Music.class);
     }
-    public Sound getTauntSound(){
-        return manager.get("music/taunt.mp3", Sound.class);
+    public Sound getDeathSound() {
+        return manager.get(AssetPaths.DEATH_SOUND, Sound.class);
+    }
+    public Sound getCastFireballSound() {
+        return manager.get(AssetPaths.FIREBALL_SOUND, Sound.class);
+    }
+    public Sound getComeBackSound() {
+        return manager.get(AssetPaths.COME_BACK_SOUND, Sound.class);
+    }
+    public Sound getNormalAttackSound() {
+        return manager.get(AssetPaths.NORMAL_ATTACK, Sound.class);
+    }
+    public Music getRunningSound() {
+        return manager.get(AssetPaths.RUNNING_SOUND, Music.class);
+    }
+    public Sound getTauntSound() {
+        return manager.get(AssetPaths.TAUNT_SOUND, Sound.class);
     }
 }

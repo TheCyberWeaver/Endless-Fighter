@@ -193,6 +193,19 @@ public class ServerConnection {
                         }
                     }
                 }
+            }).on("GegnerKilled", new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    if (args.length > 0 && args[0] instanceof JSONObject && hasInitializedMap) {
+                        JSONObject data = (JSONObject) args[0];
+                        try {
+                            recievedGegnerKilled(data);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }).on("playerLeft", new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
@@ -222,7 +235,6 @@ public class ServerConnection {
                     if (args.length > 1 && args[1] instanceof String) {
                         String text = (String) args[1];
                         Logger.log("[Server Warning]: " + text);
-                        //TODO: Write server warnings into a logging file
                     }
                 }
             });
@@ -379,17 +391,20 @@ public class ServerConnection {
         // value 则是对应的 PlayerData 对象
         for (NPCData npcData : NPCsMap) {
             boolean found = false;
+            float x = npcData.position.x;
+            float y = npcData.position.y;
+
             for(NPC npc : allNPCs){
                 if (npcData.id.equals(npc.id)){
                     found = true;
                     npc.updateItems(npcData.itemIDs);
+                    npc.updateTargetPosition(new Vector2(x, y));
                     break;
                 }
             }
             if (!found) {
 //                Logger.log("Debug:"+socketId+" | "+playerData.name);
-                float x = npcData.position.x;
-                float y = npcData.position.y;
+
                 NPC npc = NPCFactory.createNPC(npcData.id, npcData.name,npcData.maxHP,new Vector2(x,y),npcData.gender,npcData.type, npcData.marketTextureID,assetManager);
                 npc.updateItems(npcData.itemIDs);
                 allNPCs.add(npc);
@@ -402,22 +417,44 @@ public class ServerConnection {
         // value 则是对应的 PlayerData 对象
         for (GegnerData gegnerData : GegnersMap) {
             boolean found = false;
+
+            float x = gegnerData.position.x;
+            float y = gegnerData.position.y;
+
             for(Gegner gegner : allGegner){
                 if (gegnerData.id.equals(gegner.id)){
                     found = true;
+                    gegner.updateTargetPosition(new Vector2(x, y));
+
+                    gegner.updateHPFromGegnerData(gegnerData.hp);
                     break;
                 }
             }
             if (!found) {
 //                Logger.log("Debug:"+socketId+" | "+playerData.name);
-                float x = gegnerData.position.x;
-                float y = gegnerData.position.y;
+
                 Gegner Gegner = GegnerFactory.createGegner(gegnerData.id, gegnerData.name,gegnerData.maxHP,new Vector2(x,y),gegnerData.type,assetManager);
                 allGegner.add(Gegner);
             }
         }
     }
-
+    private void recievedGegnerKilled(JSONObject data) throws JSONException {
+        String gegnerID = data.getString("gegnerID");
+        String playerID   = data.getString("killedByPlayerID");
+        Gegner gegner=null;
+        for(Gegner gegner1 : allGegner){
+            if(gegner1.id.equals(gegnerID)){
+                gegner=gegner1;
+            }
+        }
+        Player player = allPlayers.get(playerID);
+        if(player!=null&&player.isAlive()&&gegnerID!=null){
+            if(player.equals(localPlayer)){
+                Logger.log("You killed Gegner["+gegnerID+"]");
+                //TODO recieved Gegner get killed
+            }
+        }
+    }
     public void sendPlayerDeath(Player player){
         JSONObject actionData = new JSONObject();
         try {
@@ -483,6 +520,21 @@ public class ServerConnection {
             e.printStackTrace();
         }
     }
+    public void sendItemUse(Player player, int itemIndex, String itemID){
+        JSONObject data = new JSONObject();
+        try {
+            String id = player.id;
+            if (id != null){
+                data.put("actionType", "ItemUse");
+                data.put("playerID", id);
+                data.put("itemID", itemID);
+                data.put("itemIndex", itemIndex);
+                socket.emit("playerAction", data);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
     public void sendTakeDamage(Player player, float damage){
         JSONObject takeDamageData = new JSONObject();
         try {
@@ -533,13 +585,24 @@ public class ServerConnection {
     public void sendPlayerUpdateGold(Player player){
         JSONObject playerUpdateGoldData = new JSONObject();
         try {
-            playerUpdateGoldData.put("gold", player.getGold()+"");
+            playerUpdateGoldData.put("Gold", player.getGold()+"");
             socket.emit("playerUpdateGold", playerUpdateGoldData);
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+    public void sendAttackGegner(Gegner gegner, float damage){
+        JSONObject attackedGegnerData = new JSONObject();
+        try{
+            attackedGegnerData.put("gegnerID", gegner.id);
+            attackedGegnerData.put("damage", damage);
+            socket.emit("AttackGegner", attackedGegnerData);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void disconnect() {
         if (socket != null) {
             socket.disconnect();

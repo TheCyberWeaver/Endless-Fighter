@@ -106,15 +106,17 @@ public class Mage extends Player {
                     int xOffset = 0;
                     if (rotation.angleDeg() == 180) {
                         xOffset = -36;
-                    } else {
+                    } else if (rotation.angleDeg() == 0) {
                         xOffset = 47;
                     }
                     this.isAttacking = true;
 
                     ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
                     int finalXOffset = xOffset;
+                    int finalYOffset = 0;
                     scheduler.schedule(() -> {
-                        castFireball(this.position.x + finalXOffset, this.position.y + 46, rotation);
+
+                        castFireball(this.position.x + finalXOffset, this.position.y+finalYOffset, rotation);
                         scheduler.shutdown(); // Scheduler nach Ausführung beenden
                     }, 400, TimeUnit.MILLISECONDS);
 
@@ -187,7 +189,8 @@ public class Mage extends Player {
         }
 
         currentFrame.setPosition(position.x-currentFrame.getWidth()/2f, position.y-currentFrame.getHeight()/2f);
-        currentFrame.setOrigin(currentFrame.getWidth()/2, currentFrame.getHeight()/2);
+        currentFrame.setOriginCenter();
+
         currentFrame.setScale(0.75f);
         currentFrame.draw(batch);
 
