@@ -32,6 +32,9 @@ public abstract class Item {
     public void render(Batch batch, float x, float y,float scale) {
         batch.draw(texture, x, y, 80*scale, 80*scale);
     }
+
+    public abstract use (Player player);
+    
     @Override
     public String toString(){
         return id;
