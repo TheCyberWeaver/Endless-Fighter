@@ -16,6 +16,7 @@ import io.github.infotest.character.Gegner;
 import io.github.infotest.character.NPC;
 import io.github.infotest.character.Player;
 import io.github.infotest.item.Item;
+import io.github.infotest.item.Potion;
 import io.github.infotest.util.*;
 import io.github.infotest.util.Overlay.UI_Layer;
 import io.github.infotest.util.Factory.PlayerFactory;
@@ -415,6 +416,10 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
             if (Gdx.input.isKeyPressed(Input.Keys.NUM_7) && !localPlayer.isFrozen()) {
                 localPlayer.useItem(6, serverConnection);
             }
+            if (Gdx.input.isKeyPressed(Input.Keys.NUM_8) && !localPlayer.isFrozen()) {
+                localPlayer.addItem(new Potion(Potion.TYPE.MANA, 10, assetManager));
+            }
+
 
 
 

@@ -170,7 +170,10 @@ public class AssetPaths {
 
     // Items
     public static final String[] ITEMS = {
-        "item/apple.png"
+        "item/apple.png",
+        "item/potion_blue.png",
+        "item/potion_red.png",
+        "item/potion_yellow.png"
         // add more item textures here
     };
 

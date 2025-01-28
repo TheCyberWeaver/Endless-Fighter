@@ -2,6 +2,7 @@ package io.github.infotest.util.Factory;
 
 import io.github.infotest.item.Apple;
 import io.github.infotest.item.Item;
+import io.github.infotest.item.Potion;
 import io.github.infotest.util.MyAssetManager;
 
 public class ItemFactory {
@@ -18,8 +19,13 @@ public class ItemFactory {
         String itemName = getNameFromId(itemID);
         switch (itemName) {
             case "Apple":
-                return new Apple(itemID, "apple",assetManager,100);
-
+                return new Apple(itemID, "apple",assetManager,20);
+            case "ManaPotion":
+                return new Potion(Potion.TYPE.MANA, 40, assetManager);
+            case "HealthPotion":
+                return new Potion(Potion.TYPE.HEALTH, 40, assetManager);
+            case "AusdauerPotion":
+                return new Potion(Potion.TYPE.AUSDAUER, 40, assetManager);
             default:
                 throw new IllegalArgumentException("Unknown item: " + itemName);
         }

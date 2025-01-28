@@ -12,7 +12,7 @@ public class Apple extends Item {
 
     public Apple(String id, String name,MyAssetManager assetManager, float healthRegen) {
         super(id,"apple","just an apple", assetManager.getItemAssets()[0]);
-        this. healthRegen = healthRegen;
+        this.healthRegen = healthRegen;
     }
 
     public void use (Player actor){

@@ -117,7 +117,6 @@ public abstract class Actor {
         }
     }
     public void heal(int amount) {
-        Logger.log(""+amount);
         healthPoints += amount;
         if (healthPoints > maxHealthPoints) {
             healthPoints = maxHealthPoints;
