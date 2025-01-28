@@ -6,7 +6,7 @@ public class Coffee extends Item {
     public String color;
     
 
-    public Coffee (MyAssetManager assetManager, float ausdauerRegen) {
+    public Coffee (MyAssetManager assetManager) {
         super("coffee","just a coffee", assetManager.getLoadingScreenTexture());
         
     }
