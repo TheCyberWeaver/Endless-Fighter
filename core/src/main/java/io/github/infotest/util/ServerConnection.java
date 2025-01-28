@@ -288,6 +288,16 @@ public class ServerConnection {
                 player.castSkill(1, this);
                 //Logger.log("[INFO]: Fireball triggered"+player.getName());
                 break;
+            case "FlameThrower":
+                float xF = Float.parseFloat(data.getString("actionPositionX"));
+                float yF = Float.parseFloat(data.getString("actionPositionY"));
+                GameRenderer.addFlameThrower(player, new Vector2(xF, yF));
+                break;
+            case "BlackHole":
+                float xB = Float.parseFloat(data.getString("actionPositionX"));
+                float yB = Float.parseFloat(data.getString("actionPositionY"));
+                GameRenderer.blackHole(xB, yB, localPlayer.getT4Scale(), localPlayer.getT4Damage(), localPlayer.getT4LT());
+                break;
             case "TakeDamage":
                 float damage = Float.parseFloat(data.getString("damage"));
                 player.takeDamage(damage);
@@ -457,11 +467,13 @@ public class ServerConnection {
             e.printStackTrace();
         }
     }
-    public void sendCastSkill(Player player, String skillName){
+    public void sendCastSkill(Player player, String skillName, Vector2 pos){
         JSONObject skillData = new JSONObject();
         try {
             skillData.put("actionType", skillName);
             skillData.put("targetId", player.id);
+            skillData.put("actionPositionX", pos.x);
+            skillData.put("actionPositionY", pos.y);
             //skillData.put("damage", damage);
 
             socket.emit("playerAction", skillData);

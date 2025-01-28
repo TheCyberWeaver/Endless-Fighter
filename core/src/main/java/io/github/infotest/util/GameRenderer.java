@@ -783,8 +783,25 @@ public class GameRenderer {
             localPlayer.getT3ScaleHeight());
         flameThrower.draw(batch);
     }
-    public static void blackHole(float pX, float pY, float scale, float damage, float lt, Player player){
-        activeBlackHoles.add(new AbilityInstance(pX, pY, 4, 0, 0, new Vector2(), scale, scale, damage, lt, player));
+    public static void blackHole(float pX, float pY, float scale, float damage, float lt){
+        activeBlackHoles.add(new AbilityInstance(pX, pY, 4, 0, 0, new Vector2(), scale, scale, damage, lt, null));
+    }
+
+    private static HashMap<Player, Vector2> flameThrowers = new HashMap<>();
+    public static void addFlameThrower(Player p, Vector2 mousePos){
+        Vector2 direction = new Vector2(p.getX()-mousePos.x, p.getY()-mousePos.y);
+        flameThrowers.put(p, direction);
+    }
+    public void renderAllFlameThrowers(Batch batch){
+        for(Player player : allPlayers.values()){
+            if (flameThrowers.containsKey(player)){
+                Vector2 direction = flameThrowers.get(player);
+                renderFlameThrower(batch, direction, player);
+            }
+        }
+    }
+    public void clearFlameThrowers(){
+        flameThrowers.clear();
     }
 
     private void updateAllArrows() {

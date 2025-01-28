@@ -5,6 +5,7 @@ package org.example;
  */
 import com.corundumstudio.socketio.*;
 import com.google.gson.*;
+import jdk.jfr.internal.Logger;
 import org.example.character.Gegner;
 import org.example.character.Player;
 import org.example.character.NPC;
@@ -200,7 +201,7 @@ public class GameSocketServer {
                         targetPlayer.isAlive=false;
                         // Notify all clients
                         server.getBroadcastOperations().sendEvent("playerAction",
-                            new ActionData(targetId, "PlayerDeath"));
+                            new ActionData(targetId, "PlayerDeath", "0", "0"));
 
                         if(players.get(targetPlayer.lastAttackedBy)!=null) {
                             players.get(targetPlayer.lastAttackedBy).gold+= targetPlayer.gold;
@@ -234,8 +235,22 @@ public class GameSocketServer {
                 case "Fireball":
                     // Broadcast to others that some player cast a Fireball
                     server.getBroadcastOperations().sendEvent("playerAction",
-                        new ActionData(socketId, "Fireball"));
+                        new ActionData(socketId, "Fireball", "0", "0"));
                     System.out.println("[Debug]: " + messageFromPlayer.name + " casts a Fireball");
+                    break;
+                case "FlameThrower":
+                    // Broadcast to others that some player cast a FlameThrower
+                    String positionXF = json.get("actionPositionX").getAsString();
+                    String positionYF = json.get("actionPositionY").getAsString();
+                    server.getBroadcastOperations().sendEvent("playerAction",
+                        new ActionData(socketId, "FlameThrower", positionXF, positionYF));
+                    break;
+                case "BlackHole":
+                    // Broadcast to others that some player cast a BlackHole
+                    String positionXB = json.get("skillPositionX").getAsString();
+                    String positionYB = json.get("skillPositionY").getAsString();
+                    server.getBroadcastOperations().sendEvent("playerAction",
+                        new ActionData(socketId, "BlackHole", positionXB, positionYB));
                     break;
                 case "TakeDamage":
                     // Retrieve targetId and damage from data
@@ -369,7 +384,7 @@ public class GameSocketServer {
         public String message;
 
         public playerMessageData(String message, String playerID, String actionType) {
-            super(playerID,actionType);
+            super(playerID,actionType, "0", "0");
             this.message = message;
         }
     }
@@ -403,10 +418,14 @@ public class GameSocketServer {
     static class ActionData {
         public String playerID;
         public String actionType;
+        public String actionPositionX;
+        public String actionPositionY;
 
-        public ActionData(String playerID, String actionType){
+        public ActionData(String playerID, String actionType, String actionPositionX, String actionPositionY) {
             this.playerID = playerID;
             this.actionType = actionType;
+            this.actionPositionX = actionPositionX;
+            this.actionPositionY = actionPositionY;
         }
     }
 

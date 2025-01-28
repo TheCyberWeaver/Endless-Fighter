@@ -45,7 +45,7 @@ public class Mage extends Player {
 
     private float blackHoleCost = 30f;
     private float blackHoleDamage = 2f;
-    private float blackHoleCooldown = 25f;
+    private float blackHoleCooldown = 1f; //25
     private float blackHoleScale = 1f;
     private float blackHoleLT = 4f; // lifetime with 0.5 second on start and 0.7 s on hit and 0.8 on end without hit
 
@@ -119,7 +119,7 @@ public class Mage extends Player {
                     }, 400, TimeUnit.MILLISECONDS);
 
                     if(localPlayer==this){
-                        serverConnection.sendCastSkill(this, "Fireball");
+                        serverConnection.sendCastSkill(this, "Fireball", new Vector2());
                     }
                 }
                 break;

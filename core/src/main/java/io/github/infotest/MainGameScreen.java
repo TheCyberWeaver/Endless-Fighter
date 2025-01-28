@@ -435,6 +435,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 Vector2 direction = new Vector2( localPlayer.getX() - mouseWorldPos.x, -(mouseWorldPos.y - localPlayer.getY()));
                 GameRenderer.renderFlameThrower(batch, direction, localPlayer);
                 checkFlameThrowerCollision(batch, direction, localPlayer, delta, mouseWorldPos);
+                serverConnection.sendCastSkill(localPlayer, "FlameThrower", new Vector2(mouseWorldPos.x, mouseWorldPos.y));
             }
 
             float d = 32*32;
@@ -443,7 +444,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                     float dX = Math.abs(clickPos.x-localPlayer.getX());
                     float dY = Math.abs(clickPos.y-localPlayer.getY());
                     if (dX < d/2 && dY < d/2) {
-                        GameRenderer.blackHole(clickPos.x, clickPos.y, localPlayer.getT4Scale(), localPlayer.getT4Damage(), localPlayer.getT4LT(), localPlayer);
+                        GameRenderer.blackHole(clickPos.x, clickPos.y, localPlayer.getT4Scale(), localPlayer.getT4Damage(), localPlayer.getT4LT());
+                        serverConnection.sendCastSkill(localPlayer, "BlackHole", new Vector2(clickPos.x, clickPos.y));
                         localPlayer.drainMana(localPlayer.getT4Cost());
                         localPlayer.resetAttacking4();
                         localPlayer.unfreeze();
@@ -451,6 +453,8 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
                 }
             }
 
+            gameRenderer.renderAllFlameThrowers(batch);
+            gameRenderer.clearFlameThrowers();
 
             batch.draw(assetManager.getPlayerAssets(), 0, 0, 0, 0, assetManager.getPlayerAssets().getWidth(), assetManager.getPlayerAssets().getWidth(), 32, 32);
             batch.setShader(null);
