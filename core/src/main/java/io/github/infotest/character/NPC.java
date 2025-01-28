@@ -155,6 +155,7 @@ public class NPC extends Actor {
 
     public void trade(int itemIndex, Player player, ServerConnection serverConnection) {
         if (itemIndex >= 0){
+            Logger.log("Traded");
             Item item = market[itemIndex];
             if (player.addItem(item)) {
                 market[itemIndex] = null;

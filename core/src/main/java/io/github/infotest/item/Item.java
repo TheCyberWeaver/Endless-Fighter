@@ -2,6 +2,7 @@ package io.github.infotest.item;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import io.github.infotest.character.Player;
 import io.github.infotest.util.MyAssetManager;
 
 public abstract class Item {
@@ -33,8 +34,8 @@ public abstract class Item {
         batch.draw(texture, x, y, 80*scale, 80*scale);
     }
 
-    public abstract use (Player player);
-    
+    public abstract void use (Player player);
+
     @Override
     public String toString(){
         return id;

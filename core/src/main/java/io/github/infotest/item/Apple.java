@@ -3,6 +3,7 @@ package io.github.infotest.item;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import io.github.infotest.character.Actor;
+import io.github.infotest.character.Player;
 import io.github.infotest.util.MyAssetManager;
 
 public class Apple extends Item {
@@ -14,8 +15,8 @@ public class Apple extends Item {
         this. healthRegen = healthRegen;
     }
 
-    public void use (Actor actor){
-        actor.heal (healthRegen);
+    public void use (Player actor){
+        actor.heal ((int) healthRegen);
         healthRegen = 0;
     }
 

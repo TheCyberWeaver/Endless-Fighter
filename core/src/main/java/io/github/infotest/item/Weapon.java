@@ -1,6 +1,7 @@
 package io.github.infotest.item;
 
 import io.github.infotest.character.Actor;
+import io.github.infotest.character.Player;
 import io.github.infotest.util.MyAssetManager;
 
 public class Weapon extends Item {
@@ -64,6 +65,11 @@ public class Weapon extends Item {
         System.out.println("Range: " + range + " meters");
         //System.out.println("Weight: " + weight + " kg");
         // System.out.println("Material: " + material);
+    }
+
+    @Override
+    public void use(Player player) {
+        return;
     }
 }
 

@@ -146,6 +146,7 @@ public abstract class Player extends Actor{
         float textWidth = layout.width;
         font.draw(batch, name, predictedPosition.x - textWidth/2f  , predictedPosition.y + 50);
 
+
         // 3) Speech bubble logic
         if (isSpeechBubbleVisible && speechBubbleMessage != null) {
             // Update timer
@@ -193,7 +194,7 @@ public abstract class Player extends Actor{
 
     }
 
-    
+
 
     @Override
     public void update(float delta){
@@ -466,7 +467,7 @@ public abstract class Player extends Actor{
     public float getAusdauer() {
         return ausdauer;
     }
-    
+
     public float getMaxAusdauer() {
         return maxAusdauer;
     }
