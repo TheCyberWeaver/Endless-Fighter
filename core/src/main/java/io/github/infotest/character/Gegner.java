@@ -15,14 +15,21 @@ public class Gegner extends  Actor{
 
     private float killXP;
     private float killGold;
+    private Player player;
+    private float attackRange = 20; //Beispielzahl 
+    private float attackCooldown = 2; // Beispielzahl Zeit zw Angriffen
+    private float lastAttackTime = 0; //letzter Angriff
+    private boolean isWaiting = false;
+    private ServerConnection serverConnection;
 
-
-    public Gegner(String id,int maxHealthPoints, Vector2 initialPosition, float speed, Texture texture, float exp, float gold) {
+    public Gegner(String id,int maxHealthPoints, Vector2 initialPosition, float speed, Texture texture, float exp, float gold, Player player, ServerConnection serverConnection) {
 
         super(maxHealthPoints, initialPosition, speed, texture);
-        this.id=id;
+        this.id = id;
         this.killXP = exp;
         this.killGold = gold;
+        this.player = player;
+        this.serverConnection = serverConnection;
     }
 
     @Override
@@ -67,15 +74,32 @@ public class Gegner extends  Actor{
 
 
     @Override
-    public void takeDamage(float damage, ServerConnection serverConnection) {
-        super.takeDamage(damage);
-        serverConnection.sendAttackGegner(this,damage);
+    public void update(float delta) {
+        float distanceToPlayer = position.dst(player.getPosition());
+        if (distanceToPlayer < attackRange){
+            if (lastAttackTime >= attackCooldown){
+                isWaiting = false; 
+            }
+            if (isWaiting == false){
+                isWaiting = true;
+                lastAttackTime = 0;
+                attack (player);
+                }
+        } else {
+            Vector2 direction = player.getPosition().cpy.sub(position).nor();
+            postion.add (direction.scl (speed * delta));
+        }
+        if (isWaiting){
+            lastAttackTime += delta;
+        }
     }
 
     @Override
-    public void update(float delta) {
-        return;
+    public void attack (Player player){
+        float damage = 10; //Beispielzahl
+        player.takeDamage (damage, serverConnection);
     }
+    
     public void updateHPFromGegnerData(float hp){
         this.healthPoints=hp;
     }
