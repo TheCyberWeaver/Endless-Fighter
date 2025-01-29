@@ -5,15 +5,16 @@ import com.badlogic.gdx.graphics.Texture;
 public class AssetPaths {
 
     // Single-file asset paths
-    public static final String LOADING_SCREEN   = "ui/loadingscreen.png";
-    public static final String SKILL_BAR        = "ui/skillbar.png";
-    public static final String GOLD_BAR         = "ui/goldbar.png";
-    public static final String FIREBALL_SYMBOL  = "player/mage/mageFireballSymbol.png";
-    public static final String PLAYER_ASSASSIN  = "assassin.png";
-    public static final String GEGNER           = "Gegner.png";
-    public static final String SIGN_INV_FULL    = "Ur_Inv_Is_Full_Sign.png";
-    public static final String ARROW            = "arrow.png";
-    public static final String ITEM_BAR         = "ui/itembar.png";
+    public static final String LOADING_SCREEN           = "ui/loadingscreen.png";
+    public static final String SKILL_BAR                = "ui/skillbar.png";
+    public static final String GOLD_BAR                 = "ui/goldbar.png";
+    public static final String FIREBALL_SYMBOL          = "player/mage/mageFireballSymbol.png";
+    public static final String PLAYER_ASSASSIN          = "assassin.png";
+    public static final String GEGNER                   = "Gegner.png";
+    public static final String SIGN_INV_FULL            = "Ur_Inv_Is_Full_Sign.png";
+    public static final String ARROW                    = "arrow.png";
+    public static final String ITEM_BAR                 = "ui/itembar.png";
+    public static final String FLAME_THOROWER_ASSETS    = "flameThrower_sheet.png";
     // etc.
 
     // Example: arrays for grouped assets
@@ -93,6 +94,7 @@ public class AssetPaths {
         "player/mage/fireball/fireball_sheet_endTime.png",
         "player/mage/fireball/fireball_sheet_endHit.png"
     };
+
     public static final String[] BLACKHOLE_ASSETS = {
         "player/mage/abilities/blackHole1_sheet.png",
         "player/mage/abilities/blackHole2_sheet.png"

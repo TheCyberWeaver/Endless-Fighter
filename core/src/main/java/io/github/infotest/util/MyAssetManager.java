@@ -28,6 +28,7 @@ public class MyAssetManager {
             result[i] = manager.get(paths[i], Texture.class);
         }
         return result;
+    }
     // -----------
     // LOAD all methods
     // -----------
@@ -45,6 +46,7 @@ public class MyAssetManager {
         loadMageAssets();
         loadFireballAssets();
         loadFireballSymbol();
+        loadFameThrowerAssets();
         loadBlackHoleAssets();
 
         loadHealthBarAssets();
@@ -124,6 +126,10 @@ public class MyAssetManager {
 
     public void loadFireballSymbol() {
         manager.load(AssetPaths.FIREBALL_SYMBOL, Texture.class);
+    }
+
+    public void loadFameThrowerAssets() {
+        manager.load(AssetPaths.FLAME_THOROWER_ASSETS, Texture.class);
     }
 
     public void loadBlackHoleAssets(){
