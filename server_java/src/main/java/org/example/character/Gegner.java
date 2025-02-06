@@ -16,6 +16,9 @@ public class Gegner {
     public float maxHP;
     public float hp;
     public Vector2 position;
+    private boolean isStuned;
+    private float stunTimer;
+    private float stunTime = 1.6f;
 
     public Player lastAttackedBy = null;
 
@@ -63,6 +66,10 @@ public class Gegner {
     }
 
     public void update(float delta) {
+
+        if (stunTimer >= stunTime) isStuned = false;
+        if (!isStuned) stunTimer = 0f;
+
         //position=position.add(new Vector2(0.5f,0f));
         Player closestPlayer = findPlayer();
         if(closestPlayer != null){
@@ -71,11 +78,12 @@ public class Gegner {
             float distance =position.distance(closestPlayer.position) ;
             if (distance <= attackRange && attackCoolDownTimer>=attackCoolDownTime) {
                 //performAttack(closestPlayer);
-            } else {
+            } else if (!isStuned){
                 moveTowards (closestPlayer, delta);
             }
         }
 
+        if (isStuned) stunTimer += delta;
         attackCoolDownTimer+=delta;
     }
 
@@ -115,6 +123,11 @@ public class Gegner {
             this.gegnerID = gegnerID;
             this.killedByPlayerID = killedByPlayerID;
         }
+    }
+
+    public void stun(){
+        isStuned=true;
+        stunTimer =0f;
     }
 }
 

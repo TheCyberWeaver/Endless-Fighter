@@ -348,6 +348,7 @@ public class GameSocketServer {
             if(gegner!=null&& player!=null) {
                 if(gegner.isAlive()){
                     gegner.takeDamage(damage,player);
+                    gegner.stun();
                     needGegnerUpdate=true;
                 }
             }
