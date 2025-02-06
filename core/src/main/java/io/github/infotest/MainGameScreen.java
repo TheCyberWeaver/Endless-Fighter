@@ -171,6 +171,10 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
     @Override
     public void render(float delta) {
 
+        for (Gegner g : allGegner){
+            g.update(delta);
+        }
+
         //Logger.log(player);
 
         // clear screen
@@ -584,7 +588,7 @@ public class MainGameScreen implements Screen, InputProcessor, ServerConnection.
 
                 if (dX <= 32f && dY <= 32f&& !fireball.hasHit()){
                     if(fireball.getOwner().equals(localPlayer)){
-                        gegner.takeDamage(fireball.getDamage(),serverConnection);
+                        gegner.takeDamage(localPlayer,fireball.getDamage(),serverConnection);
                     }
                     fireball.setHit();
                 }

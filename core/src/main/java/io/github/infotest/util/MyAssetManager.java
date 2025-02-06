@@ -55,7 +55,7 @@ public class MyAssetManager {
         loadSkillBarAsset();
         loadGoldBarAsset();
 
-
+        loadGoblinAssets();
 
 
         loadNPCMaleAssets();
@@ -142,6 +142,10 @@ public class MyAssetManager {
 
     public void loadAusdauerBarAssets() {
         loadTextures(AssetPaths.AUSDAUER_BAR);
+    }
+
+    public void loadGoblinAssets() {
+        loadTextures(AssetPaths.GOBLIN);
     }
 
     public void loadNPCMaleAssets() {
@@ -246,8 +250,7 @@ public class MyAssetManager {
         return getTextures(AssetPaths.MAP_WATER);
     }
 
-
-        public Texture getSkillBarAsset() {
+    public Texture getSkillBarAsset() {
         return manager.get(AssetPaths.SKILL_BAR, Texture.class);
     }
 
@@ -285,6 +288,10 @@ public class MyAssetManager {
         return getTextures(AssetPaths.AUSDAUER_BAR);
     }
 
+    public Texture[] getGoblinAssets() {
+        return getTextures(AssetPaths.GOBLIN);
+    }
+
     public Texture[] getNPCMaleAssets() {
         return getTextures(AssetPaths.NPC_MALE);
     }
@@ -292,6 +299,7 @@ public class MyAssetManager {
     public Texture[] getNPCWomenAssets() {
         return getTextures(AssetPaths.NPC_WOMAN);
     }
+
     public Texture[] getNPCMarketAssets() {
         return getTextures(AssetPaths.NPC_MARKET);
     }

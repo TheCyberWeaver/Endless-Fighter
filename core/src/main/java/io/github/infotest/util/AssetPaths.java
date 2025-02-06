@@ -120,6 +120,15 @@ public class AssetPaths {
         "ui/ausdauerbar/ausdauerbar_empty_middle.png"
     };
 
+    // Gegner
+    public static final String[] GOBLIN = {
+        "gegner/goblin/goblin_attack.png",
+        "gegner/goblin/goblin_death.png",
+        "gegner/goblin/goblin_hit.png",
+        "gegner/goblin/goblin_idle.png",
+        "gegner/goblin/goblin_run.png",
+    };
+
     // NPCs
     public static final String[] NPC_MALE = {
         "NPC/male/NPC_Male_1.png",

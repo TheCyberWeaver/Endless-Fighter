@@ -423,7 +423,7 @@ public class ServerConnection {
             if (!found) {
 //                Logger.log("Debug:"+socketId+" | "+playerData.name);
 
-                Gegner Gegner = GegnerFactory.createGegner(gegnerData.id, gegnerData.name,gegnerData.maxHP,new Vector2(x,y),gegnerData.type,assetManager);
+                Gegner Gegner = GegnerFactory.createGegner(gegnerData.id, io.github.infotest.character.Gegner.SPEZIES.GOBLIN, gegnerData.name,gegnerData.maxHP,new Vector2(x,y),gegnerData.type,assetManager, this);
                 allGegner.add(Gegner);
             }
         }
